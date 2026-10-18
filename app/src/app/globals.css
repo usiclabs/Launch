@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ── "Clear Sky" ──────────────────────────────────────────────────────────────
+/* ── LAUNCH / MyUSIC accent ──────────────────────────────────────────────────────────────
    LIGHT is the default and the unclassed base: every value in @theme is the
    original light palette, unchanged. DARK is an explicit choice behind the
    header toggle: next-themes puts `.dark` on <html> and the toggler flips that
@@ -35,9 +35,9 @@
   --color-skeleton-highlight: #f5f4f1;
 
   /* accent */
-  --color-brand: #0052ff;
-  --color-brand-strong: #0041cc;
-  --color-brand-soft: #eaf0ff;
+  --color-brand: #d60035;
+  --color-brand-strong: #b8002e;
+  --color-brand-soft: #fff0f4;
 
   /* money: up (refund / locked), down (displaced), warm (takeover / testnet) */
   --color-up: #15803d;
@@ -59,8 +59,8 @@
 
   /* the dim second voice of a display headline: a neutral grey (no slate cast against the warm paper) */
   --color-dim: #737373;
-  /* decorative glows (card edges, hover halos, beams, the hero grid): neutral on light, brand blue on dark,
-     so blue on light stays the action colour alone */
+  /* decorative glows (card edges, hover halos, beams, the hero grid): neutral on light, MyUSIC pink-red on dark,
+     so the accent on light stays the action colour alone */
   --color-glow: rgb(15 23 42 / 0.3);
   --color-glow-soft: rgb(15 23 42 / 0.035);
   /* segmented controls (components/vendor/toggle-group.tsx): a recessed track and a raised thumb that slides */
@@ -120,8 +120,7 @@
 :root:has(.bb-mid) { --page-max: 80rem; --page-pad: clamp(1rem, 2.5vw, 2rem); }
 .bb-page { width: 100%; max-width: var(--page-max); margin-inline: auto; padding-inline: var(--page-pad); }
 
-/* ── Dark: black ground, alpha ramp of white, near-zero chroma greys. The blue
-   and green brighten because the light values drop under 3:1 on black. ── */
+/* ── Dark: black ground, alpha ramp of white, near-zero chroma greys. The brand accent follows MyUSIC; green brightens for contrast on black. ── */
 .dark {
   color-scheme: dark;
   --color-paper: #000000;
@@ -136,9 +135,9 @@
   --color-inverse: #000000;
   --color-skeleton: #141414;
   --color-skeleton-highlight: #1f1f1f;
-  --color-brand: #4d8bff;
-  --color-brand-strong: #7aa6ff;
-  --color-brand-soft: #0d1b33;
+  --color-brand: #fa003e;
+  --color-brand-strong: #ff527d;
+  --color-brand-soft: #2b0710;
   --color-up: #05df72;
   --color-up-soft: #06241a;
   --color-down: #ff6b6b;
@@ -152,8 +151,8 @@
   --color-chart-grid: #1a1a1a;
   --color-chart-vol: #333333;
   --color-dim: #8c8c8c;
-  --color-glow: #4d8bff;
-  --color-glow-soft: rgb(77 139 255 / 0.09);
+  --color-glow: #fa003e;
+  --color-glow-soft: rgb(250 0 62 / 0.09);
   --color-track: #000000;
   --color-thumb: #232323;
   --color-scrim: #000000;
