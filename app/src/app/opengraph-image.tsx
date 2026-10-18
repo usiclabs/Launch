@@ -15,16 +15,15 @@ const INK = "#0F172A";
 const BODY = "#475569";
 const MUTED = "#64748B";
 const LINE = "#E7E5E4";
-const BLUE = "#0052FF";
+const BLUE = "#FA003E";
 const UP = "#15803D";
 
 function MarkSvg({ size: s }: { size: number }) {
   return (
     <svg width={s} height={s} viewBox="0 0 32 32">
       <rect width="32" height="32" rx="7" fill={BLUE} />
-      <path fill="#FFFFFF" fillRule="evenodd" d="M10.5 13a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13ZM10.5 16.4a3.1 3.1 0 1 0 0 6.2a3.1 3.1 0 1 0 0-6.2Z" />
-      <rect x="19.5" y="6" width="4.6" height="20" rx="1.4" fill="#FFFFFF" />
-      <rect x="19.5" y="21.4" width="8.2" height="4.6" rx="1.4" fill="#FFFFFF" />
+      <rect x="10" y="6" width="4.6" height="20" rx="1.4" fill="#FFFFFF" />
+      <rect x="10" y="21.4" width="13" height="4.6" rx="1.4" fill="#FFFFFF" />
     </svg>
   );
 }

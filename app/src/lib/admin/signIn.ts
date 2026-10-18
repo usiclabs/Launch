@@ -8,7 +8,7 @@ import { CHAINS } from "@/lib/chainPublic";
  * warn on a mismatch, so a look-alike site cannot quietly collect a sign-in for openlaunch. Shared by the sign-in card
  * (which builds the message) and the server (which accepts only the exact text this file would build).
  */
-export const ADMIN_SIGN_IN_STATEMENT = "Sign in to the openlaunch admin. A signature, not a transaction: it costs nothing and moves nothing.";
+export const ADMIN_SIGN_IN_STATEMENT = "Sign in to the LAUNCH admin. A signature, not a transaction: it costs nothing and moves nothing.";
 /** Signed on Base, where the admin wallets live (a smart wallet's signature is checked there). */
 export const ADMIN_SIGN_IN_CHAIN_ID = CHAINS.base.id;
 /** A server-issued nonce, and the message carrying it, are good for 5 minutes. */

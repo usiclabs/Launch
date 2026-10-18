@@ -9,7 +9,7 @@ const CONTRACTS = `${BRAND_GITHUB}/tree/main/contracts/src`;
 
 /**
  * The home sidebar's case for the price: a $0 platform fee, where a trading fee goes (all of it to the creator's
- * wallets or burned, none to openlaunch), the fees a creator can pick, and the two contract facts behind it, each one
+ * wallets or burned, none to LAUNCH), the fees a creator can pick, and the two contract facts behind it, each one
  * checkable in the source.
  */
 export default function WhyFree() {
@@ -30,7 +30,7 @@ export default function WhyFree() {
         <div className="mt-4 rounded-xl border border-line bg-paper/60 p-3">
           <p className="text-[11px] font-medium text-body">Where a trading fee goes</p>
           <FeeShare label="The creator's wallets, or burned" pct={100} />
-          <FeeShare label="openlaunch" pct={0} />
+          <FeeShare label="LAUNCH" pct={0} />
         </div>
 
         <div className="mt-3">

@@ -152,9 +152,9 @@ export function buildPairApplyMessage(p: { action: PairApplyAction; chain: Chain
   ].join("\n");
 }
 
-/** "waive": approve an application that has not paid, the fee waived by openlaunch (an admin call, signed like the rest). */
+/** "waive": approve an application that has not paid, the fee waived by LAUNCH (an admin call, signed like the rest). */
 export const PAIR_REVIEW_DECISIONS = ["approve", "waive", "changes", "reject"] as const;
-export const PAIR_FEE_WAIVED = "Fee waived by openlaunch.";
+export const PAIR_FEE_WAIVED = "Fee waived by LAUNCH.";
 export type PairReviewDecision = (typeof PAIR_REVIEW_DECISIONS)[number];
 export function isPairReviewDecision(v: unknown): v is PairReviewDecision {
   return typeof v === "string" && (PAIR_REVIEW_DECISIONS as readonly string[]).includes(v);
@@ -168,16 +168,16 @@ export function buildPairReviewMessage(p: { decision: PairReviewDecision; id: nu
 
 export const PAIR_APPLY_COPY = {
   title: "List your token as a community pair",
-  lead: "Launches paired with your community's token carry its badge and a USD price everywhere on openlaunch, and reach Trending. Check your token here for free, apply, and a person reviews it.",
+  lead: "Launches paired with your community's token carry its badge and a USD price everywhere on LAUNCH, and reach Trending. Check your token here for free, apply, and a person reviews it.",
   whatYouGet: "A listing gives launches paired with your token its badge, a USD price and a place in Trending, plus a page for the pair. It does not add your token to the launch form (ETH, TWIG and stocks only): your community launches against the factory with its own tools or agents.",
   feeRule: (usd: number) => `The fee is $${usd} in TWIG, sent to 0x…dEaD. It pays for a review, not a listing, and it cannot be refunded: it is burned. It covers up to 3 reviews within 60 days.`,
   precheckFirst: "The fee can only be sent once the free check passes, so a token that cannot be listed never costs anything.",
-  profileNeeded: "Applying needs an openlaunch profile with a verified X account (from your profile page).",
+  profileNeeded: "Applying needs a LAUNCH profile with a verified X account (from your profile page).",
   proofAsk: "Post this from the community's own X account, then paste the post's link here. The reviewer checks it by hand.",
-  sentFinal: "The TWIG goes to 0x…dEaD. It cannot be undone or refunded, and nothing is paid to openlaunch or Twigpine.",
+  sentFinal: "The TWIG goes to 0x…dEaD. It cannot be undone or refunded, and nothing is paid to LAUNCH or Twigpine.",
   lockNote: "The amount is locked for 30 minutes. Sent later, it counts at the price when it lands; a shortfall can be topped up.",
   reviewNote: "Reviews look at the checks, the community (its X account, its age, its activity) and the proof post. A listing is not an endorsement.",
   disabled: "Applications open soon.",
-  waived: "No fee: openlaunch waived it for this application.",
-  waivedRest: (paidUsd: number) => `Paid: $${paidUsd.toFixed(2)}. openlaunch waived the rest of the fee.`,
+  waived: "No fee: LAUNCH waived it for this application.",
+  waivedRest: (paidUsd: number) => `Paid: $${paidUsd.toFixed(2)}. LAUNCH waived the rest of the fee.`,
 } as const;

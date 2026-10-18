@@ -122,7 +122,7 @@ async function eligibility(chain: ChainKey, token: string, wallet: string): Prom
   if (tag) return { allowed: true, tag };
   const [act] = await db<{ n: bigint }[]>`SELECT (SELECT count(*) FROM bb_launch_swaps WHERE trader = ${wallet}) + (SELECT count(*) FROM bb_launches WHERE launcher = ${wallet}) AS n`;
   if (Number(act.n) > 0) return { allowed: true, tag: null };
-  return { allowed: false, tag: null, reason: "hold the token, or trade or launch on openlaunch first, to post" };
+  return { allowed: false, tag: null, reason: "hold the token, or trade or launch on LAUNCH first, to post" };
 }
 
 export async function createPost(p: { chain: ChainKey; token: string; wallet: string; parentId: unknown; body: unknown; nonce: unknown; ts: unknown; signature: unknown }): Promise<{ ok: true; post: PostRow } | Fail> {

@@ -10,7 +10,7 @@ import { chainLandingPath } from "@/lib/chainLanding";
 import { hasChainPage } from "@/lib/launchpad/config";
 
 /**
- * The entity page: the one URL that answers "what is openlaunch" in plain words, names the
+ * The entity page: the one URL that answers "what is LAUNCH" in plain words, names the
  * official channels, and separates the brand from look-alikes. Facts only (CONTRIBUTING.md):
  * what the contracts do, where the code is, which accounts are ours. No claims about value.
  */
@@ -22,7 +22,7 @@ export const metadata: Metadata = pageMetadata({
 
 const DIFFERENCES = [
   ["No platform fee", "The factory and the locker have no fee address, fee variable or treasury. There is nothing to switch on later."],
-  ["Liquidity locked forever", "100% of the supply goes into one Uniswap v4 position at launch. Its NFT is held by an ownerless locker with no withdraw path: not the creator, not openlaunch, nobody."],
+  ["Liquidity locked forever", "100% of the supply goes into one Uniswap v4 position at launch. Its NFT is held by an ownerless locker with no withdraw path: not the creator, not LAUNCH, nobody."],
   ["No pre-mine, no admin", "Every token starts inside the pool. The contracts have no owner, no pause, no upgrade and no allowlist. They are the same for everyone."],
   ["Open source", "Contracts and site are MIT-licensed on GitHub, and every deployed contract is source-verified on the chain's explorers."],
   ["Creator-set trading fee", "0%, 1% or 3%, chosen at launch, paid in full to the beneficiaries the creator names or burned. Fixed forever."],
@@ -69,18 +69,18 @@ export default function AboutPage() {
 
       <section className={`${shell.anchorSection} mt-14`} id="who" aria-labelledby="who-heading">
         <h2 id="who-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">Who builds it</h2>
-        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">{BRAND} is built by Twigpine and developed in the open. The contracts, the indexer and this site live in one MIT-licensed repository; contributions go through pull requests there.</p>
+        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">{BRAND} is maintained by USIC Labs and built on the open-source OpenLaunch codebase by Twigpine. The contracts, the indexer and this site live in one MIT-licensed repository; contributions go through pull requests there.</p>
         <p className="mt-3 max-w-[40rem] text-base leading-relaxed text-body text-pretty">Tokens launched here are created by their launchers, not by {BRAND}. A locked pool does not make a token valuable; read <Link href="/rules#know" className="text-brand underline decoration-line-strong underline-offset-4 hover:text-ink">before you begin</Link>.</p>
       </section>
 
       <section className={`${shell.anchorSection} mt-14`} id="official" aria-labelledby="official-heading">
         <h2 id="official-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">Official channels</h2>
-        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">These are the only places {BRAND} speaks from. Accounts, domains and repositories with similar names are not affiliated with {BRAND}, and {BRAND} is not related to other products that share the name.</p>
+        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">These are the only places {BRAND} speaks from. Accounts, domains and repositories with similar names are not affiliated with {BRAND}, and links here identify this deployment.</p>
         <ul className="mt-6 grid gap-3 sm:grid-cols-3">
           <li className="rounded-2xl border border-line bg-paper p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Website</p>
             <Link href="/" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">{BRAND_DOMAIN}</Link>
-            <p className="mt-2 text-xs leading-relaxed text-muted">Formerly {LEGACY_DOMAIN}; the old domain redirects here.</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted">The current LAUNCH deployment.</p>
           </li>
           <li className="rounded-2xl border border-line bg-paper p-5">
             <p className="text-xs uppercase tracking-wide text-muted">X</p>
@@ -89,8 +89,8 @@ export default function AboutPage() {
           </li>
           <li className="rounded-2xl border border-line bg-paper p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Source code</p>
-            <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">Twigpine/openlaunch <ArrowUpRight size={13} aria-hidden="true" /></a>
-            <p className="mt-2 text-xs leading-relaxed text-muted">MIT. Forks on GitHub are copies; this is the original.</p>
+            <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">usiclabs/Launch <ArrowUpRight size={13} aria-hidden="true" /></a>
+            <p className="mt-2 text-xs leading-relaxed text-muted">MIT-licensed LAUNCH source, forked from OpenLaunch.</p>
           </li>
         </ul>
       </section>

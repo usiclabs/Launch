@@ -82,7 +82,7 @@ export function EarnCardView({ ref, vault, snapshot, balance, position, onOpen }
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button type="button" className={btn.primarySm} onClick={() => onOpen("deposit")} aria-haspopup="dialog"><ArrowDownToLine size={14} aria-hidden="true" />Deposit</button>
         <button type="button" className={btn.secondarySm} onClick={() => onOpen("withdraw")} disabled={!position} aria-haspopup="dialog"><ArrowUpFromLine size={14} aria-hidden="true" />Withdraw</button>
-        <p className="ml-auto text-[11px] text-muted">Run by {vault.curator} on {vault.protocol}. Can lose money. No openlaunch fee.</p>
+        <p className="ml-auto text-[11px] text-muted">Run by {vault.curator} on {vault.protocol}. Can lose money. No LAUNCH fee.</p>
       </div>
     </section>
   );

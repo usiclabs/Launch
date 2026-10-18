@@ -67,7 +67,7 @@ export default function LaunchFeeSettings({ feePips, beneficiary, address, split
       {feePips > 0 ? (
         <fieldset className={`${styles.fieldset} ${styles.routing}`}>
           <legend>Where should the fees go?</legend>
-          <p className={styles.routeHelp}>The full trading fee follows your allocation. Openlaunch takes none.</p>
+          <p className={styles.routeHelp}>The full trading fee follows your allocation. LAUNCH takes none.</p>
           <div className={styles.routes}>
             {routes.map(({ value, title, description, Icon }) => (
               <label key={value} className={styles.route} data-selected={beneficiary === value}>
@@ -107,7 +107,7 @@ export default function LaunchFeeSettings({ feePips, beneficiary, address, split
             </div>
           )}
           <div>
-            <dt>Openlaunch</dt>
+            <dt>LAUNCH</dt>
             <dd className={styles.platform}>0%</dd>
           </div>
         </dl>

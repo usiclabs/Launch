@@ -137,7 +137,7 @@ function Desktop({ visible = false, pulse, isActive, quietCta, onSearch }: { vis
     >
       {/* at rest, the bottom hairline catches a little brand light in the middle */}
       {!visible ? <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-[linear-gradient(90deg,transparent,var(--color-brand),transparent)] opacity-25 dark:opacity-45" /> : null}
-      <Link href="/" className="relative z-20 flex items-center gap-2" aria-label="openlaunch.lol home">
+      <Link href="/" className="relative z-20 flex items-center gap-2" aria-label="LAUNCH home">
         <Mark size={24} />
         {/* the wordmark and pulse are the first things to give way when the strip contracts */}
         {!visible ? <Wordmark /> : null}
@@ -306,7 +306,7 @@ function Mobile({ visible = false, pulse, isActive, onSearch }: { visible?: bool
       >
         <MobileNavHeader>
           <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2 py-1" aria-label="openlaunch.lol home" onClick={() => setOpen(false)}>
+            <Link href="/" className="flex items-center gap-2 py-1" aria-label="LAUNCH home" onClick={() => setOpen(false)}>
               <Mark size={24} />
               <Wordmark />
             </Link>

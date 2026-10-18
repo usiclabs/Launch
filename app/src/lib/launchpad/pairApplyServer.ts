@@ -168,7 +168,7 @@ export async function applicantAction(b: Record<string, unknown>): Promise<{ ok:
   const cid = chainIdOf(chain);
 
   if (action === "apply") {
-    if (!(await verifiedProfile(wallet))) return fail("applying needs an openlaunch profile with a verified X account", 403);
+    if (!(await verifiedProfile(wallet))) return fail("applying needs a LAUNCH profile with a verified X account", 403);
     await expireStaleApplications(chain, address);
     const pre = await precheckToken(chain, address);
     if (!pre.ok) return fail("the token does not pass the free check yet: nothing to apply for", 400);

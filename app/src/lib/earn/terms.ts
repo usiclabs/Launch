@@ -58,5 +58,5 @@ export function depositPause(live: TermsCheck | null, server: TermsCheck | null)
 
 /** The sentence under a paused deposit form. */
 export function pausedCopy(reason: string): string {
-  return `Deposits are paused here: ${reason} openlaunch listed this vault without that and has not reviewed the change. Withdrawals stay open.`;
+  return `Deposits are paused here: ${reason} LAUNCH listed this vault without that and has not reviewed the change. Withdrawals stay open.`;
 }

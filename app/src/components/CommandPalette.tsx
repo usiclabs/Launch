@@ -100,7 +100,7 @@ export default function CommandPalette({ open, onOpenChange }: { open: boolean; 
         <Dialog.Backdrop className="fixed inset-0 z-[90] bg-scrim/50 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion-reduce:transition-none" />
         <Dialog.Viewport className="fixed inset-0 z-[91] flex items-start justify-center overflow-hidden px-3 pt-[min(14vh,7rem)] pb-3">
           <Dialog.Popup
-            aria-label="Search openlaunch"
+            aria-label="Search LAUNCH"
             className="relative flex max-h-[min(36rem,calc(100dvh-6rem))] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-line-strong bg-raised text-ink shadow-dialog transition-[opacity,translate,scale] duration-150 ease-out data-[ending-style]:-translate-y-2 data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[starting-style]:-translate-y-2 data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0 motion-reduce:transition-none"
           >
             <Autocomplete.Root

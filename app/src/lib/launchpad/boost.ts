@@ -381,7 +381,7 @@ export const BOOST_COPY = {
   pickerHidden: "Not shown in the lane",
   what: "The Boosted lane shows the 5 tokens with the most TWIG sent for them in the last 24 hours. A boost counts toward that total for 24 hours. It does not change the Live sort or the Trending board, and it is not an endorsement.",
   tag: "The last digits of the amount name this token, so the transfer itself records what it boosted.",
-  final: "The TWIG goes to 0x…dEaD. It cannot be undone or refunded, and nothing is paid to openlaunch or Twigpine.",
+  final: "The TWIG goes to 0x…dEaD. It cannot be undone or refunded, and nothing is paid to LAUNCH or Twigpine.",
   hidden: "This token is not shown in the Boosted lane.",
   baseOnly: "Boosts are on Base only: TWIG exists only there.",
   how: "Anyone can boost any Base launch from its page, from 100,000 TWIG. Boosts on one token in the same 24 hours add up. When the lane is full, a token shows once its total passes the 5th place.",

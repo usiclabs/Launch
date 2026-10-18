@@ -292,7 +292,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
 
       {unlisted ? (
         <p role="note" className="rounded-xl border border-warm/30 bg-warm-soft px-3 py-2 text-[11px] leading-relaxed text-warm-ink text-pretty">
-          <b>Unlisted pair.</b> Priced in {quote.symbol} (<a href={explorerAddress(chain, quote.address)} target="_blank" rel="noreferrer" className="font-code underline underline-offset-2">{shortAddr(quote.address)} ↗</a>), a token openlaunch does not list. Anyone can deploy a token with any name, so check that address before you trade. No USD price is shown.
+          <b>Unlisted pair.</b> Priced in {quote.symbol} (<a href={explorerAddress(chain, quote.address)} target="_blank" rel="noreferrer" className="font-code underline underline-offset-2">{shortAddr(quote.address)} ↗</a>), a token LAUNCH does not list. Anyone can deploy a token with any name, so check that address before you trade. No USD price is shown.
         </p>
       ) : null}
 
@@ -435,7 +435,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
         </dl>
       ) : null}
       </div>
-      <div className="border-t border-line px-5 py-3 text-[11px] leading-relaxed text-muted text-pretty">Your wallet trades with the pool directly. openlaunch never holds your funds. Network gas applies.</div>
+      <div className="border-t border-line px-5 py-3 text-[11px] leading-relaxed text-muted text-pretty">Your wallet trades with the pool directly. LAUNCH never holds your funds. Network gas applies.</div>
     </section>
   );
 }

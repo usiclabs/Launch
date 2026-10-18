@@ -132,7 +132,7 @@ function FeeLimitNotice({ rejection, inputSymbol, gasSymbol }: { rejection: Brid
     </dl>
     <details className={styles.feeLimitReason}>
       <summary>Why is this blocked?<ChevronDown size={14} aria-hidden /></summary>
-      <p>{feeTooHigh ? `Relay’s fee is ${exactPercent}% of your amount.` : `This quote loses ${exactPercent}% in conversion and fees.`} Openlaunch blocks quotes above 5%. Source gas is extra and is not included in this limit.</p>
+      <p>{feeTooHigh ? `Relay’s fee is ${exactPercent}% of your amount.` : `This quote loses ${exactPercent}% in conversion and fees.`} LAUNCH blocks quotes above 5%. Source gas is extra and is not included in this limit.</p>
     </details>
     <p className={styles.feeLimitHint}>Change the amount or route. Your quote updates automatically.</p>
   </section>;
@@ -167,7 +167,7 @@ export default function BridgeDialog({ open, onOpenChange, restoreFocus }: {
             {transferring ? <Transfer bridge={bridge} /> : <BridgeForm bridge={bridge} connect={connect} />}
             <div className={styles.footer}>
               <a href="https://relay.link" target="_blank" rel="noreferrer">Powered by Relay <ArrowUpRight size={12} aria-hidden /></a>
-              <span>0 Openlaunch fee</span>
+              <span>0 LAUNCH fee</span>
             </div>
           </Dialog.Popup>
         </Dialog.Portal>
@@ -253,7 +253,7 @@ export function BridgeForm({ bridge: b, connect }: { bridge: Bridge; connect: ()
         {b.address ? label : "Connect wallet"}
         {!loading && b.address ? <ArrowRight size={17} aria-hidden /> : null}
       </button>
-      <p id="bridge-gas-note" className={styles.disclaimer}>Keep some {origin.symbol} on {origin.name} for gas. {convertsAsset ? "Relay converts the asset at the quoted rate. " : ""}Bridging uses Relay, a third-party protocol, and carries risk. Openlaunch does not operate Relay, holds no funds in transit, and is not responsible for delays, refunds or losses. {erc20Input ? "An unspent USDC approval remains until used or revoked." : "No token approvals required."}</p>
+      <p id="bridge-gas-note" className={styles.disclaimer}>Keep some {origin.symbol} on {origin.name} for gas. {convertsAsset ? "Relay converts the asset at the quoted rate. " : ""}Bridging uses Relay, a third-party protocol, and carries risk. LAUNCH does not operate Relay, holds no funds in transit, and is not responsible for delays, refunds or losses. {erc20Input ? "An unspent USDC approval remains until used or revoked." : "No token approvals required."}</p>
     </form>
   );
 }

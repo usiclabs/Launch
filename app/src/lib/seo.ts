@@ -125,7 +125,7 @@ export function tokenJsonLd(l: TokenJsonLdInput): Record<string, unknown> {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: `${l.name} (${l.symbol})`,
-    description: (l.description ?? `${l.name} launched on openlaunch.lol.`).slice(0, 500),
+    description: (l.description ?? `${l.name} launched on LAUNCH.`).slice(0, 500),
     url,
     dateCreated: l.blockTime,
     about: {
@@ -165,9 +165,9 @@ export function jsonLdHtml(l: TokenJsonLdInput): string {
 
 export type SiteJsonLdInput = {
   siteUrl: string;
-  /** The bare brand word ("openlaunch"): the entity name search engines reconcile the query against. */
+  /** The bare brand word ("LAUNCH"): the entity name search engines reconcile the query against. */
   brand: string;
-  /** The domain ("openlaunch.lol"): how most people write the brand, kept as an alternate name. */
+  /** The domain ("LAUNCH"): how most people write the brand, kept as an alternate name. */
   domain: string;
   description: string;
   /** Official profiles only (X, GitHub). Look-alike handles must never appear here. */

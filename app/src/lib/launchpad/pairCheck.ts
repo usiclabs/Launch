@@ -57,7 +57,7 @@ async function goplus(chain: ChainKey, address: string): Promise<GoPlus | null> 
   return body?.result?.[address] ?? null;
 }
 
-/** The token's candidate price pools: its own openlaunch pool, then GeckoTerminal's pools against a core quote. */
+/** The token's candidate price pools: its own LAUNCH pool, then GeckoTerminal's pools against a core quote. */
 async function sourcesFor(chain: ChainKey, address: string, decimals: number, pools: GtPool[] | null): Promise<PairSource[]> {
   const out: PairSource[] = [];
   const db = maybeDb();
@@ -65,7 +65,7 @@ async function sourcesFor(chain: ChainKey, address: string, decimals: number, po
     const [row] = await db<{ quote: string; pool_id: string }[]>`SELECT quote, pool_id FROM bb_launches WHERE chain_id = ${chainIdOf(chain)} AND token = ${address}`;
     if (row && isCoreQuote(chain, row.quote)) {
       const gt = pools?.find((p) => p.attributes.address.toLowerCase() === row.pool_id.toLowerCase());
-      out.push({ kind: "launch", pool: address, quote: row.quote, hook: "", label: `its openlaunch pool against ${staticQuoteInfo(chain, row.quote).symbol}`, reserve_usd: gt ? Number(gt.attributes.reserve_in_usd) : null, created_at: gt?.attributes.pool_created_at ?? null, usable: false });
+      out.push({ kind: "launch", pool: address, quote: row.quote, hook: "", label: `its LAUNCH pool against ${staticQuoteInfo(chain, row.quote).symbol}`, reserve_usd: gt ? Number(gt.attributes.reserve_in_usd) : null, created_at: gt?.attributes.pool_created_at ?? null, usable: false });
     }
   }
   for (const p of pools ?? []) {

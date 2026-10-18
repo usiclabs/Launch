@@ -124,7 +124,7 @@ export default function EarnPanel({ view: e, snapshot, onConnect }: { view: Earn
         <div><dt>Run by</dt><dd><a href={v.curatorUrl} target="_blank" rel="noreferrer">{v.curator}<ArrowUpRight size={11} aria-hidden /></a></dd></div>
         <div><dt>Protocol</dt><dd><a href={v.protocolUrl} target="_blank" rel="noreferrer">{v.protocol}<ArrowUpRight size={11} aria-hidden /></a></dd></div>
         <div><dt>Vault fee</dt><dd>{fmtFeePct(vaultFee)} of interest</dd></div>
-        <div><dt>openlaunch fee</dt><dd>None</dd></div>
+        <div><dt>LAUNCH fee</dt><dd>None</dd></div>
         <div><dt>In the vault</dt><dd>{snapshot ? `${compactAssets(snapshot.totalAssets, v.assetDecimals)} ${sym}` : "—"}</dd></div>
         <div><dt>Network</dt><dd>{network} · gas in ETH</dd></div>
       </dl>
@@ -142,7 +142,7 @@ export default function EarnPanel({ view: e, snapshot, onConnect }: { view: Earn
         {ready ? <ArrowRight size={17} aria-hidden /> : null}
       </button>
       <p id="earn-risk" className={styles.disclaimer}>
-        Deposits can lose money. Your {sym} is lent to borrowers through {v.protocol}, in markets chosen by {v.curator}, not by openlaunch. openlaunch never holds your funds, cannot move them and cannot guarantee a withdrawal: the vault pays out from what is not lent at that moment. The rate changes all the time; past rates promise nothing.
+        Deposits can lose money. Your {sym} is lent to borrowers through {v.protocol}, in markets chosen by {v.curator}, not by LAUNCH. LAUNCH never holds your funds, cannot move them and cannot guarantee a withdrawal: the vault pays out from what is not lent at that moment. The rate changes all the time; past rates promise nothing.
       </p>
     </form>
   );

@@ -28,14 +28,14 @@ export async function generateMetadata({ params }: { params: Promise<{ chain: st
   const { chain, address } = await params;
   const p = await load(chain, address);
   if (!p) return { title: "Community pair not found", robots: { index: false } };
-  return pageMetadata({ path: pairPath(p.chain, p.address), title: `${p.symbol}: community pair`, description: `Launch a token on ${CHAIN_LABELS[p.chain]} paired with ${p.symbol} on openlaunch. ${PAIR_COPY.pageNote}` });
+  return pageMetadata({ path: pairPath(p.chain, p.address), title: `${p.symbol}: community pair`, description: `Launch a token on ${CHAIN_LABELS[p.chain]} paired with ${p.symbol} on LAUNCH. ${PAIR_COPY.pageNote}` });
 }
 
 const day = (iso: string) => new Date(iso).toUTCString().replace(/ \d\d:\d\d:\d\d GMT$/, "");
 
 /** Where the pair's USD price comes from, as a link anyone can follow. */
 function sourceLink(p: PairPublic): { href: string; label: string } {
-  if (p.price_kind === "launch") return { href: `/t/${p.chain}/${p.price_pool}`, label: `its pool on openlaunch` };
+  if (p.price_kind === "launch") return { href: `/t/${p.chain}/${p.price_pool}`, label: `its pool on LAUNCH` };
   if (p.price_kind === "univ3") return { href: explorerAddress(p.chain, p.price_pool), label: shortAddr(p.price_pool) };
   return { href: `https://www.geckoterminal.com/${p.chain}/pools/${p.price_pool}`, label: `${p.price_pool.slice(0, 10)}…` };
 }

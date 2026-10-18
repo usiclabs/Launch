@@ -84,7 +84,7 @@ export default function BridgeReview() {
           <div className={styles.heading}><Dialog.Title className={styles.title}>Bridge</Dialog.Title><Dialog.Close className={styles.close} aria-label="Close preview"><X size={19} /></Dialog.Close></div>
           <Dialog.Description className={styles.description}>Preview only · {scene} · no funds move</Dialog.Description>
           {tracking ? <Transfer bridge={bridge} /> : <BridgeForm bridge={bridge} connect={() => setScene("quote")} />}
-          <div className={styles.footer}><span>Powered by Relay</span><span>0 Openlaunch fee</span></div>
+          <div className={styles.footer}><span>Powered by Relay</span><span>0 LAUNCH fee</span></div>
         </Dialog.Popup></Dialog.Portal>
       </Dialog.Root>
     </main>

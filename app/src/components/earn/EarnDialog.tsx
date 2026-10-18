@@ -46,7 +46,7 @@ export function EarnShell({ vault, title, description, close, children }: { vaul
       {children}
       <div className={styles.footer}>
         <a href={vault.curatorUrl} target="_blank" rel="noreferrer">Run by {vault.curator}<ArrowUpRight size={12} aria-hidden /></a>
-        <span>0 openlaunch fee</span>
+        <span>0 LAUNCH fee</span>
       </div>
     </>
   );

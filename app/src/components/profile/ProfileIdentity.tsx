@@ -82,7 +82,7 @@ export default function ProfileIdentity({ address, avatarClass, labelClass, addr
           {profile ? (
             <>
               <p className={labelClass}>
-                <Link href={`/u/${profile.username}`} className="hover:underline underline-offset-2">openlaunch.lol/u/{profile.username}</Link>
+                <Link href={`/u/${profile.username}`} className="hover:underline underline-offset-2">LAUNCH / {profile.username}</Link>
               </p>
               <span className="flex min-w-0 items-center gap-1.5 text-[15px] font-semibold text-ink">
                 <span className="truncate">{profile.display_name}</span>

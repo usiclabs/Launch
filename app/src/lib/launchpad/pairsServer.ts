@@ -172,9 +172,9 @@ async function inspect(chain: ChainKey, address: string, l: PairListing, others:
   if (l.price_kind === "launch") {
     const db = maybeDb()!;
     const [row] = await db<{ quote: string }[]>`SELECT quote FROM bb_launches WHERE chain_id = ${chainIdOf(chain)} AND token = ${l.price_pool}`;
-    if (!row) return fail("that openlaunch pool is not indexed: price_pool must be the launched token", 400);
-    if (row.quote !== l.price_quote) return fail("that openlaunch pool is quoted in another token", 400);
-    if (l.price_pool !== address) return fail("an openlaunch price pool is the pair token's own launch", 400);
+    if (!row) return fail("that LAUNCH pool is not indexed: price_pool must be the launched token", 400);
+    if (row.quote !== l.price_quote) return fail("that LAUNCH pool is quoted in another token", 400);
+    if (l.price_pool !== address) return fail("a LAUNCH price pool is the pair token's own launch", 400);
   } else if (l.price_kind === "univ3") {
     const tokens = await univ3Tokens(chain, l.price_pool).catch(() => null);
     if (!tokens) return fail("that is not a Uniswap v3 style pool", 400);

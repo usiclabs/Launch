@@ -19,7 +19,7 @@ function boostSection(): string {
   return `
 ## Boost (Base, optional, paid in TWIG)
 A separate "Boosted" lane on the home page: the 5 tokens with the most TWIG sent to 0x000000000000000000000000000000000000dEaD for them in the last ${BOOST_WINDOW_H}h.
-It is not part of the ranking: sort=live and the Trending board count outside wallets only. Nothing is paid to openlaunch.
+It is not part of the ranking: sort=live and the Trending board count outside wallets only. Nothing is paid to LAUNCH.
 To boost a launch: TWIG (${BOOST_TOKEN}).transfer(0x…dEaD, amount) with amount = whole * 10^18 + token_id
 (whole = a count of whole TWIG, at least ${BOOST_FLOOR_TWIG}; token_id = the launch's position id, the list API's token_id field,
 greater than 0 and less than 10^11). The last 12 digits name the launch; a transfer outside these bounds is not a boost.
@@ -47,7 +47,7 @@ export function GET() {
   const a = launchpad("arc");
   const body = `# ${BRAND_DOMAIN}
 
-> openlaunch (${BRAND_DOMAIN}) is an open-source (MIT: ${BRAND_GITHUB}), zero-fee token launchpad on Base (8453), Robinhood Chain (4663) and Arc (5042). One transaction deploys a token and locks 100% of its supply as
+> LAUNCH (${BRAND_DOMAIN}) is an open-source (MIT: ${BRAND_GITHUB}), zero-fee token launchpad on Base (8453), Robinhood Chain (4663) and Arc (5042). One transaction deploys a token and locks 100% of its supply as
 > Uniswap v4 liquidity, forever. No platform fee: the factory and locker have no fee address at all. About page: ${SITE_URL}/about
 
 ## Source verification

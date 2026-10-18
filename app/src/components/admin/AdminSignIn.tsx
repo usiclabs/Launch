@@ -62,7 +62,7 @@ export default function AdminSignIn() {
     <section className={`${card} space-y-4 p-6`} aria-labelledby="admin-sign-in">
       <div className="space-y-1.5">
         <h1 id="admin-sign-in" className="font-display text-2xl font-bold tracking-[-0.02em] text-ink">Admin sign-in</h1>
-        <p className="text-sm text-body">For openlaunch admins. Sign in with an admin wallet: one signature, no transaction, nothing spent. The session lasts 8 hours.</p>
+        <p className="text-sm text-body">For LAUNCH admins. Sign in with an admin wallet: one signature, no transaction, nothing spent. The session lasts 8 hours.</p>
       </div>
       {address ? (
         <button type="button" disabled={busy} onClick={() => void signIn()} className={`${btn.primary} w-full`}>

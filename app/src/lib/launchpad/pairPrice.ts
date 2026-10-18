@@ -65,8 +65,8 @@ async function launchLeg(src: PairPriceSource, quoteDecimals: number): Promise<L
        ORDER BY block_number, log_index LIMIT 5000`,
   ]);
   const row = launch[0];
-  if (!row?.sqrt_price_x96) throw new Error("its openlaunch pool is not indexed");
-  if (row.quote !== src.price_quote.toLowerCase()) throw new Error("its openlaunch pool is quoted in another token");
+  if (!row?.sqrt_price_x96) throw new Error("its LAUNCH pool is not indexed");
+  if (row.quote !== src.price_quote.toLowerCase()) throw new Error("its LAUNCH pool is quoted in another token");
   const at = (sqrt: string) => quotePerToken(BigInt(sqrt), quoteDecimals); // launched tokens are 18-dec and sort above their quote
   const spot = at(row.sqrt_price_x96);
   const baseline = before[0] ? at(before[0].sqrt_price_x96) : null;

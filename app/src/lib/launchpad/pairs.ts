@@ -34,7 +34,7 @@ export function isPairPriceKind(v: unknown): v is PairPriceKind {
 }
 /** What each price source is, in words for the pair page and the admin form. */
 export const PAIR_PRICE_KIND_LABEL: Record<PairPriceKind, string> = {
-  launch: "its own openlaunch pool",
+  launch: "its own LAUNCH pool",
   univ3: "a Uniswap v3 (or Aerodrome Slipstream) pool, with its on-chain 30-minute average",
   univ4: "a Uniswap v4 pool, against our own 30-minute record of its price",
 };
@@ -282,11 +282,11 @@ export const PAIR_COPY = {
   badge: "Community pair",
   badgeTitle: (symbol: string) => `Paired with ${symbol}, a community pair: listed after public checks, not an endorsement. Buyers pay in ${symbol}.`,
   pageNote: "Listed after public checks. Not an endorsement: check the token yourself.",
-  about: (symbol: string) => `Paired with ${symbol}, a community pair on openlaunch: a token the site lists after public checks, with its price read from one named pool. Not an endorsement.`,
+  about: (symbol: string) => `Paired with ${symbol}, a community pair on LAUNCH: a token the site lists after public checks, with its price read from one named pool. Not an endorsement.`,
   suspended: (symbol: string, reason: string | null) => `Its pair, ${symbol}, is suspended${reason ? `: ${reason}` : ""}. Its launches still trade, with no USD price and no badge, until it is listed again.`,
   delisted: (symbol: string) => `Its pair, ${symbol}, was delisted. Its launches still trade, as an unlisted pair.`,
   indexTitle: "Community pairs",
-  indexLead: "Community tokens that launches are paired with. A listed pair's launches carry its badge and a USD price everywhere on openlaunch. Each is listed after public checks, priced from one named pool, and watched every hour: a pair whose checks fail for a day is suspended. The contracts accept any token as the pair; this list is the site's.",
+  indexLead: "Community tokens that launches are paired with. A listed pair's launches carry its badge and a USD price everywhere on LAUNCH. Each is listed after public checks, priced from one named pool, and watched every hour: a pair whose checks fail for a day is suspended. The contracts accept any token as the pair; this list is the site's.",
   noForm: "The launch form offers ETH, TWIG and stocks only. A launch paired with a community token is made straight against the factory, by the community's own tools or agents.",
   indexEmpty: "No community pairs yet.",
   applySoon: "Applications to list a token open soon.",

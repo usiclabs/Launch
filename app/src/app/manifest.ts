@@ -4,7 +4,7 @@ import { BRAND, BRAND_DOMAIN, TAGLINE } from "@/lib/brand";
 /** PWA manifest. Icons reuse the existing Next app-icon routes. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${BRAND_DOMAIN} — ${TAGLINE}`,
+    name: `${BRAND} — ${TAGLINE}`,
     short_name: BRAND,
     description: TAGLINE,
     start_url: "/",

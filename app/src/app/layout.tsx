@@ -22,14 +22,14 @@ const DESCRIPTION = SITE_DESCRIPTION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: TITLE, template: `%s · ${BRAND_DOMAIN}` },
+  title: { default: TITLE, template: `%s · ${BRAND}` },
   description: DESCRIPTION,
   applicationName: BRAND,
   // No canonical here: metadata merges shallowly, so a root canonical of "/" was inherited by every
   // page without its own (launch, rules, feed, agents) and told search engines they were duplicates
   // of the home page. Each indexable page declares its own canonical.
   verification: siteVerification(process.env),
-  openGraph: { siteName: BRAND_DOMAIN, title: TITLE, description: SOCIAL_DESCRIPTION, type: "website", url: SITE_URL },
+  openGraph: { siteName: BRAND, title: TITLE, description: SOCIAL_DESCRIPTION, type: "website", url: SITE_URL },
   twitter: { card: "summary_large_image", site: `@${BRAND_X}`, title: TITLE, description: SOCIAL_DESCRIPTION },
 };
 

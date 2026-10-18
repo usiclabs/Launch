@@ -10,7 +10,7 @@ import styles from "./Footer.module.css";
 const EXPLORE = [
   { href: "/", label: "Launchpad" },
   { href: "/rules", label: "How it works" },
-  { href: "/about", label: "About openlaunch" },
+  { href: "/about", label: "About LAUNCH" },
   { href: "/feed", label: "Community posts" },
   { href: "/me", label: "Your dashboard" },
 ];

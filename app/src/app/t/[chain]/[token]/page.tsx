@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{ chain: st
   const l = isChainKey(chain) && isAddress(token) ? await getLaunch(chain, token) : null;
   if (!l) return { title: "Token not found" };
   const title = `${l.name} (${l.symbol})`;
-  const description = clampSocial(l.description ?? `${l.name} launched on openlaunch.lol. 100% of supply locked as Uniswap v4 liquidity on ${CHAIN_LABELS[l.chain]}, ${l.lp_fee === 0 ? "0% trading fee" : "no platform fee"}.`, 155);
+  const description = clampSocial(l.description ?? `${l.name} launched on LAUNCH. 100% of supply locked as Uniswap v4 liquidity on ${CHAIN_LABELS[l.chain]}, ${l.lp_fee === 0 ? "0% trading fee" : "no platform fee"}.`, 155);
   // Next replaces nested metadata objects rather than merging them, so repeat the site-level fields here:
   // og:site_name (Discord shows it above the title) and twitter summary_large_image (full-width card).
   return {
@@ -287,7 +287,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
                   <Row k="Fixed supply" v={`${supplyLabel} ${l.symbol}`} />
                   <Row k="Launched" v={new Date(l.block_time).toUTCString().replace(" GMT", " UTC")} />
                 </dl>
-                {unlisted ? <p className="mt-4 text-xs leading-relaxed text-muted text-pretty">Paired with {quote.symbol}, a token openlaunch does not list. The launch contracts accept any ERC-20 as the pair; its name here is what its own contract reports, so check the pair token address above. Prices are in {quote.symbol} only, with no USD figure, and this launch is not ranked in Trending.</p> : null}
+                {unlisted ? <p className="mt-4 text-xs leading-relaxed text-muted text-pretty">Paired with {quote.symbol}, a token LAUNCH does not list. The launch contracts accept any ERC-20 as the pair; its name here is what its own contract reports, so check the pair token address above. Prices are in {quote.symbol} only, with no USD figure, and this launch is not ranked in Trending.</p> : null}
                 {quote.key === "pair" ? <p className="mt-4 text-xs leading-relaxed text-muted text-pretty">{PAIR_COPY.about(quote.symbol)} {mode === "free" ? "This pool has no trading fee." : mode === "burn" ? `Trading fees on this pool are burned as ${quote.symbol} when collected.` : `Trading fees on this pool are paid out in ${quote.symbol}.`}{pairRec ? ` USD figures use ${PAIR_PRICE_KIND_LABEL[pairRec.price_kind]}, and the price of the token on its other side.` : ""} <Link href={pairPath(chain, l.quote)} className="underline decoration-line underline-offset-2 hover:text-ink">The pair&apos;s checks and record</Link></p> : null}
                 {unlisted && pairRec && pairRec.status !== "listed" ? <p className="mt-2 text-xs leading-relaxed text-warm-ink text-pretty">{pairRec.status === "suspended" ? PAIR_COPY.suspended(pairRec.symbol, pairRec.status_reason) : PAIR_COPY.delisted(pairRec.symbol)} <Link href={pairPath(chain, l.quote)} className="underline decoration-line underline-offset-2 hover:text-ink">Its record</Link></p> : null}
                 {stockQuote ? <p className="mt-4 text-xs leading-relaxed text-muted text-pretty">Paired with {stockQuote.name} ({stockQuote.symbol}), a third-party tokenized stock. These securities are not offered to US persons. The quote asset is identified from the issuer registry, not its token name.</p> : null}

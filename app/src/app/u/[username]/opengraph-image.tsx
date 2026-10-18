@@ -9,7 +9,7 @@ import { usernameFromPath } from "@/lib/profiles/validate";
 import { BRAND, BRAND_DOMAIN, BRAND_TLD } from "@/lib/brand";
 import { walletHue, walletMark } from "@/lib/wallet-mark";
 
-export const alt = "profile on openlaunch.lol";
+export const alt = "profile on LAUNCH";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const dynamic = "force-dynamic";
@@ -19,7 +19,7 @@ const INK = "#0F172A";
 const BODY = "#475569";
 const MUTED = "#64748B";
 const LINE = "#E7E5E4";
-const BLUE = "#0052FF";
+const BLUE = "#FA003E";
 
 /** The avatar from our own store only (uploaded + re-encoded by us), as a PNG data URL; satori cannot decode WebP. */
 async function avatarPng(url: string | null): Promise<string | null> {
@@ -51,9 +51,8 @@ export default async function ProfileOg({ params }: { params: Promise<{ username
         <div style={{ display: "flex", alignItems: "center", padding: "40px 64px 0", gap: 12 }}>
           <svg width={40} height={40} viewBox="0 0 32 32">
             <rect width="32" height="32" rx="7" fill={BLUE} />
-            <path fill="#FFFFFF" fillRule="evenodd" d="M10.5 13a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13ZM10.5 16.4a3.1 3.1 0 1 0 0 6.2a3.1 3.1 0 1 0 0-6.2Z" />
-            <rect x="19.5" y="6" width="4.6" height="20" rx="1.4" fill="#FFFFFF" />
-            <rect x="19.5" y="21.4" width="8.2" height="4.6" rx="1.4" fill="#FFFFFF" />
+            <rect x="10" y="6" width="4.6" height="20" rx="1.4" fill="#FFFFFF" />
+            <rect x="10" y="21.4" width="13" height="4.6" rx="1.4" fill="#FFFFFF" />
           </svg>
           <span style={{ fontSize: 26, fontWeight: 700, display: "flex" }}>
             {BRAND}

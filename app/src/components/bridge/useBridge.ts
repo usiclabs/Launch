@@ -543,7 +543,7 @@ export function useBridge(open: boolean) {
           if (!lock) throw new Error("A bridge request is already open in another tab. Check that tab before continuing.");
           await execute();
         });
-      } else throw new Error("This browser cannot safely coordinate bridge requests between tabs. Open Openlaunch in a current browser to continue.");
+      } else throw new Error("This browser cannot safely coordinate bridge requests between tabs. Open LAUNCH in a current browser to continue.");
     } catch (error) {
       setIssue({ key: reviewed.address.toLowerCase(), message: messageOf(error, "Could not prepare the transfer. Request a new quote and try again.", BRIDGE_CHAINS[reviewed.originChainId].symbol) });
     } finally {

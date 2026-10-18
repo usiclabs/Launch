@@ -38,8 +38,8 @@ export function proofFacts({ holders, symbol, launcher, launcherName, lpFee, mod
     tone: "good",
     title: "Liquidity is locked forever",
     detail: ready
-      ? `${fmtShare(holders!.poolBps)} of the supply is in the locked Uniswap v4 pool. No wallet can withdraw the position, including the creator and openlaunch.`
-      : "The pool position sits in an ownerless locker. No wallet can withdraw it, including the creator and openlaunch.",
+      ? `${fmtShare(holders!.poolBps)} of the supply is in the locked Uniswap v4 pool. No wallet can withdraw the position, including the creator and LAUNCH.`
+      : "The pool position sits in an ownerless locker. No wallet can withdraw it, including the creator and LAUNCH.",
   });
 
   if (ready) {
@@ -67,7 +67,7 @@ export function proofFacts({ holders, symbol, launcher, launcherName, lpFee, mod
       : { key: "launch", tone: h.sniper.bps >= 1_000 ? "warn" : "info", title: `${plural(h.sniper.wallets, "wallet")} bought at launch`, detail: `${h.sniper.wallets === 1 ? "It" : "They"} took ${fmtShare(h.sniper.bps)} of the supply in ${window}.` });
   }
 
-  const fixed = "openlaunch takes 0%. Fee routing was set in the launch transaction and can never change.";
+  const fixed = "LAUNCH takes 0%. Fee routing was set in the launch transaction and can never change.";
   const pct = pipsToPct(lpFee);
   facts.push(mode === "free"
     ? { key: "fees", tone: "good", title: "No trading fee", detail: `Trades pay only the network's gas. ${fixed}` }
