@@ -64,6 +64,7 @@ COPY --from=build --chown=app:app /app/public ./public
 COPY --from=build --chown=app:app /app/db ./db
 COPY --from=build --chown=app:app /app/scripts/migrate.mjs ./scripts/migrate.mjs
 COPY --from=build --chown=app:app /app/scripts/lib ./scripts/lib
-USER app
 EXPOSE 3000
-CMD ["node", "server.js"]
+# Railway volumes are mounted root-owned; hand the upload mount to the app user at startup.
+USER root
+CMD ["sh", "-c", "mkdir -p /app/.uploads && chown app:app /app/.uploads && exec su -s /bin/sh app -c 'exec node server.js'"]
