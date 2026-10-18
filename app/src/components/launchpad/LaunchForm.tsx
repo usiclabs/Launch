@@ -172,7 +172,7 @@ async function firstBuy(ctx: FirstBuyCtx, tokenAddr: Address, launchHash: Hex, a
   return received > 0n ? { hash: h, out: received, exact: true } : { hash: h, out, exact: false };
 }
 
-export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = DEFAULT_CHAIN }: { ethUsd: number | null; gitlawbUsd?: number | null; initialChain?: ChainKey }) {
+export default function LaunchForm({ ethUsd, platformPrices = { base: null, robinhood: null, arc: null }, gitlawbUsd = null, initialChain = DEFAULT_CHAIN }: { ethUsd: number | null; platformPrices?: Record<ChainKey, number | null>; gitlawbUsd?: number | null; initialChain?: ChainKey }) {
   const router = useRouter();
   const [chain, setChain] = useState<ChainKey>(initialChain);
   const cfg = launchpad(chain);
@@ -188,7 +188,7 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
   // GITLAWB's USD is live: the page fetched it server-side (same as ethUsd); the static config carries null. TWIG unwraps 1:1 to GITLAWB, so it takes the same price (gitlawbLinkedUsd).
   const staticQuote: Quote = quoteKey === "stock" && stock ? stock : (cfg.quotes.find((q) => q.key === quoteKey) ?? cfg.quotes[0]);
   const linkedUsd = gitlawbLinkedUsd(staticQuote.key, gitlawbUsd);
-  const quote: Quote = linkedUsd === undefined ? staticQuote : { ...staticQuote, usd: linkedUsd };
+  const quote: Quote = staticQuote.key === "platform" ? { ...staticQuote, usd: platformPrices[chain] } : linkedUsd === undefined ? staticQuote : { ...staticQuote, usd: linkedUsd };
   // the branded quote this chain's form offers, if any: TWIG on Base, GITLAWB on Robinhood Chain
   const brandQuote = cfg.quotes.find((q) => q.key === "platform") ?? null;
   // TWIG and GITLAWB: badged, priced at GITLAWB's live price, millions of units per dollar
@@ -592,7 +592,7 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
                   </span>
                   <p className={helper}>
                     Your token carries the <QuoteBrandBadge quoteKey={quote.key} /> badge on the launch list, trending, the activity feed, its page and its share card.{" "}
-                    BNKR is the temporary test pairing token. It is not LAUNCH&apos;s own token. No TWIG wrapper or swap route is used. USD pricing is unavailable until a chain-specific price source is verified.
+                    BNKR is the temporary test pairing token. It is not LAUNCH&apos;s own token. No TWIG wrapper or swap route is used. USD estimates use this chain’s verified 30-minute pool average when available; otherwise enter amounts in BNKR.
                     <span className="block mt-2 font-mono break-all">{quote.address}</span>
                     <a href={PLATFORM_TOKEN.website} target="_blank" rel="noreferrer" className="underline">Bankr ↗</a>
                   </p>

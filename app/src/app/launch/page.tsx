@@ -1,3 +1,4 @@
+import { platformTokenPrice } from "@/lib/launchpad/platformTokenPrice";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import LaunchForm from "@/components/launchpad/LaunchForm";
@@ -22,7 +23,7 @@ function initialChainFor(param: string | undefined): ChainKey {
 
 export default async function LaunchPage({ searchParams }: { searchParams: Promise<{ chain?: string }> }) {
   const sp = await searchParams;
-  const [usd, gitlawb] = await Promise.all([ethUsd(), gitlawbUsd()]);
+  const [usd, basePrice, robinhoodPrice] = await Promise.all([ethUsd(), platformTokenPrice("base"), platformTokenPrice("robinhood")]);
   return (
     <>
       <main className="relative mx-auto max-w-6xl px-4 pt-6 sm:pt-10 pb-16 space-y-5 sm:space-y-6">
@@ -31,7 +32,7 @@ export default async function LaunchPage({ searchParams }: { searchParams: Promi
           <p className="mt-2 text-base text-body">BNKR integration preview. Select Base or Robinhood, choose BNKR, and inspect the launch preview.</p>
           <p className="mt-3 rounded-lg border border-line p-3 text-sm">Read-only test deployment. Launching, approvals, trading, boosts and listing payments are disabled. BNKR is a temporary test asset, not LAUNCH’s own token. <a className="underline" href="/token-check">View token verification</a></p>
         </header>
-        <LaunchForm ethUsd={usd} gitlawbUsd={gitlawb} initialChain={initialChainFor(sp.chain)} />
+        <LaunchForm ethUsd={usd} platformPrices={{ base: basePrice.usd, robinhood: robinhoodPrice.usd, arc: null }} initialChain={initialChainFor(sp.chain)} />
       </main>
     </>
   );

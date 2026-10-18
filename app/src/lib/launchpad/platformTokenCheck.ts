@@ -1,4 +1,5 @@
 import "server-only";
+import { platformTokenPrice } from "./platformTokenPrice";
 import { createPublicClient, http, erc20Abi, type Address } from "viem";
 import { PLATFORM_TOKEN } from "./platformToken";
 import { CHAINS } from "../chainPublic";
@@ -28,5 +29,6 @@ export async function checkPlatformToken(chain: "base" | "robinhood") {
       liquidity = { status: pools.length ? "candidates-found" : "no-indexed-pools", pools };
     }
   } catch { /* Missing market data never inherits another token's price. */ }
-  return { chain, address, metadata, liquidity, transactionsEnabled: false, pricingEnabled: false, checkedAt: new Date().toISOString() };
+  const pricing = await platformTokenPrice(chain);
+  return { chain, address, metadata, liquidity, pricing, transactionsEnabled: false, pricingEnabled: pricing.usd !== null, checkedAt: new Date().toISOString() };
 }

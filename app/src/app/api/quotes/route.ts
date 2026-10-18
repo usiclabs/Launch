@@ -1,3 +1,4 @@
+import { platformTokenPrice } from "@/lib/launchpad/platformTokenPrice";
 import { NextResponse } from "next/server";
 import { isChainKey } from "@/lib/chainPublic";
 import { launchpad } from "@/lib/launchpad/config";
@@ -26,7 +27,9 @@ export async function GET(req: Request) {
   if (!isChainKey(chain)) return NextResponse.json({ error: "bad chain" }, { status: 400 });
   const q = (u.searchParams.get("q") ?? "").slice(0, 12);
   const gl = await gitlawbUsd(); // one price for both chains: the Robinhood token is the Base token bridged 1:1
+  const platformPrice = chain === "arc" ? null : (await platformTokenPrice(chain)).usd;
   const fixed = launchpad(chain).quotes.map((x) => {
+    if (x.key === "platform") return { ...x, usd: platformPrice };
     const linked = gitlawbLinkedUsd(x.key, gl); // GITLAWB, and TWIG (unwraps 1:1 to GITLAWB), take GITLAWB's live price
     return { ...x, usd: linked === undefined ? x.usd : linked };
   });
