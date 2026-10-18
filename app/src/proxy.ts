@@ -3,6 +3,7 @@ import { BRAND_DOMAIN, LEGACY_DOMAIN } from "@/lib/brand";
 import { buildCsp, cspNonce, extraConnectOrigins } from "@/lib/security-headers";
 
 const DEV = process.env.NODE_ENV === "development";
+const READ_ONLY_PREVIEW = process.env.BNKR_PREVIEW_READ_ONLY === "on";
 // Literal accesses so Next inlines the same build-time values the client bundle uses (see browserRpc).
 const CONNECT_SRC = extraConnectOrigins({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
@@ -20,11 +21,13 @@ const CONNECT_SRC = extraConnectOrigins({
  * reads `x-nonce` for next-themes, and the response repeats the same policy.
  */
 export function proxy(req: NextRequest) {
-  // This branch is an isolated read-only integration preview, never production.
-  const path = req.nextUrl.pathname;
-  if (req.method !== "GET" && req.method !== "HEAD") return NextResponse.json({ error: "Read-only BNKR preview: writes are disabled" }, { status: 403 });
-  if (path === "/") return NextResponse.redirect(new URL("/launch", req.url));
-  if (!new Set(["/launch", "/token-check", "/api/platform-token-check", "/api/quotes", "/api/health", "/manifest.webmanifest", "/robots.txt"]).has(path) && !/\.(png|svg|jpg|jpeg|webp|woff2?)$/.test(path)) return new NextResponse("This route is disabled in the BNKR integration preview.", { status: 404 });
+  // Optional preview guard; keep enabled until a dedicated LAUNCH factory and isolated DB are ready.
+  if (READ_ONLY_PREVIEW) {
+    const path = req.nextUrl.pathname;
+    if (req.method !== "GET" && req.method !== "HEAD") return NextResponse.json({ error: "Read-only BNKR preview: writes are disabled" }, { status: 403 });
+    if (path === "/") return NextResponse.redirect(new URL("/launch", req.url));
+    if (!new Set(["/launch", "/token-check", "/api/platform-token-check", "/api/quotes", "/api/health", "/manifest.webmanifest", "/robots.txt"]).has(path) && !/\.(png|svg|jpg|jpeg|webp|woff2?)$/.test(path)) return new NextResponse("This route is disabled in the BNKR integration preview.", { status: 404 });
+  }
   const host = req.headers.get("host")?.toLowerCase() ?? "";
   if ((host === LEGACY_DOMAIN || host === `www.${LEGACY_DOMAIN}` || host === `www.${BRAND_DOMAIN}`) && !req.nextUrl.pathname.startsWith("/api/")) {
     const url = req.nextUrl.clone();

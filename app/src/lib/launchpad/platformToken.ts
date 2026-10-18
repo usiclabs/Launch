@@ -12,7 +12,7 @@ export const PLATFORM_TOKEN = {
     arc: null,
   } satisfies Record<ChainKey, `0x${string}` | null>,
 } as const;
-export const TOKEN_PREVIEW = true;
+export const TOKEN_PREVIEW = process.env.NEXT_PUBLIC_BNKR_PREVIEW !== "off";
 export function isPlatformToken(chain: ChainKey, address: string): boolean {
   return PLATFORM_TOKEN.addresses[chain] !== null && PLATFORM_TOKEN.addresses[chain] === address.toLowerCase();
 }

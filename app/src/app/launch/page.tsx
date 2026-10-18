@@ -1,5 +1,6 @@
 import { platformTokenPrice } from "@/lib/launchpad/platformTokenPrice";
 import type { Metadata } from "next";
+import { TOKEN_PREVIEW } from "@/lib/launchpad/platformToken";
 import { pageMetadata } from "@/lib/seo";
 import LaunchForm from "@/components/launchpad/LaunchForm";
 import { ethUsd } from "@/lib/launchpad/ethPrice";
@@ -30,7 +31,7 @@ export default async function LaunchPage({ searchParams }: { searchParams: Promi
         <header className="max-w-2xl">
           <h1 className="font-display font-bold tracking-[-0.02em] text-ink text-3xl sm:text-4xl">Launch a token</h1>
           <p className="mt-2 text-base text-body">BNKR integration preview. Select Base or Robinhood, choose BNKR, and inspect the launch preview.</p>
-          <p className="mt-3 rounded-lg border border-line p-3 text-sm">Read-only test deployment. Launching, approvals, trading, boosts and listing payments are disabled. BNKR is a temporary test asset, not LAUNCH’s own token. <a className="underline" href="/token-check">View token verification</a></p>
+          <p className="mt-3 rounded-lg border border-line p-3 text-sm">{TOKEN_PREVIEW ? "Read-only integration preview. Launch transactions stay disabled until LAUNCH-owned factory contracts are deployed. " : "BNKR integration test. Transactions are enabled for the deployed LAUNCH factory. "}BNKR is a temporary test asset, not LAUNCH’s own token. <a className="underline" href="/token-check">View token verification</a></p>
         </header>
         <LaunchForm ethUsd={usd} platformPrices={{ base: basePrice.usd, robinhood: robinhoodPrice.usd, arc: null }} initialChain={initialChainFor(sp.chain)} />
       </main>
