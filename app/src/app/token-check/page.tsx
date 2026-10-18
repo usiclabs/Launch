@@ -1,0 +1,7 @@
+import Link from "next/link";
+import { checkPlatformToken } from "@/lib/launchpad/platformTokenCheck";
+export const dynamic = "force-dynamic";
+export default async function TokenCheckPage() {
+  const checks = await Promise.all([checkPlatformToken("base"), checkPlatformToken("robinhood")]);
+  return <main className="mx-auto max-w-4xl p-6 space-y-6"><Link href="/launch" className="text-brand">← Launch preview</Link><h1 className="text-3xl font-bold">BNKR integration checks</h1><p>Read-only checks of the exact contracts you supplied. Liquidity results are discovery candidates, not approved trading routes. No transactions or token payments are enabled.</p>{checks.map((c) => <section key={c.chain} className="rounded-xl border border-line p-5 space-y-3"><h2 className="text-xl font-semibold">{c.chain === "base" ? "Base" : "Robinhood Chain"}</h2><p className="font-mono text-sm break-all">{c.address}</p><p>Contract metadata: <strong>{c.metadata.status}</strong></p>{"symbol" in c.metadata ? <p>{c.metadata.name} · {c.metadata.symbol} · {c.metadata.decimals} decimals · chain {c.metadata.chainId}</p> : <p>{c.metadata.reason}</p>}<p>Liquidity discovery: <strong>{c.liquidity.status}</strong></p>{c.liquidity.pools.map((p) => <div key={p.address} className="border-t border-line pt-2 text-sm"><p>{p.dex} · BNKR / {p.quote} · reported liquidity ${p.liquidityUsd.toLocaleString()}</p><p className="font-mono break-all">{p.address}</p></div>)}<p className="text-sm text-muted">USD pricing and transactions remain disabled. Last checked {c.checkedAt}.</p></section>)}</main>;
+}

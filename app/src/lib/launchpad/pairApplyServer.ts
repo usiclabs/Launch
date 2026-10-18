@@ -41,7 +41,7 @@ import {
  * through the same checks as an admin listing (pairsServer.writeListing).
  */
 export function applicationsOpen(): boolean {
-  return process.env.PAIRS_APPLY === "on";
+  return false; // BNKR preview: listing payments disabled.
 }
 
 type Fail = { ok: false; error: string; status: number };

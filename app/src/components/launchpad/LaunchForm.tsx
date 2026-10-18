@@ -30,6 +30,7 @@ import { fdvForStartTick, fmtCompact, fmtQuoteUnits, fmtUnitsExact, fmtUsd, init
 import { BUY_PRESETS, defaultFirstBuy, gasReserveInQuote, suggestFirstBuy } from "@/lib/launchpad/first-buy";
 import { getFirstBuyDeclined, getFirstBuyDeclinedServer, setFirstBuyDeclined, subscribeFirstBuyDeclined } from "@/lib/launchpad/first-buy-session";
 import { encodeV4ExactInSingle, type PoolKey } from "@/lib/launchpad/swap";
+import { PLATFORM_TOKEN, TOKEN_PREVIEW } from "@/lib/launchpad/platformToken";
 import { GITLAWB_SITE } from "@/lib/launchpad/gitlawb";
 import { TWIG_WRAP_URL, gitlawbLinkedUsd } from "@/lib/launchpad/twig";
 import { parseXHandle } from "@/lib/launchpad/xHandle";
@@ -75,7 +76,7 @@ const STOCK_PICK_MESSAGE = "Pick a stock to price the token in, or switch the qu
 /** Per-chain copy in the form. A chain's quotes and stock registry differ, so its sentences do too; `stock` is null where no registry exists. */
 const CHAIN_COPY: Record<ChainKey, { blurb: string; gitlawbOrigin: string; stock: { pays: string; badge: string; empty: string; issuer: string } | null }> = {
   base: {
-    blurb: "Priced in ETH, TWIG or a Coinbase tokenized stock. Gas ≈ cents.",
+    blurb: "Priced in ETH, BNKR or a Coinbase tokenized stock. Gas ≈ cents.",
     gitlawbOrigin: "", // the Base form offers TWIG, not GITLAWB, so this copy is never shown there
     stock: {
       pays: "Buyers pay with a Coinbase tokenized stock; fees are paid in that stock.",
@@ -85,7 +86,7 @@ const CHAIN_COPY: Record<ChainKey, { blurb: string; gitlawbOrigin: string; stock
     },
   },
   robinhood: {
-    blurb: "Priced in USDG (dollars), ETH, GITLAWB or a Robinhood Stock Token. Gas ≈ cents.",
+    blurb: "Priced in USDG (dollars), ETH, BNKR or a Robinhood Stock Token. Gas ≈ cents.",
     gitlawbOrigin: ", bridged 1:1 from Base to Robinhood Chain over LayerZero",
     stock: {
       pays: "Buyers pay with a Robinhood Stock Token; fees are paid in that stock.",
@@ -189,9 +190,9 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
   const linkedUsd = gitlawbLinkedUsd(staticQuote.key, gitlawbUsd);
   const quote: Quote = linkedUsd === undefined ? staticQuote : { ...staticQuote, usd: linkedUsd };
   // the branded quote this chain's form offers, if any: TWIG on Base, GITLAWB on Robinhood Chain
-  const brandQuote = cfg.quotes.find((q) => q.key === "twig") ?? cfg.quotes.find((q) => q.key === "gitlawb") ?? null;
+  const brandQuote = cfg.quotes.find((q) => q.key === "platform") ?? null;
   // TWIG and GITLAWB: badged, priced at GITLAWB's live price, millions of units per dollar
-  const isBrandQuote = quote.key === "twig" || quote.key === "gitlawb";
+  const isBrandQuote = quote.key === "platform";
   const quoteUsd = quoteUsdOf(quote, ethUsd);
   const NATIVE_SYMBOL = CHAIN.nativeCurrency.symbol;
   const gasReserve = GAS_RESERVE_WEI[chain];
@@ -326,7 +327,7 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
   const valid = errors.length === 0;
   // the rail beside the steps: a check once a step is complete (the first buy is optional, so it is complete unless its amount fails a check)
   const done = {
-    chain: cfg.configured && !(quoteKey === "stock" && !stock),
+    chain: !TOKEN_PREVIEW && cfg.configured && !(quoteKey === "stock" && !stock),
     token: nameOk && symbolOk && httpsOrEmpty(image) && httpsOrEmpty(banner) && httpsOrEmpty(website) && xParsed.ok,
     price: startTick !== null,
     fees: !(feePips > 0 && beneficiary === "custom" && split.errors.length > 0),
@@ -357,7 +358,7 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
   const hasRow = (payout: string) => rows.some((r) => r.payout.trim().toLowerCase() === payout.toLowerCase());
 
   async function launch() {
-    if (!valid || !address || !cfg.factory || startTick === null) return;
+    if (TOKEN_PREVIEW || !valid || !address || !cfg.factory || startTick === null) return;
     const FACTORY_ADDRESS = cfg.factory;
     let salt = saltRef.current ?? (saltRef.current = randomSalt());
     let metaKey = metaKeyRef.current ?? (metaKeyRef.current = randomSalt());
@@ -525,7 +526,7 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
                     <button
                       type="button"
                       key={k}
-                      disabled={!ok}
+                      disabled={!ok && !TOKEN_PREVIEW}
                       onClick={() => {
                         if (k === chain) return; // the active chain: nothing to switch, nothing to reset
                         setChain(k);
@@ -548,7 +549,7 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
                         <span className={`font-semibold text-sm ${active ? "text-brand" : "text-ink"}`}>{CHAIN_LABELS[k]}</span>
                         {active ? <Check size={15} strokeWidth={2.6} aria-hidden="true" className="ml-auto shrink-0 text-brand" /> : null}
                       </span>
-                      <span className="mt-2 block text-xs text-body leading-snug">{!ok ? UNCONFIGURED_CHAIN_COPY : CHAIN_COPY[k].blurb}</span>
+                      <span className="mt-2 block text-xs text-body leading-snug">{!ok && !TOKEN_PREVIEW ? UNCONFIGURED_CHAIN_COPY : CHAIN_COPY[k].blurb}</span>
                     </button>
                   );
                 })}
@@ -591,12 +592,9 @@ export default function LaunchForm({ ethUsd, gitlawbUsd = null, initialChain = D
                   </span>
                   <p className={helper}>
                     Your token carries the <QuoteBrandBadge quoteKey={quote.key} /> badge on the launch list, trending, the activity feed, its page and its share card.{" "}
-                    {quote.key === "twig" ? (
-                      <>TWIG is Twigpine&apos;s token on Base: a 1:1 wrapper of GITLAWB that anyone can wrap or unwrap any time, with no fee. No owner, no transfer restrictions. Name no beneficiary and the fees are burned as TWIG when collected. Priced at GITLAWB&apos;s price, from the Uniswap v4 WETH/GITLAWB pool on Base.</>
-                    ) : (
-                      <>GITLAWB is Twigpine&apos;s token{CHAIN_COPY[chain].gitlawbOrigin}: an ordinary ERC-20, no transfer restrictions, no issuer switch. Name no beneficiary and the fees are burned as GITLAWB when collected. Price from the Uniswap v4 WETH/GITLAWB pool on Base.</>
-                    )}{" "}
-                    <a href={quote.key === "twig" ? TWIG_WRAP_URL : GITLAWB_SITE} target="_blank" rel="noreferrer" className="underline decoration-line underline-offset-2 hover:text-ink">{quote.key === "twig" ? "wrap.twigpine.com" : "twigpine.com"} ↗</a>
+                    BNKR is the temporary test pairing token. It is not LAUNCH&apos;s own token. No TWIG wrapper or swap route is used. USD pricing is unavailable until a chain-specific price source is verified.
+                    <span className="block mt-2 font-mono break-all">{quote.address}</span>
+                    <a href={PLATFORM_TOKEN.website} target="_blank" rel="noreferrer" className="underline">Bankr ↗</a>
                   </p>
                 </div>
               ) : null}

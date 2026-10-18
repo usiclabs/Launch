@@ -5,5 +5,5 @@ import "server-only";
  * totals query can ask it without importing the lane's server half. Anything else, or unset, is off.
  */
 export function boostEnabled(): boolean {
-  return process.env.BOOST?.trim().toLowerCase() === "on";
+  return false; // BNKR preview: payments disabled regardless of environment.
 }

@@ -1,3 +1,4 @@
+import { PLATFORM_TOKEN } from "@/lib/launchpad/platformToken";
 import { PAIR_COPY } from "@/lib/launchpad/pairs";
 import GitlawbBadge, { isGitlawbQuote } from "./GitlawbBadge";
 import TwigBadge, { isTwigQuote } from "./TwigBadge";
@@ -26,9 +27,10 @@ export function CommunityPairBadge({ symbol, logo, size = "sm", className = "", 
   );
 }
 
-type Brand = "twig" | "gitlawb" | "pair";
+type Brand = "platform" | "twig" | "gitlawb" | "pair";
 /** The badge a quote earns, if any: TWIG, GITLAWB, or a community pair's. The one list of them. */
 function brandOf(quoteKey: string | null | undefined): Brand | null {
+  if (quoteKey === "platform") return "platform";
   if (isTwigQuote(quoteKey)) return "twig";
   if (isGitlawbQuote(quoteKey)) return "gitlawb";
   if (quoteKey === "pair") return "pair";
@@ -48,6 +50,7 @@ export function QuoteBrandBadge({ quoteKey, symbol = "", logo = null, size = "sm
   const brand = brandOf(quoteKey);
   if (brand === null || (brand === "pair" && !symbol)) return null;
   return ({
+    platform: <CommunityPairBadge symbol={PLATFORM_TOKEN.symbol} logo={null} size={size} className={className} collapse={collapse} />,
     twig: <TwigBadge size={size} className={className} collapse={collapse} />,
     gitlawb: <GitlawbBadge size={size} className={className} collapse={collapse} />,
     pair: <CommunityPairBadge symbol={symbol} logo={logo} size={size} className={className} collapse={collapse} />,
