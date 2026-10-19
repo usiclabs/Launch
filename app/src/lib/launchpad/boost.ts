@@ -45,7 +45,7 @@ export function isLaunchTag(tag: bigint): boolean {
 
 /** The raw amount for a boost of `whole` TWIG on the launch with position id `tag`. */
 export function boostAmount(whole: bigint, tag: bigint): bigint {
-  if (whole < 1n) throw new Error("a boost sends at least 1 TWIG");
+  if (whole < 1n) throw new Error("a boost sends at least 1 legacy wrapper");
   if (!isLaunchTag(tag)) throw new Error("not a launch tag");
   return whole * UNIT + tag;
 }
@@ -77,9 +77,9 @@ export function parseBoostWhole(input: string): bigint | null {
 
 /** Why an amount cannot be sent yet, or null when it can. */
 export function boostAmountProblem(whole: bigint | null, balance: bigint | undefined, tag: bigint): string | null {
-  if (whole === null) return "Enter a whole number of TWIG.";
-  if (whole < BOOST_FLOOR_TWIG) return `A boost sends at least ${groupWhole(BOOST_FLOOR_TWIG)} TWIG.`;
-  if (balance !== undefined && boostAmount(whole, tag) > balance) return "Not enough TWIG in this wallet.";
+  if (whole === null) return "Enter a whole number of legacy wrapper.";
+  if (whole < BOOST_FLOOR_TWIG) return `A boost sends at least ${groupWhole(BOOST_FLOOR_TWIG)} legacy wrapper.`;
+  if (balance !== undefined && boostAmount(whole, tag) > balance) return "Not enough legacy wrapper in this wallet.";
   return null;
 }
 
@@ -251,7 +251,7 @@ export const BOOST_PANEL_CLICKS_MIN = 10;
  * whether or not the boost brought the token into the lane yet.
  */
 export function boostShareText(symbol: string, raw: bigint | string): string {
-  return `Boosted $${symbol} with ${fmtBoostTwig(raw)} on ${BRAND_DOMAIN}. The TWIG went to 0x…dEaD.`;
+  return `Boosted $${symbol} with ${fmtBoostTwig(raw)} on ${BRAND_DOMAIN}. The legacy wrapper went to 0x…dEaD.`;
 }
 
 /** The X intent for that post: the token's page as its link, via the official account (the one intent builder, xpost.ts). */
@@ -368,8 +368,8 @@ export function buildBoostModMessage(p: { action: BoostModAction; token: string;
 /** Every sentence the feature shows, in one place, so a test can hold them to the rules (no value talk). */
 export const BOOST_COPY = {
   laneTitle: "Boosted",
-  laneNote: "Paid in TWIG sent to 0x…dEaD. Not a ranking: the Live sort and Trending count outside wallets only.",
-  laneEmpty: "Nothing is boosted right now. Any Base launch can be boosted with TWIG from its page.",
+  laneNote: "Paid in legacy wrapper sent to 0x…dEaD. Not a ranking: the Live sort and Trending count outside wallets only.",
+  laneEmpty: "Nothing is boosted right now. Any Base launch can be boosted with legacy wrapper from its page.",
   cta: "Boost a token",
   openSpot: "Open spot",
   pickerNote: "Pick a Base token. The boost happens on its page, where you see the amount and the lane before anything is sent.",
@@ -379,16 +379,16 @@ export const BOOST_COPY = {
   pickerNone: "No Base token matches.",
   pickerFailed: "Search is unavailable right now. Any token's page still has its Boost button.",
   pickerHidden: "Not shown in the lane",
-  what: "The Boosted lane shows the 5 tokens with the most TWIG sent for them in the last 24 hours. A boost counts toward that total for 24 hours. It does not change the Live sort or the Trending board, and it is not an endorsement.",
+  what: "The Boosted lane shows the 5 tokens with the most legacy wrapper sent for them in the last 24 hours. A boost counts toward that total for 24 hours. It does not change the Live sort or the Trending board, and it is not an endorsement.",
   tag: "The last digits of the amount name this token, so the transfer itself records what it boosted.",
-  final: "The TWIG goes to 0x…dEaD. It cannot be undone or refunded, and nothing is paid to LAUNCH or Twigpine.",
+  final: "The legacy wrapper goes to 0x…dEaD. It cannot be undone or refunded, and nothing is paid to LAUNCH or the original project.",
   hidden: "This token is not shown in the Boosted lane.",
-  baseOnly: "Boosts are on Base only: TWIG exists only there.",
-  how: "Anyone can boost any Base launch from its page, from 100,000 TWIG. Boosts on one token in the same 24 hours add up. When the lane is full, a token shows once its total passes the 5th place.",
+  baseOnly: "Boosts are on Base only: legacy wrapper exists only there.",
+  how: "Anyone can boost any Base launch from its page, from 100,000 legacy wrapper. Boosts on one token in the same 24 hours add up. When the lane is full, a token shows once its total passes the 5th place.",
   short: "The lane is full. This boost alone will not bring this token into it yet: the 5th place holds more. It still counts for 24 hours and adds up with any other boost.",
 } as const;
 
 /** The confirm button's words for an amount. */
 export function boostConfirmLabel(whole: bigint): string {
-  return `Send ${groupWhole(whole)} TWIG to 0x…dEaD`;
+  return `Send ${groupWhole(whole)} legacy wrapper to 0x…dEaD`;
 }

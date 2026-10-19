@@ -69,7 +69,7 @@ export default function AboutPage() {
 
       <section className={`${shell.anchorSection} mt-14`} id="who" aria-labelledby="who-heading">
         <h2 id="who-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">Who builds it</h2>
-        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">{BRAND} is maintained by USIC Labs and built on the open-source OpenLaunch codebase by Twigpine. The contracts, the indexer and this site live in one MIT-licensed repository; contributions go through pull requests there.</p>
+        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">{BRAND} is maintained by USIC Labs and built on an MIT-licensed open-source codebase. The contracts, the indexer and this site live in one MIT-licensed repository; contributions go through pull requests there.</p>
         <p className="mt-3 max-w-[40rem] text-base leading-relaxed text-body text-pretty">Tokens launched here are created by their launchers, not by {BRAND}. A locked pool does not make a token valuable; read <Link href="/rules#know" className="text-brand underline decoration-line-strong underline-offset-4 hover:text-ink">before you begin</Link>.</p>
       </section>
 

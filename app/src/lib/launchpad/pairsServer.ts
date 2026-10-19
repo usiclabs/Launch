@@ -154,7 +154,7 @@ export function readListing(b: Record<string, unknown>): { ok: true; listing: Pa
 /** What can be read about the token and its price pool before it is listed or changed; an error says what is wrong. */
 async function inspect(chain: ChainKey, address: string, l: PairListing, others: PairPublic[]): Promise<{ ok: true; symbol: string; name: string; decimals: number; code_hash: string } | Fail> {
   if (isCoreQuote(chain, address)) return fail("a core quote cannot be a community pair", 400);
-  if (!isCoreQuote(chain, l.price_quote)) return fail("the price pool must be against a core quote (ETH, WETH, USDC, GITLAWB or TWIG)", 400);
+  if (!isCoreQuote(chain, l.price_quote)) return fail("the price pool must be against a core quote (ETH, WETH, USDC, supported legacy quotes)", 400);
   const client = publicClient(chain);
   const code_hash = await codeHashOf(chain, address).catch(() => null);
   if (!code_hash) return fail("no contract code at that address (or the chain could not be read)", 400);

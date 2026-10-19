@@ -1,9 +1,8 @@
-import { GITLAWB_LOGO_BG, GITLAWB_LOGO_PATH, GITLAWB_SYMBOL } from "@/lib/launchpad/gitlawb";
+import { GITLAWB_LOGO_BG, GITLAWB_SYMBOL } from "@/lib/launchpad/gitlawb";
 
 /** Gitlawb's logo tile (black, white branch-and-key mark; transparent corners baked in), served from our origin. */
 export function GitlawbMark({ size = 16, className = "" }: { size?: number; className?: string }) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={GITLAWB_LOGO_PATH} alt="" width={size} height={size} className={`shrink-0 ${className}`} />;
+  return <span aria-hidden="true" className={`inline-block rounded-full bg-line ${className}`} style={{ width: size, height: size }} />;
 }
 
 /**
@@ -18,7 +17,7 @@ export default function GitlawbBadge({ size = "sm", className = "", label = GITL
     <span
       className={`inline-flex shrink-0 items-center rounded-md border border-black/10 font-semibold leading-none whitespace-nowrap text-white dark:border-white/25 ${size === "md" ? "h-6 gap-1.5 pl-[3px] pr-2 text-[11px]" : "h-5 gap-1 pl-[2px] pr-1.5 text-[10px] tracking-wide"} ${collapse ? "max-sm:pr-[2px]" : ""} ${className}`}
       style={{ background: GITLAWB_LOGO_BG }}
-      title="Paired with GITLAWB: buyers pay in GITLAWB; any trading fee is paid, or burned, in GITLAWB."
+      title="Paired with legacy token: buyers pay in legacy token; any trading fee is paid, or burned, in legacy token."
     >
       <GitlawbMark size={size === "md" ? 18 : 16} />
       {collapse ? <span className="max-sm:sr-only">{label}</span> : label}

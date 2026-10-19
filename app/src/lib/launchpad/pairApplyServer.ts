@@ -224,7 +224,7 @@ export async function quoteFee(id: number): Promise<PairApplicationPublic["quote
   const parts = await gitlawbUsdParts(); // TWIG is priced as GITLAWB (one unwraps to one)
   const due = Math.max(app.fee_usd - app.paid_usd, 1);
   const q = pairFeeQuote(due, parts.spot, parts.twap);
-  if (!q) return fail("TWIG has no price right now: try again in a minute", 503);
+  if (!q) return fail("The fee token has no price right now: try again in a minute", 503);
   const [row] = await db<AppRow[]>`
     UPDATE bb_pair_applications SET quote_twig = ${q.whole.toString()}, quote_price_usd = ${q.priceUsd}, quote_at = now(), quote_until = now() + ${`${PAIR_QUOTE_LOCK_MS / 1000} seconds`}::interval,
            last_quote_until = now() + ${`${PAIR_QUOTE_LOCK_MS / 1000} seconds`}::interval

@@ -1,9 +1,8 @@
-import { TWIG_LOGO_BG, TWIG_LOGO_PATH, TWIG_SYMBOL } from "@/lib/launchpad/twig";
+import { TWIG_LOGO_BG, TWIG_SYMBOL } from "@/lib/launchpad/twig";
 
 /** Twigpine's logo tile (the light tree with its green dot on near-black; transparent corners baked in), served from our origin. */
 export function TwigMark({ size = 16, className = "" }: { size?: number; className?: string }) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={TWIG_LOGO_PATH} alt="" width={size} height={size} className={`shrink-0 ${className}`} />;
+  return <span aria-hidden="true" className={`inline-block rounded-full bg-line ${className}`} style={{ width: size, height: size }} />;
 }
 
 /**
@@ -17,7 +16,7 @@ export default function TwigBadge({ size = "sm", className = "", label = TWIG_SY
     <span
       className={`inline-flex shrink-0 items-center rounded-md border border-black/10 font-semibold leading-none whitespace-nowrap text-white dark:border-white/25 ${size === "md" ? "h-6 gap-1.5 pl-[3px] pr-2 text-[11px]" : "h-5 gap-1 pl-[2px] pr-1.5 text-[10px] tracking-wide"} ${collapse ? "max-sm:pr-[2px]" : ""} ${className}`}
       style={{ background: TWIG_LOGO_BG }}
-      title="Paired with TWIG, the 1:1 wrapper of GITLAWB: buyers pay in TWIG; any trading fee is paid, or burned, in TWIG."
+      title="Paired with legacy wrapper, the 1:1 wrapper of legacy token: buyers pay in legacy wrapper; any trading fee is paid, or burned, in legacy wrapper."
     >
       <TwigMark size={size === "md" ? 18 : 16} />
       {collapse ? <span className="max-sm:sr-only">{label}</span> : label}

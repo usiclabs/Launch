@@ -51,8 +51,8 @@ export function shapeCard(l: CardInput, now: number): Card {
 
 /** "priced in" pill: registry stocks get a ticker tile, GITLAWB the Gitlawb tile, TWIG the Twigpine tile, a community pair its own logo; ETH / USDG / unlisted get none. */
 export function quotePillOf(quoteKey: string, quoteSymbol: string, quoteLogo: string | null = null): Card["quote"] {
-  if (quoteKey === "twig") return { symbol: "TWIG", ticker: "TW", kind: "twig" };
-  if (quoteKey === "gitlawb") return { symbol: "GITLAWB", ticker: "GL", kind: "gitlawb" };
+  if (quoteKey === "twig") return { symbol: "Legacy wrapper", ticker: "L", kind: "twig" };
+  if (quoteKey === "gitlawb") return { symbol: "Legacy token", ticker: "L", kind: "gitlawb" };
   const sym = quoteSymbol.trim();
   if (quoteKey === "pair" && sym) return { symbol: sym.slice(0, 12), ticker: sym.toUpperCase().slice(0, 4), kind: "pair", logo: quoteLogo };
   if (quoteKey !== "stock" || !sym || sym === "?") return null;

@@ -216,7 +216,7 @@ export default function BoostedLane({ initial, serverNow, source }: { initial: B
                   </span>
                 </Link>
                 <span className="relative min-w-0 truncate justify-self-end font-mono text-[12px] font-medium text-warm-ink tnum [grid-area:twig] sm:justify-self-start sm:text-[11px] sm:font-normal">
-                  <LiveNumber value={Number(boostWholeOf(BigInt(b.twig)))} format={TWIG_FORMAT} suffix=" TWIG" />
+                  <LiveNumber value={Number(boostWholeOf(BigInt(b.twig)))} format={TWIG_FORMAT} suffix=" legacy wrapper" />
                   {lit ? (
                     <span key={`embers-${lit}`} aria-hidden="true" className="pointer-events-none absolute bottom-1 left-2">
                       {EMBERS.map((e, k) => (
@@ -240,7 +240,7 @@ export default function BoostedLane({ initial, serverNow, source }: { initial: B
                 <span className="shrink-0 justify-self-end text-[11px] text-muted [grid-area:left]" suppressHydrationWarning>{left}</span>
                 {/* credit: the wallet that sent the most TWIG for it in the window; only the name is a link (above the card's) */}
                 {b.top_booster ? (
-                  <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted [grid-area:by] max-sm:pl-[42px]" title="Sent the most TWIG for this token in the last 24 hours">
+                  <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted [grid-area:by] max-sm:pl-[42px]" title="Sent the most legacy wrapper for this token in the last 24 hours">
                     <span className="shrink-0">by</span>
                     <WhoName
                       address={b.top_booster}

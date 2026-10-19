@@ -164,7 +164,7 @@ export async function precheckPair(chain: ChainKey, rawAddress: string, listed: 
   const [gt, gp] = await Promise.all([gecko(chain, address), goplus(chain, address)]);
   const sources = erc20 && hasCode ? await sourcesFor(chain, address, dec, gt.pools) : [];
   const best = sources.find((s) => s.usable) ?? null;
-  add({ id: "pool", label: "A price pool against ETH, WETH, USDC, GITLAWB or TWIG that reads a price", pass: sources.length ? best !== null : gt.pools === null ? null : false, hard: true, value: best ? best.label : "none found" });
+  add({ id: "pool", label: "A price pool against ETH, WETH, USDC, supported legacy quotes that reads a price", pass: sources.length ? best !== null : gt.pools === null ? null : false, hard: true, value: best ? best.label : "none found" });
   const liq = best?.reserve_usd ?? null;
   add({ id: "liquidity", label: `At least $${PAIR_MIN_LIQUIDITY_USD.toLocaleString("en-US")} in that pool`, pass: liq === null ? null : liq >= PAIR_MIN_LIQUIDITY_USD, hard: true, value: liq === null ? "unknown" : `$${Math.round(liq).toLocaleString("en-US")}` });
   const oldest = (gt.pools ?? []).map((p) => (p.attributes.pool_created_at ? Date.parse(p.attributes.pool_created_at) : NaN)).filter(Number.isFinite).sort((a, b) => a - b)[0];

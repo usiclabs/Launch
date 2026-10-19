@@ -76,7 +76,7 @@ const STOCK_PICK_MESSAGE = "Pick a stock to price the token in, or switch the qu
 /** Per-chain copy in the form. A chain's quotes and stock registry differ, so its sentences do too; `stock` is null where no registry exists. */
 const CHAIN_COPY: Record<ChainKey, { blurb: string; gitlawbOrigin: string; stock: { pays: string; badge: string; empty: string; issuer: string } | null }> = {
   base: {
-    blurb: "Priced in ETH, BNKR or a Coinbase tokenized stock. Gas ≈ cents.",
+    blurb: `Priced in ETH, ${PLATFORM_TOKEN.symbol} or a Coinbase tokenized stock. Gas ≈ cents.`,
     gitlawbOrigin: "", // the Base form offers TWIG, not GITLAWB, so this copy is never shown there
     stock: {
       pays: "Buyers pay with a Coinbase tokenized stock; fees are paid in that stock.",
@@ -86,7 +86,7 @@ const CHAIN_COPY: Record<ChainKey, { blurb: string; gitlawbOrigin: string; stock
     },
   },
   robinhood: {
-    blurb: "Priced in USDG (dollars), ETH, BNKR or a Robinhood Stock Token. Gas ≈ cents.",
+    blurb: `Priced in USDG (dollars), ETH, ${PLATFORM_TOKEN.symbol} or a Robinhood Stock Token. Gas ≈ cents.`,
     gitlawbOrigin: ", bridged 1:1 from Base to Robinhood Chain over LayerZero",
     stock: {
       pays: "Buyers pay with a Robinhood Stock Token; fees are paid in that stock.",
@@ -592,9 +592,9 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
                   </span>
                   <p className={helper}>
                     Your token carries the <QuoteBrandBadge quoteKey={quote.key} /> badge on the launch list, trending, the activity feed, its page and its share card.{" "}
-                    BNKR is the temporary test pairing token. It is not LAUNCH&apos;s own token. No TWIG wrapper or swap route is used. USD estimates use this chain’s verified 30-minute pool average when available; otherwise enter amounts in BNKR.
+                    {PLATFORM_TOKEN.temporary ? `${PLATFORM_TOKEN.symbol} is the temporary pairing token. It is not LAUNCH’s own token. ` : `${PLATFORM_TOKEN.symbol} is the platform pairing token. `}USD estimates use this chain’s verified 30-minute pool average when available; otherwise enter amounts in {PLATFORM_TOKEN.symbol}.
                     <span className="block mt-2 font-mono break-all">{quote.address}</span>
-                    <a href={PLATFORM_TOKEN.website} target="_blank" rel="noreferrer" className="underline">Bankr ↗</a>
+                    <a href={PLATFORM_TOKEN.website} target="_blank" rel="noreferrer" className="underline">{PLATFORM_TOKEN.name} ↗</a>
                   </p>
                 </div>
               ) : null}

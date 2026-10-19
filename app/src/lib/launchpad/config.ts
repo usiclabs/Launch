@@ -33,10 +33,10 @@ const USDG: Quote = { key: "usdg", address: "0x5fc5360D0400a0Fd4f2af552ADD042D71
 /** USDC on Arc: the ERC-20 face of the chain's gas token (same balance as the native asset, 6 decimals here vs 18 natively). */
 const USDC_ARC: Quote = { key: "usdc", address: "0x3600000000000000000000000000000000000000", symbol: "USDC", decimals: 6, usd: 1 };
 /** GITLAWB: usd is null here (client-safe static); the server fills the live price (gitlawbServer.ts). Robinhood's is the LayerZero OFT of the Base token. */
-const GITLAWB: Quote = { key: "gitlawb", address: GITLAWB_ADDRESS as Address, symbol: GITLAWB_SYMBOL, decimals: GITLAWB_DECIMALS, usd: null, name: GITLAWB_NAME, logo: GITLAWB_LOGO_PATH };
+const GITLAWB: Quote = { key: "gitlawb", address: GITLAWB_ADDRESS as Address, symbol: GITLAWB_SYMBOL, decimals: GITLAWB_DECIMALS, usd: null, name: GITLAWB_NAME, logo: null };
 const GITLAWB_RH: Quote = { ...GITLAWB, address: GITLAWB_ADDRESS_ROBINHOOD as Address };
 /** TWIG: usd is null here (client-safe static); the server fills GITLAWB's live price, since one TWIG unwraps to one GITLAWB (twig.ts). Base only. */
-const TWIG: Quote = { key: "twig", address: TWIG_ADDRESS as Address, symbol: TWIG_SYMBOL, decimals: TWIG_DECIMALS, usd: null, name: TWIG_NAME, logo: TWIG_LOGO_PATH };
+const TWIG: Quote = { key: "twig", address: TWIG_ADDRESS as Address, symbol: TWIG_SYMBOL, decimals: TWIG_DECIMALS, usd: null, name: TWIG_NAME, logo: null };
 /**
  * Circle's USDC on Base and WETH (the OP Stack predeploy). The Base form offers neither, but the factory takes any ERC-20,
  * so scripts and agents pair with them; known here, they show as USDC / WETH and price (USDC at a dollar, WETH at ETH's live

@@ -14,7 +14,6 @@ import { ERC20_MIN_ABI, PERMIT2_ABI, STATE_VIEW_ABI, UNIVERSAL_ROUTER_ABI, V4_QU
 import { fmtImpact, impactLevel, priceImpact } from "@/lib/launchpad/price-impact";
 import { BUY_PRESETS, NATIVE, SWAP_GAS_RESERVE_WEI, launchpad, quoteUsdOf, sharesGasBalance, type Quote } from "@/lib/launchpad/config";
 import { pairBuyPresets } from "@/lib/launchpad/pairs";
-import { TWIG_WRAP_URL } from "@/lib/launchpad/twig";
 import { gasReserveInQuote } from "@/lib/launchpad/first-buy";
 import { fmtCompact, fmtQuoteUnits, fmtUsd, minOut, units } from "@/lib/launchpad/math";
 import { sanitizeDecimalInput } from "@/lib/launchpad/decimal-input";
@@ -409,12 +408,6 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
         </button>
       )}
 
-      {side === "buy" && quote.key === "twig" && !viaEth && (balance === undefined || balance === 0n || insufficient) ? (
-        <p className="text-center text-xs text-muted text-pretty">
-          Need TWIG? Wrap GITLAWB 1:1 or buy TWIG at{" "}
-          <a href={TWIG_WRAP_URL} target="_blank" rel="noreferrer" className="underline decoration-line underline-offset-2 hover:text-ink">wrap.twigpine.com ↗</a>
-        </p>
-      ) : null}
       {phase.k === "error" ? (
         <p className="rounded-xl bg-down-soft border border-down/20 text-down-ink text-sm px-3 py-2" role="alert">
           {phase.message}

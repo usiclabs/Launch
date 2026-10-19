@@ -7,7 +7,7 @@ export default function BoostRulesEntry() {
     <details open id="boosted">
       <summary>What is the Boosted lane?<ChevronDown size={17} aria-hidden="true" /></summary>
       <div>
-        <p>It is a separate, labelled row on the home page and the Base page. A place in it is paid for by sending TWIG to 0x…dEaD: the TWIG is gone, and nothing is paid to LAUNCH or Twigpine. It is not part of the ranking above: the Live sort and the Trending board count outside wallets only, and no boost changes them.</p>
+        <p>It is a separate, labelled row on the home page and the Base page. A place in it is paid for by sending legacy wrapper to 0x…dEaD: the legacy wrapper is gone, and nothing is paid to LAUNCH or the original project. It is not part of the ranking above: the Live sort and the Trending board count outside wallets only, and no boost changes them.</p>
         <p>{BOOST_COPY.what} {BOOST_COPY.how}</p>
         <p>{BOOST_COPY.tag} {BOOST_COPY.final}</p>
       </div>

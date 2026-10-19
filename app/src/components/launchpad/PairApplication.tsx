@@ -10,7 +10,7 @@ import { btn, card, helper, input } from "@/components/ui";
 import { BUILDER_DATA_SUFFIX, CHAINS, explorerTx, shortAddr } from "@/lib/chainPublic";
 import { ERC20_MIN_ABI, ERC20_TRANSFER_ABI } from "@/lib/launchpad/abi";
 import { DEAD } from "@/lib/launchpad/config";
-import { TWIG_ADDRESS, TWIG_WRAP_URL } from "@/lib/launchpad/twig";
+import { TWIG_ADDRESS } from "@/lib/launchpad/twig";
 import { nowMs } from "@/lib/launchpad/time";
 import { nonce } from "@/lib/nonce";
 import { friendlyError } from "@/lib/errors";
@@ -168,7 +168,7 @@ export default function PairApplication({ initial, open }: { initial: PairApplic
         const rc = await pub.waitForTransactionReceipt({ hash });
         if (rc.status !== "success") {
           remember(null); // reverted: nothing was sent, so nothing guards against sending it again
-          throw new Error("The transfer reverted on-chain. No TWIG was sent; you can try again.");
+          throw new Error("The transfer reverted on-chain. No legacy wrapper was sent; you can try again.");
         }
       } catch (e) {
         // sent, outcome unknown: say so, never offer to send the same TWIG again
@@ -220,7 +220,7 @@ export default function PairApplication({ initial, open }: { initial: PairApplic
       </div>
 
       <div className={`${card} space-y-3 p-5`}>
-        <h2 className="text-sm font-semibold text-ink">2 · The fee: ${app.fee_usd} in TWIG</h2>
+        <h2 className="text-sm font-semibold text-ink">2 · The fee: ${app.fee_usd} in legacy wrapper</h2>
         <p className="text-sm text-body">{PAIR_APPLY_COPY.feeRule(app.fee_usd)}</p>
         {app.status === "open" && waiting ? (
           <div className="space-y-2">
@@ -233,16 +233,16 @@ export default function PairApplication({ initial, open }: { initial: PairApplic
           ) : (
             <div className="space-y-2">
               <p className="text-sm text-ink">
-                ${Math.ceil(due)} = <span className="font-mono font-semibold">{group(q.twig)} TWIG</span> <span className="text-muted">· locked for {Math.floor(left / 60)}:{String(left % 60).padStart(2, "0")}</span>
+                ${Math.ceil(due)} = <span className="font-mono font-semibold">{group(q.twig)} legacy wrapper</span> <span className="text-muted">· locked for {Math.floor(left / 60)}:{String(left % 60).padStart(2, "0")}</span>
               </p>
               <p className={helper}>{PAIR_APPLY_COPY.lockNote} The last digits of the amount name this application, so the transfer itself records what it paid for.</p>
               {short ? (
                 <p className="text-xs text-warm-ink">
-                  This wallet holds less TWIG than that. <a href={TWIG_WRAP_URL} target="_blank" rel="noreferrer" className="underline">Get TWIG ↗</a>
+                  This wallet has insufficient balance. Paid applications are currently unavailable.
                 </p>
               ) : null}
               <p className="text-xs text-warm-ink">{PAIR_APPLY_COPY.sentFinal}</p>
-              <button type="button" onClick={() => void pay()} disabled={!address || busy !== null || left === 0 || Boolean(short)} className={btn.primary}>{!address ? "Connect a wallet to pay" : busy === "pay" ? "Sending…" : `Send ${group(q.twig)} TWIG to 0x…dEaD`}</button>
+              <button type="button" onClick={() => void pay()} disabled={!address || busy !== null || left === 0 || Boolean(short)} className={btn.primary}>{!address ? "Connect a wallet to pay" : busy === "pay" ? "Sending…" : `Send ${group(q.twig)} legacy wrapper to 0x…dEaD`}</button>
             </div>
           )
         ) : (
@@ -253,7 +253,7 @@ export default function PairApplication({ initial, open }: { initial: PairApplic
           <ul className="space-y-1 text-xs text-body">
             {app.burns.map((b) => (
               <li key={b.tx_hash}>
-                <a href={explorerTx(CHAIN, b.tx_hash)} target="_blank" rel="noopener noreferrer" className="underline decoration-line underline-offset-2">{group(b.twig)} TWIG</a> · {b.usd !== null ? `$${b.usd.toFixed(2)} (${b.priced_by === "quote" ? "at the locked price" : "at the price when it landed"})` : "not valued yet"} · from {shortAddr(b.sender)}
+                <a href={explorerTx(CHAIN, b.tx_hash)} target="_blank" rel="noopener noreferrer" className="underline decoration-line underline-offset-2">{group(b.twig)} legacy wrapper</a> · {b.usd !== null ? `$${b.usd.toFixed(2)} (${b.priced_by === "quote" ? "at the locked price" : "at the price when it landed"})` : "not valued yet"} · from {shortAddr(b.sender)}
               </li>
             ))}
           </ul>

@@ -1,3 +1,4 @@
+import { PLATFORM_TOKEN } from "@/lib/launchpad/platformToken";
 import { SITE_URL } from "@/lib/chainPublic";
 import { launchpad } from "@/lib/launchpad/config";
 import { BRAND_DOMAIN, BRAND_GITHUB } from "@/lib/brand";
@@ -8,8 +9,8 @@ import { applicationsOpen } from "@/lib/launchpad/pairApplyServer";
 /** How to apply for a community pair, only while applications are open: an agent must never burn for one that cannot exist yet. */
 function pairApplySection(): string {
   if (!applicationsOpen()) return "";
-  return `Listing is applied for at /pairs/apply (a free check, then a fee in TWIG sent to 0x…dEaD naming the application: amount = whole TWIG × 10^18
-+ 3 × 10^11 + application id; it pays for a review, not a listing, and is not refunded). Rules: https://github.com/Twigpine/openlaunch/blob/main/docs/pairs.md
+  return `Listing is applied for at /pairs/apply (a free check, then a fee in legacy wrapper sent to 0x…dEaD naming the application: amount = whole legacy wrapper × 10^18
++ 3 × 10^11 + application id; it pays for a review, not a listing, and is not refunded). Rules: https://github.com/usiclabs/Launch/blob/main/docs/pairs.md
 `;
 }
 
@@ -17,11 +18,11 @@ function pairApplySection(): string {
 function boostSection(): string {
   if (!boostEnabled()) return "";
   return `
-## Boost (Base, optional, paid in TWIG)
-A separate "Boosted" lane on the home page: the 5 tokens with the most TWIG sent to 0x000000000000000000000000000000000000dEaD for them in the last ${BOOST_WINDOW_H}h.
+## Boost (Base, optional, paid in legacy wrapper)
+A separate "Boosted" lane on the home page: the 5 tokens with the most legacy wrapper sent to 0x000000000000000000000000000000000000dEaD for them in the last ${BOOST_WINDOW_H}h.
 It is not part of the ranking: sort=live and the Trending board count outside wallets only. Nothing is paid to LAUNCH.
-To boost a launch: TWIG (${BOOST_TOKEN}).transfer(0x…dEaD, amount) with amount = whole * 10^18 + token_id
-(whole = a count of whole TWIG, at least ${BOOST_FLOOR_TWIG}; token_id = the launch's position id, the list API's token_id field,
+To boost a launch: legacy wrapper (${BOOST_TOKEN}).transfer(0x…dEaD, amount) with amount = whole * 10^18 + token_id
+(whole = a count of whole legacy wrapper, at least ${BOOST_FLOOR_TWIG}; token_id = the launch's position id, the list API's token_id field,
 greater than 0 and less than 10^11). The last 12 digits name the launch; a transfer outside these bounds is not a boost.
 Then POST ${SITE_URL}/api/launch/sync?chain=base&tx=0x… to show it at once. Burns are final.
 - GET  ${SITE_URL}/api/boost?chain=base                (the lane: twig, boosts, last_at, expires_at, clicks, top_booster, launch; names)
@@ -67,7 +68,7 @@ ${verificationLine("Arc (5042)", a, [
 
 ## What a launch does
 1. deploys a fixed-supply ERC-20 (1,000,000,000; no mint/pause/blacklist/tax/owner)
-2. initializes a Uniswap v4 pool quote/token (quote = ETH, TWIG on Base, GITLAWB, USDG on Robinhood Chain, USDC on Arc, USDC or WETH on Base (priced, not in the form), or a registry stock token; tick spacing 200, no hook) at the chosen start tick
+2. initializes a Uniswap v4 pool quote/token (quote = ETH, ${PLATFORM_TOKEN.symbol} on Base and Robinhood Chain, USDG on Robinhood Chain, USDC on Arc, USDC or WETH on Base (priced, not in the form), or a registry stock token; tick spacing 200, no hook) at the chosen start tick
 3. mints one single-sided position holding 100% of supply to an ownerless locker (no withdraw path exists)
 4. registers fee routing: lpFee 0 | 10000 (1%) | 30000 (3%) pips; recipients [] = fees burned,
    else {payout,bps}[] summing to 10000. Fixed forever.
@@ -84,9 +85,9 @@ USDG (Robinhood, 6 dec): 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
 USDC (Arc, 6 dec):       0x3600000000000000000000000000000000000000 (also the gas token; native balance = the same USDC at 18 decimals)
 USDC (Base, 6 dec):      0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 (Circle's; priced at $1)
 WETH (Base, 18 dec):     0x4200000000000000000000000000000000000006 (priced at ETH; buyers pay WETH, not ETH)
-TWIG (Base, 18 dec):     0x6aC18bcf4eDE02591d4917452700ea5eaAea13c1 (Twigpine's token: 1:1 wrapper of GITLAWB, wrap/unwrap any time, no fee; the Base form's quote; priced = GITLAWB; fees paid in TWIG, burned when recipients = [])
-GITLAWB (Base, 18 dec):  0x5F980Dcfc4c0fa3911554cf5ab288ed0eb13DBa3 (Twigpine's token; still recognised and priced on Base; fees paid in GITLAWB, burned when recipients = [])
-GITLAWB (Robinhood, 18 dec): 0xd1b0d44E4f6ed940fcC7A9F59Bf30Daf62cCFe3D (LayerZero OFT of the Base token, 1:1)
+${PLATFORM_TOKEN.symbol} (Base, 18 dec): ${PLATFORM_TOKEN.addresses.base}
+${PLATFORM_TOKEN.symbol} (Robinhood, 18 dec): ${PLATFORM_TOKEN.addresses.robinhood}
+Use the configured quote contract for the selected chain.
 
 ## Launch (contract call)
 factory.launch((name, symbol, metadataURI, quote, supply=0, startTick, lpFee, salt, recipients))
@@ -99,7 +100,7 @@ holder and no price move reads as dead on screeners and sits under "quiet launch
 ${boostSection()}
 ## Community pairs (Base)
 A launch may be paired with a listed community token: the site badges it and prices it in USD from one named pool (checked against
-that pool's 30-minute average). The launch form does not offer them (ETH, TWIG and stocks only): such a launch is made against the
+that pool's 30-minute average). The launch form does not offer them (ETH, ${PLATFORM_TOKEN.symbol} and stocks): such a launch is made against the
 factory directly. The contracts accept any ERC-20 either way; an unlisted one shows as "Unlisted pair", unpriced. Each listing is
 checked hourly and suspended when its checks fail.
 - GET  ${SITE_URL}/api/pairs                                        (every pair: address, symbol, decimals, status, usd, price source)

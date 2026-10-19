@@ -67,7 +67,7 @@ export default function BoostPanel({ token, tokenId, symbol, name, initial, twig
             {active ? (
               <>Boosted with <span className="font-mono text-warm-ink tnum">{fmtBoostTwig(state.twig)}</span> in the last 24 hours<span suppressHydrationWarning> · {left}</span>.</>
             ) : (
-              <>Not boosted. Sending TWIG to 0x…dEaD puts {symbol} in the Boosted lane for 24 hours.</>
+              <>Not boosted. Sending legacy wrapper to 0x…dEaD puts {symbol} in the Boosted lane for 24 hours.</>
             )}
           </p>
           {/* what the lane brought it: only while boosted, and not until it reads like a result */}
@@ -78,7 +78,7 @@ export default function BoostPanel({ token, tokenId, symbol, name, initial, twig
             </p>
           ) : null}
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <button type="button" onClick={() => setOpen(true)} className={btn.secondarySm}>{pending ? "Boost sent: check it" : "Boost with TWIG"}</button>
+            <button type="button" onClick={() => setOpen(true)} className={btn.secondarySm}>{pending ? "Boost sent: check it" : "Boost with legacy wrapper"}</button>
             {active && state.last_tx ? <a href={explorerTx(BOOST_CHAIN, state.last_tx)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-[11px] text-muted hover:text-ink">Latest burn<ArrowUpRight size={11} aria-hidden="true" /></a> : null}
           </div>
         </>

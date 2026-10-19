@@ -48,10 +48,10 @@ export function ethRouteFor(chain: ChainKey, quoteAddress: string, token: Addres
   const currencyIn = GITLAWB_POOL_KEY.currency0; // WETH: what the first hop's pool actually holds
   const toGitlawb: PathKey = { intermediateCurrency: gitlawb as Address, fee: GITLAWB_POOL_KEY.fee, tickSpacing: GITLAWB_POOL_KEY.tickSpacing, hooks: GITLAWB_POOL_KEY.hooks, hookData: "0x" };
   const toToken: PathKey = { intermediateCurrency: token, fee: pool.fee, tickSpacing: pool.tickSpacing, hooks: pool.hooks, hookData: "0x" };
-  if (q === gitlawb) return { currencyIn, path: [toGitlawb, toToken], via: ["ETH", "GITLAWB"] };
+  if (q === gitlawb) return { currencyIn, path: [toGitlawb, toToken], via: ["ETH", "legacy token"] };
   if (twig && q === twig) {
     const toTwig: PathKey = { intermediateCurrency: twig as Address, fee: TWIG_HOOK_POOL.fee, tickSpacing: TWIG_HOOK_POOL.tickSpacing, hooks: TWIG_HOOK_POOL.hooks as Address, hookData: "0x" };
-    return { currencyIn, path: [toGitlawb, toTwig, toToken], via: ["ETH", "GITLAWB", "TWIG"] };
+    return { currencyIn, path: [toGitlawb, toTwig, toToken], via: ["ETH", "legacy token", "legacy wrapper"] };
   }
   return null;
 }

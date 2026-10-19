@@ -1,3 +1,4 @@
+import { PLATFORM_TOKEN } from "@/lib/launchpad/platformToken";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import SectionIntro from "@/components/sections/SectionIntro";
@@ -9,12 +10,11 @@ import { PAIR_CHAINS, PAIR_COPY, pairPath, pairVolumeLabel, type PairPublic } fr
 import { fmtUsd, units } from "@/lib/launchpad/math";
 import { CHAIN_LABELS } from "@/lib/chainPublic";
 import { applicationsOpen } from "@/lib/launchpad/pairApplyServer";
-import { pairListingUsd } from "@/lib/launchpad/pairApply";
 
 export const metadata = pageMetadata({
   path: "/pairs",
   title: "Community pairs",
-  description: "Tokens a launch on LAUNCH can be paired with besides ETH and TWIG. Each is listed after public checks, priced from one named pool and watched every hour.",
+  description: `Tokens a launch on LAUNCH can be paired with besides ETH and ${PLATFORM_TOKEN.symbol}. Each is listed after public checks, priced from one named pool and watched every hour.`,
 });
 export const dynamic = "force-dynamic";
 
@@ -44,7 +44,7 @@ export default async function PairsPage() {
           <p className="mt-2 text-sm text-body">
             Your community&apos;s token here?{" "}
             <Link href="/pairs/apply" className="font-semibold text-brand hover:text-ink">Check it for free and apply →</Link>{" "}
-            <span className="text-muted">The fee is ${pairListingUsd()} in TWIG, burned, for a review.</span>
+            <span className="text-muted">Paid pair applications are currently unavailable.</span>
           </p>
         ) : (
           <p className="mt-2 text-sm text-muted">{PAIR_COPY.applySoon}</p>

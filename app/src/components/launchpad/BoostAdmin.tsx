@@ -158,8 +158,8 @@ function LaneStats({ wallet }: { wallet: string }) {
                 <th scope="col" className="py-1.5 pr-3 text-right font-medium">Clicks</th>
                 <th scope="col" className="py-1.5 pr-3 text-right font-medium">Rate</th>
                 <th scope="col" className="py-1.5 pr-3 text-right font-medium">Visitors</th>
-                <th scope="col" className="py-1.5 pr-3 text-right font-medium">TWIG burned</th>
-                <th scope="col" className="py-1.5 text-right font-medium" title="Clicks for every 100,000 TWIG burned for the token in this period">Per 100K</th>
+                <th scope="col" className="py-1.5 pr-3 text-right font-medium">legacy wrapper burned</th>
+                <th scope="col" className="py-1.5 text-right font-medium" title="Clicks for every 100,000 legacy wrapper burned for the token in this period">Per 100K</th>
               </tr>
             </thead>
             <tbody className="font-mono tnum">

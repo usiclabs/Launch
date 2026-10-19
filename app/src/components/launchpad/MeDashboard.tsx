@@ -292,7 +292,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
                     </button>
                     {/* Boost opens the dialog on the token's page (Base only, while the switch is on) */}
                     {boostOn && l.chain === BOOST_CHAIN ? (
-                      <Link href={`/t/${l.chain}/${l.token}?boost=1#boost`} className={styles.quietButton} aria-label={`Boost ${l.symbol} with TWIG`}>
+                      <Link href={`/t/${l.chain}/${l.token}?boost=1#boost`} className={styles.quietButton} aria-label={`Boost ${l.symbol} with legacy wrapper`}>
                         <Flame size={14} aria-hidden="true" />Boost
                       </Link>
                     ) : null}

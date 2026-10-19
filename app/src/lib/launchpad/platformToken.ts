@@ -3,6 +3,7 @@ import type { ChainKey } from "../chainKeys.ts";
 /** Temporary integration, isolated on the bnkr-test branch. Never relabel legacy pools. */
 export const PLATFORM_TOKEN = {
   symbol: "BNKR",
+  temporary: true,
   name: "BankrCoin",
   decimals: 18,
   website: "https://bankr.bot",

@@ -13,7 +13,6 @@ import { Spinner } from "@/components/Skeleton";
 import { useHydratedAccount } from "@/lib/useHydratedAccount";
 import { ERC20_MIN_ABI, ERC20_TRANSFER_ABI } from "@/lib/launchpad/abi";
 import { DEAD } from "@/lib/launchpad/config";
-import { TWIG_WRAP_URL } from "@/lib/launchpad/twig";
 import { fmtUsd } from "@/lib/launchpad/math";
 import { friendlyError } from "@/lib/errors";
 import { BUILDER_DATA_SUFFIX, CHAINS, SITE_URL, explorerTx } from "@/lib/chainPublic";
@@ -120,13 +119,13 @@ export default function BoostDialog({ token, tokenId, symbol, name, twigUsd, cur
   async function settle(hash: Hex, whole: bigint, ok: boolean, shows: boolean) {
     onPending(null);
     if (!ok) {
-      setPhase({ k: "error", message: "The transfer reverted on-chain. No TWIG was sent; you can try again." });
+      setPhase({ k: "error", message: "The transfer reverted on-chain. No legacy wrapper was sent; you can try again." });
       return;
     }
     // index it now rather than at the next poll: the lane and this page show it straight away
     await fetch(`/api/launch/sync?chain=${BOOST_CHAIN}&tx=${hash}`, { method: "POST" }).catch(() => {});
     setPhase({ k: "done", hash, whole, shows });
-    toast({ kind: "info", title: `${symbol} is boosted`, sub: `${groupWhole(whole)} TWIG sent to 0x…dEaD`, chain: BOOST_CHAIN, token, symbol });
+    toast({ kind: "info", title: `${symbol} is boosted`, sub: `${groupWhole(whole)} legacy wrapper sent to 0x…dEaD`, chain: BOOST_CHAIN, token, symbol });
     void bal.refetch();
     onBoosted?.();
   }
@@ -182,16 +181,16 @@ export default function BoostDialog({ token, tokenId, symbol, name, twigUsd, cur
                 placeholder={groupWhole(BOOST_FLOOR_TWIG)}
                 aria-describedby={`boost-${token}-note`}
               />
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-semibold text-ink"><TwigMark size={14} className="rounded-[3px]" />TWIG</span>
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-semibold text-ink"><TwigMark size={14} className="rounded-[3px]" />legacy wrapper</span>
             </div>
             <div className="mt-3 flex gap-1.5">
               {BOOST_PRESETS.map((p) => (
-                <button key={p} type="button" disabled={busy} onClick={() => setAmount(groupWhole(BigInt(p)))} aria-label={`Send ${groupWhole(BigInt(p))} TWIG`} className="min-h-7 flex-1 rounded-full border border-line px-2 font-mono text-[11px] tnum hover:border-line-strong hover:text-ink">
-                  {fmtBoostTwig(BigInt(p) * 10n ** 18n).replace(" TWIG", "")}
+                <button key={p} type="button" disabled={busy} onClick={() => setAmount(groupWhole(BigInt(p)))} aria-label={`Send ${groupWhole(BigInt(p))} legacy wrapper`} className="min-h-7 flex-1 rounded-full border border-line px-2 font-mono text-[11px] tnum hover:border-line-strong hover:text-ink">
+                  {fmtBoostTwig(BigInt(p) * 10n ** 18n).replace(" legacy wrapper", "")}
                 </button>
               ))}
             </div>
-            <p id={`boost-${token}-note`} className="mt-2 min-h-4 text-[10px] text-muted">{problem ?? (usd ? `≈ ${usd} at today's TWIG price` : " ")}</p>
+            <p id={`boost-${token}-note`} className="mt-2 min-h-4 text-[10px] text-muted">{problem ?? (usd ? `≈ ${usd} at today's legacy wrapper price` : " ")}</p>
           </div>
 
           {/* the lane is full and this amount stays under its 5th place: said before anything is sent */}
@@ -200,7 +199,7 @@ export default function BoostDialog({ token, tokenId, symbol, name, twigUsd, cur
               <p>{BOOST_COPY.short}</p>
               {neededWhole !== null && neededWhole > 0n ? (
                 <button type="button" disabled={busy} onClick={() => setAmount(groupWhole(neededWhole < BOOST_FLOOR_TWIG ? BOOST_FLOOR_TWIG : neededWhole))} className="font-medium text-ink underline underline-offset-2 hover:text-brand">
-                  Send {groupWhole(neededWhole < BOOST_FLOOR_TWIG ? BOOST_FLOOR_TWIG : neededWhole)} TWIG to show now
+                  Send {groupWhole(neededWhole < BOOST_FLOOR_TWIG ? BOOST_FLOOR_TWIG : neededWhole)} legacy wrapper to show now
                 </button>
               ) : null}
             </div>
@@ -217,8 +216,7 @@ export default function BoostDialog({ token, tokenId, symbol, name, twigUsd, cur
 
           {balance === 0n ? (
             <p className="text-[11px] text-muted">
-              No TWIG in this wallet. Wrap GITLAWB 1:1 or buy TWIG at{" "}
-              <a href={TWIG_WRAP_URL} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">wrap.twigpine.com ↗</a>
+              No boost token in this wallet. Boost payments are currently unavailable.
             </p>
           ) : null}
 
@@ -232,7 +230,7 @@ export default function BoostDialog({ token, tokenId, symbol, name, twigUsd, cur
           {phase.k === "sent" ? <a href={explorerTx(BOOST_CHAIN, phase.hash)} target="_blank" rel="noreferrer" className="block text-center text-[11px] text-muted underline underline-offset-2 hover:text-ink">View the transaction ↗</a> : null}
           {phase.k === "unconfirmed" ? (
             <div role="status" className="space-y-2 rounded-xl border border-line bg-paper px-3 py-2.5 text-[11px] leading-relaxed text-body">
-              <p>Your wallet sent {groupWhole(phase.whole)} TWIG, but Base has not confirmed it to this page yet. Sending is locked until it does, so the same boost is never paid twice.</p>
+              <p>Your wallet sent {groupWhole(phase.whole)} legacy wrapper, but Base has not confirmed it to this page yet. Sending is locked until it does, so the same boost is never paid twice.</p>
               {phase.note ? <p className="text-warm-ink">{phase.note}</p> : null}
               <div className="flex flex-wrap items-center gap-3">
                 <button type="button" disabled={phase.checking} onClick={() => void checkAgain()} className={btn.secondarySm}>{phase.checking ? <><Spinner size={12} /> Checking…</> : "Check again"}</button>

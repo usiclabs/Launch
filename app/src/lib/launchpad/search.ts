@@ -10,8 +10,8 @@ export const FILTERS: { key: LaunchFilter; label: string; title: string; chains?
   { key: "burn", label: "fees burned", title: "no beneficiary; every fee is burned" },
   { key: "usdg", label: "USDG", title: "priced in USDG (Robinhood Chain)", chains: ["robinhood"] },
   { key: "usdc", label: "USDC", title: "priced in USDC (Base or Arc)", chains: ["base", "arc"] },
-  { key: "twig", label: "TWIG", title: "priced in TWIG, the 1:1 wrapper of GITLAWB (Base)", chains: CHAIN_KEYS.filter((k) => TWIG_ADDRESSES[k] !== null) },
-  { key: "gitlawb", label: "GITLAWB", title: "priced in GITLAWB (Base or Robinhood Chain)", chains: CHAIN_KEYS.filter((k) => GITLAWB_ADDRESSES[k] !== null) },
+  { key: "twig", label: "Legacy wrapper", title: "priced in a legacy wrapper (Base)", chains: CHAIN_KEYS.filter((k) => TWIG_ADDRESSES[k] !== null) },
+  { key: "gitlawb", label: "Legacy token", title: "priced in a legacy token (Base or Robinhood Chain)", chains: CHAIN_KEYS.filter((k) => GITLAWB_ADDRESSES[k] !== null) },
   { key: "today", label: "today", title: "launched in the last 24 hours" },
 ];
 /** Whether a filter is offered with `chain` selected (null = all chains: every filter). */

@@ -13,9 +13,7 @@ import { imagePublicBase, readImage } from "@/lib/launchpad/imageStore";
 import { rasterSharp } from "@/lib/launchpad/imageProcess";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { GITLAWB_LOGO_BG, GITLAWB_LOGO_PATH } from "@/lib/launchpad/gitlawb";
 import { isSiteLogoPath } from "@/lib/launchpad/pairs";
-import { TWIG_LOGO_BG, TWIG_LOGO_PATH } from "@/lib/launchpad/twig";
 
 /** Brand logos from public/, inlined once per process each (satori needs a data URL or absolute URL). */
 const brandLogos = new Map<string, Promise<string | null>>();
@@ -76,11 +74,9 @@ export default async function TokenOg({ params }: { params: Promise<{ chain: str
   const [usd, fonts] = await Promise.all([ethUsd(), loadOgFonts()]);
   const l = isChainKey(chain) && isAddress(token) ? await memo(`og:${chain}:${token.toLowerCase()}`, 30_000, () => getLaunch(chain, token, usd)) : null;
   const card = l ? shapeCard(l, nowMs()) : null;
-  const glLogo = card?.quote?.kind === "gitlawb" ? await logoDataUrl(GITLAWB_LOGO_PATH) : null;
   // a community pair's logo: a tile served from public/ (MUSEWORLD's), or one on our own image host; nothing else is fetched
   const pairLogoUrl = card?.quote?.kind === "pair" ? (card.quote.logo ?? null) : null;
   const pLogo = pairLogoUrl ? (isSiteLogoPath(pairLogoUrl) ? await logoDataUrl(pairLogoUrl) : await memo(`og-pair-logo:${pairLogoUrl}`, 300_000, () => ownLogo(pairLogoUrl))) : null;
-  const twLogo = card?.quote?.kind === "twig" ? await logoDataUrl(TWIG_LOGO_PATH) : null;
   const logo = l ? await memo(`og-logo:${chain}:${token.toLowerCase()}`, 60_000, () => ownLogo(l.image_url)) : null;
   const h = hueOf(token);
   return new ImageResponse(
@@ -131,14 +127,6 @@ export default async function TokenOg({ params }: { params: Promise<{ chain: str
                     {card.quote.kind === "pair" ? (
                       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, background: LINE, color: BODY, fontSize: 14, fontWeight: 800, overflow: "hidden" }}>
                         {pLogo ? <img src={pLogo} width={30} height={30} alt="" /> : card.quote.ticker.slice(0, 1)}
-                      </span>
-                    ) : card.quote.kind === "twig" ? (
-                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, background: TWIG_LOGO_BG, overflow: "hidden" }}>
-                        {twLogo ? <img src={twLogo} width={30} height={30} alt="" /> : null}
-                      </span>
-                    ) : card.quote.kind === "gitlawb" ? (
-                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, background: GITLAWB_LOGO_BG, overflow: "hidden" }}>
-                        {glLogo ? <img src={glLogo} width={30} height={30} alt="" /> : null}
                       </span>
                     ) : (
                       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, background: BLUE, color: "#fff", fontSize: card.quote.ticker.length > 4 ? 7 : card.quote.ticker.length > 3 ? 8 : 10, fontWeight: 800, letterSpacing: -0.5, whiteSpace: "nowrap", overflow: "hidden" }}>
