@@ -37,7 +37,7 @@
 .bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-top: 16px; border-top: 1px solid var(--color-line); color: var(--color-muted); font-size: 11px; }
 .credit { text-decoration: underline; text-decoration-color: var(--color-line-strong); text-underline-offset: 3px; }
 .credit:hover { color: var(--color-ink); }
-.utilities { display: flex; align-items: center; gap: 24px; }
+.utilities { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 24px; }
 .license, .backTop { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 .license:hover, .backTop:hover { color: var(--color-ink); }
 .backTop svg { transition: transform 180ms ease; }

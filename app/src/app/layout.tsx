@@ -14,6 +14,7 @@ import { siteJsonLdHtml, siteVerification } from "@/lib/seo";
 import Footer from "@/components/Footer";
 import RouteProgress from "@/components/RouteProgress";
 import ThemeProvider from "@/components/ThemeProvider";
+import OnboardingTour from "@/components/onboarding/OnboardingTour";
 import { Suspense } from "react";
 import { geist, geistMono } from "./fonts";
 
@@ -58,6 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <TxToasts />
           <div className="flex-1 min-w-0">{children}</div>
           <Footer />
+          <OnboardingTour />
           </LiveProvider>
         </Web3Provider>
         </ThemeProvider>

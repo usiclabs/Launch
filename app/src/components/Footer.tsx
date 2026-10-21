@@ -6,6 +6,7 @@ import { hasChainPage, launchpad } from "@/lib/launchpad/config";
 import { chainLandingPath } from "@/lib/chainLanding";
 import Mark from "./launchpad/Mark";
 import styles from "./Footer.module.css";
+import { TourButton } from "./onboarding/OnboardingTour";
 
 const EXPLORE = [
   { href: "/", label: "Launchpad" },
@@ -75,6 +76,7 @@ export default function Footer() {
           {/* the chart library's licence credit, on every page that can show a chart */}
           <p>Open source. Open participation. Charts by <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer" className={styles.credit}>TradingView</a>.</p>
           <div className={styles.utilities}>
+            <TourButton />
             <a href={`${BRAND_GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={styles.license}>MIT licensed <ArrowUpRight size={12} aria-hidden="true" /></a>
             <a href="#site-top" className={styles.backTop}>Back to top <ArrowUp size={14} aria-hidden="true" /></a>
           </div>
