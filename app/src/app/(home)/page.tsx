@@ -21,6 +21,7 @@ import LaunchPill from "@/components/launchpad/LaunchPill";
 import WhyFree from "@/components/launchpad/WhyFree";
 import { MagicCard } from "@/components/vendor/magic-card";
 import { LAYOUT_COOKIE, parseLayout } from "@/lib/launchpad/list-layout";
+import { MARKET_COOKIE, parseMarketPreferences } from "@/lib/launchpad/market-preferences";
 
 export const dynamic = "force-dynamic";
 // Title and description come from the root layout; ?sort= / ?chain= / ?window= / ?view= are all this one page.
@@ -30,13 +31,18 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 const RIVER_SEED = 100;
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ sort?: string; window?: string; chain?: string; filter?: string; view?: string }> }) {
-  const sp = await searchParams;
+  const requested = await searchParams;
+  const jar = await cookies();
+  // Explicit links always win. A plain home visit restores the previous market selection before rendering.
+  const saved = parseMarketPreferences(jar.get(MARKET_COOKIE)?.value);
+  const hasSelection = [requested.sort, requested.window, requested.chain, requested.filter, requested.view].some(v => v !== undefined);
+  const sp = hasSelection || !saved ? requested : { sort: saved.sort, window: saved.window, chain: saved.chain ?? undefined, filter: saved.filter ?? undefined, view: undefined };
   const sort = parseSort(sp.sort, "live");
   const window: VolumeWindow = VOLUME_WINDOWS.includes(sp.window as VolumeWindow) ? (sp.window as VolumeWindow) : "all";
   const chain = visibleChainOr(sp.chain);
   const filter = isFilter(sp.filter) ? sp.filter : null;
   const usd = await ethUsd();
-  const layout = parseLayout((await cookies()).get(LAYOUT_COOKIE)?.value);
+  const layout = parseLayout(jar.get(LAYOUT_COOKIE)?.value);
   const listOpts = { sort, window, chain, filter, limit: PAGE_SIZE, ethUsd: usd };
   const [page, feed, fresh, posts, fetchedTrending, boost] = await Promise.all([
     listLaunchesPage(listOpts),

@@ -24,6 +24,7 @@ import { liveChip, liveChipParts, liveTier } from "@/lib/launchpad/ranking";
 import { PAGE_SIZE } from "@/lib/launchpad/paging";
 import { Spinner } from "@/components/Skeleton";
 import { layoutCookie, type ListLayout } from "@/lib/launchpad/list-layout";
+import { marketCookie } from "@/lib/launchpad/market-preferences";
 import { startNav } from "@/components/RouteProgress";
 
 const SORTS: { key: LaunchSort; label: string }[] = [
@@ -145,6 +146,7 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
    * router.replace would re-render the whole page on the server, and a failing render there unmounts the page.
    */
   function syncUrl(next: Selection, v: ListView): URLSearchParams {
+    try { document.cookie = marketCookie(next); } catch { /* Browsing still works when saved settings are blocked. */ }
     const p = new URLSearchParams();
     if (next.sort !== "live") p.set("sort", next.sort);
     if (next.window !== "all") p.set("window", next.window);
@@ -254,7 +256,7 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
   /** Rows or cards; remembered in a cookie so the next visit renders the same layout from the server. */
   function chooseLayout(next: ListLayout) {
     setLayout(next);
-    document.cookie = layoutCookie(next);
+    try { document.cookie = layoutCookie(next); } catch { /* Keep the in-memory layout when cookies are blocked. */ }
   }
 
   const searchResult = remote?.query === nq && remote.chain === chain ? remote : null;
@@ -350,8 +352,8 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
         {shown.length === 0 ? <li className="col-span-full space-y-3 border-t border-line px-5 py-12 text-center">
           <Search size={20} aria-hidden="true" className="mx-auto text-muted" />
           <p className="text-sm font-semibold text-ink">{updating || searching ? "Finding your launches…" : nq || filter || chain ? "No matching launches" : "The next launch could be yours"}</p>
-          <p className="mx-auto max-w-xs text-pretty text-xs leading-relaxed text-muted">{!hasDb ? "The launch database is not configured yet." : nq || filter || chain ? "Try a different name, chain or filter." : "New tokens will appear here as soon as they launch."}</p>
-          {nq || filter || chain ? <button type="button" onClick={reset} className={btn.secondarySm}>Clear search & filters</button> : <Link href="/launch" className={btn.secondarySm}>Launch the first token <ArrowRight size={13} aria-hidden="true" /></Link>}
+          <p className="mx-auto max-w-xs text-pretty text-xs leading-relaxed text-muted">{!hasDb ? "Launch data is temporarily unavailable. You can still explore how launching works." : nq ? "Search by a token’s name, symbol, or full contract address. You can also clear filters to search every chain." : filter || chain ? "No launches match this view yet. Browse every chain or create a token of your own." : "Give your idea a name, choose a pair, and preview your token before signing. New launches appear here once confirmed."}</p>
+          {!hasDb ? <Link href="/rules#launchpad" className={btn.secondary}>See how launching works <ArrowRight size={13} aria-hidden="true" /></Link> : updating || searching ? null : nq || filter || chain ? <button type="button" onClick={reset} className={btn.secondary}>Browse all launches</button> : <Link href="/launch" className={btn.secondary}>Create a token <ArrowRight size={13} aria-hidden="true" /></Link>}
         </li> : null}
       </ul>
       {loadError || searchResult?.error ? <p role="alert" className={`flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-xs text-warm-ink ${pad}`}>

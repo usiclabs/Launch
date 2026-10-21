@@ -1,10 +1,11 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ImagePlus, X } from "lucide-react";
 import { helper, input as inputCls } from "@/components/ui";
 import { BANNER_HEIGHT, BANNER_WIDTH, maxBytesFor, sniffImage, type ImageRole } from "@/lib/launchpad/images";
 import { Spinner } from "@/components/Skeleton";
+import ImageCropper from "./ImageCropper";
 
 /**
  * The address an image preview loads: an http(s) URL typed into the field, parsed the way the browser will request
@@ -30,35 +31,56 @@ function previewUrl(value: string): string | null {
  * fills the height it is given, so a logo and a banner side by side end level: the logo's tile sits above
  * its words, and the banner zone drops its fixed 3:1 for the row's height.
  */
-export default function ImageUpload({ value, onChange, wallet, compact = false, kind = "logo", stacked = false }: { value: string; onChange: (url: string) => void; wallet: string | undefined; compact?: boolean; kind?: ImageRole; stacked?: boolean }) {
+export default function ImageUpload({ value, onChange, wallet, compact = false, kind = "logo", stacked = false, onBusyChange, disabled = false }: { value: string; onChange: (url: string) => void; wallet: string | undefined; compact?: boolean; kind?: ImageRole; stacked?: boolean; onBusyChange?: (busy: boolean) => void; disabled?: boolean }) {
   const id = useId();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [over, setOver] = useState(false);
+  const [crop, setCrop] = useState<string | null>(null);
+  const picking = useRef(false);
+  useEffect(() => { onBusyChange?.(busy || Boolean(crop)); return () => onBusyChange?.(false); }, [busy, crop, onBusyChange]);
   const preview = previewUrl(value);
   const banner = kind === "banner";
   const max = maxBytesFor(kind);
 
-  async function upload(file: File) {
-    setErr(null);
-    if (!wallet) return setErr("Connect a wallet to upload.");
-    if (file.size > max) return setErr(`Max ${max / 1024 / 1024} MB.`);
-    const head = new Uint8Array(await file.slice(0, 16).arrayBuffer());
-    if (!sniffImage(head)) return setErr("PNG, JPEG, WebP or GIF only.");
+  async function choose(file: File) {
+    if (disabled || busy || crop || picking.current) return;
+    picking.current = true;
     setBusy(true);
+    setErr(null);
+    try {
+      if (file.size > max) throw new Error(`Max ${max / 1024 / 1024} MB.`);
+      const head = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+      if (!sniffImage(head)) throw new Error("PNG, JPEG, WebP or GIF only.");
+      // data: is already allowed by the image CSP; no policy expansion is needed for local previews.
+      const source = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Could not read this image."));
+        reader.onerror = () => reject(new Error("Could not read this image."));
+        reader.readAsDataURL(file);
+      });
+      setCrop(source);
+    } catch (error) { setErr(error instanceof Error ? error.message : "Could not open this image."); }
+    finally { picking.current = false; setBusy(false); }
+  }
+
+  async function upload(file: File) {
+    if (!wallet) throw new Error("Connect your wallet before uploading. Cancel, connect, and select your image again.");
+    setBusy(true);
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 45000);
     try {
       const fd = new FormData();
       fd.set("wallet", wallet);
       fd.set("kind", kind);
       fd.set("file", file, kind);
-      const r = await fetch("/api/launch/image", { method: "POST", body: fd });
+      const r = await fetch("/api/launch/image", { method: "POST", body: fd, signal: controller.signal });
       const j = (await r.json().catch(() => ({}))) as { url?: string; error?: string };
       if (!r.ok || !j.url) throw new Error(j.error || `upload failed (${r.status})`);
       onChange(j.url);
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "upload failed");
     } finally {
+      window.clearTimeout(timer);
       setBusy(false);
     }
   }
@@ -66,13 +88,14 @@ export default function ImageUpload({ value, onChange, wallet, compact = false, 
   // the drop zone behaves the same for both kinds; only what it draws differs
   const zone = {
     role: "button" as const,
-    tabIndex: 0,
+    tabIndex: disabled ? -1 : 0,
     "aria-label": banner ? "Upload token banner" : "Upload token image",
-    onClick: () => !busy && fileRef.current?.click(),
+    "aria-disabled": disabled || busy || Boolean(crop),
+    onClick: () => !disabled && !busy && !crop && fileRef.current?.click(),
     onKeyDown: (e: React.KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        fileRef.current?.click();
+        if (!disabled && !busy && !crop) fileRef.current?.click();
       }
     },
     onDragOver: (e: React.DragEvent) => {
@@ -84,7 +107,7 @@ export default function ImageUpload({ value, onChange, wallet, compact = false, 
       e.preventDefault();
       setOver(false);
       const f = e.dataTransfer.files?.[0];
-      if (f) void upload(f);
+      if (f) void choose(f);
     },
   };
   const edge = `${over ? "border-brand bg-brand-soft" : "border-line hover:border-ink/40 bg-paper"} ${busy ? "opacity-70 cursor-progress" : ""}`;
@@ -93,12 +116,13 @@ export default function ImageUpload({ value, onChange, wallet, compact = false, 
       ref={fileRef}
       id={id}
       type="file"
+      disabled={disabled || busy}
       accept="image/png,image/jpeg,image/webp,image/gif"
       className="sr-only"
       onChange={(e) => {
         const f = e.target.files?.[0];
         e.target.value = "";
-        if (f) void upload(f);
+        if (f) void choose(f);
       }}
     />
   );
@@ -149,11 +173,13 @@ export default function ImageUpload({ value, onChange, wallet, compact = false, 
           {fileInput}
         </div>
       )}
-      {err ? <p className="text-xs text-red-600 mt-1.5">{err}</p> : null}
+      {err ? <p role="alert" className="text-xs text-down-ink mt-1.5">{err}</p> : null}
+      {!wallet ? <p className={`${helper} mt-2`}>Preview a crop now. Connect your wallet to upload it.</p> : null}
       <details className="mt-2">
         <summary className={`${helper} cursor-pointer select-none`}>{banner ? "or paste a banner URL" : "or paste an image URL"}</summary>
         <input className={`${inputCls} mt-2`} value={value} onChange={(e) => onChange(e.target.value)} placeholder={banner ? "https://…/banner.png" : "https://…/logo.png"} inputMode="url" aria-label={banner ? "Banner URL" : "Image URL"} />
       </details>
+      {crop ? <ImageCropper source={crop} kind={kind} onClose={() => setCrop(null)} onSave={upload} /> : null}
     </div>
   );
 }

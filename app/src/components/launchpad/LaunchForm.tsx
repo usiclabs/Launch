@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { ChartCandlestick, Check, CircleDollarSign, Globe, Rocket } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ChartCandlestick, Check, ChevronDown, CircleDollarSign, Circle, Globe, Rocket, Save } from "lucide-react";
 import { useBalance, useConfig, useReadContract, useSwitchChain } from "wagmi";
 import { useHydratedAccount } from "@/lib/useHydratedAccount";
 import { getPublicClient, getWalletClient } from "wagmi/actions";
@@ -31,13 +30,15 @@ import { BUY_PRESETS, defaultFirstBuy, gasReserveInQuote, suggestFirstBuy } from
 import { getFirstBuyDeclined, getFirstBuyDeclinedServer, setFirstBuyDeclined, subscribeFirstBuyDeclined } from "@/lib/launchpad/first-buy-session";
 import { encodeV4ExactInSingle, type PoolKey } from "@/lib/launchpad/swap";
 import { PLATFORM_TOKEN, TOKEN_PREVIEW } from "@/lib/launchpad/platformToken";
-import { GITLAWB_SITE } from "@/lib/launchpad/gitlawb";
-import { TWIG_WRAP_URL, gitlawbLinkedUsd } from "@/lib/launchpad/twig";
+import { gitlawbLinkedUsd } from "@/lib/launchpad/twig";
 import { parseXHandle } from "@/lib/launchpad/xHandle";
 import { CHAINS, CHAIN_LABELS, CHAIN_KEYS, DEFAULT_CHAIN, BUILDER_DATA_SUFFIX, explorerTx, shortAddr, type ChainKey } from "@/lib/chainPublic";
 import { friendlyError } from "@/lib/errors";
 import { Spinner } from "@/components/Skeleton";
-import { startNav } from "@/components/RouteProgress";
+import { useLaunchDraft } from "./useLaunchDraft";
+import type { DraftDetails } from "@/lib/launchpad/launch-draft";
+import LaunchSuccess from "./LaunchSuccess";
+import FieldHelp from "./FieldHelp";
 import WalletPicker from "@/components/WalletPicker";
 import { randomHex } from "@/lib/nonce";
 
@@ -57,6 +58,7 @@ type Phase =
   | { k: "buying"; hash: Hex; step: "sent"; buyHash: Hex }
   | { k: "indexing"; hash: Hex }
   | { k: "done"; hash: Hex; token: string }
+  | { k: "pending"; hash: Hex; message: string }
   | { k: "error"; message: string };
 
 // A chain without contracts reads as upcoming to visitors; in development the reason is what matters.
@@ -173,7 +175,6 @@ async function firstBuy(ctx: FirstBuyCtx, tokenAddr: Address, launchHash: Hex, a
 }
 
 export default function LaunchForm({ ethUsd, platformPrices = { base: null, robinhood: null, arc: null }, gitlawbUsd = null, initialChain = DEFAULT_CHAIN }: { ethUsd: number | null; platformPrices?: Record<ChainKey, number | null>; gitlawbUsd?: number | null; initialChain?: ChainKey }) {
-  const router = useRouter();
   const [chain, setChain] = useState<ChainKey>(initialChain);
   const cfg = launchpad(chain);
   const CHAIN = CHAINS[chain];
@@ -264,6 +265,21 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   // the server answers 409 and launch() rotates BOTH (a key is locked to the details it was first registered with).
   const metaKeyRef = useRef<Hex | null>(null);
   const [phase, setPhase] = useState<Phase>({ k: "idle" });
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [bannerBusy, setBannerBusy] = useState(false);
+  const [resultNote, setResultNote] = useState<string | null>(null);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const submitting = useRef(false);
+  const submittedHash = useRef<Hex | null>(null);
+  const inFlight = phase.k !== "idle" && phase.k !== "error";
+  const draftDetails = useMemo(() => ({ name, symbol, description, image, banner, website, x, chain }), [name, symbol, description, image, banner, website, x, chain]);
+  const draft = useLaunchDraft(draftDetails, !inFlight);
+  function applyDraft(value: DraftDetails) {
+    setName(value.name); setSymbol(value.symbol); setDescription(value.description); setImage(value.image); setBanner(value.banner); setWebsite(value.website); setX(value.x);
+    setChain(value.chain); setQuoteKey(launchpad(value.chain).quotes[0].key); setStock(null); setMcapPick(null); setCustomMcap("");
+    setTypedBuyFor(null); setDeclinedNow(true);
+    setFeePips(0); setBeneficiary("burn"); setRows([emptyRow()]);
+  }
 
   // Starting cap: entered in dollars whenever the quote has a USD price, else in quote units (lib/launchpad/market-cap.ts).
   // The tick is always computed from the quote-denominated cap; every figure shown leads with dollars.
@@ -310,6 +326,9 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   if (!httpsOrEmpty(website)) errors.push("Website must be an https URL.");
   const xParsed = parseXHandle(x);
   if (!xParsed.ok) errors.push("X: enter a handle or an x.com link.");
+  if (logoBusy || bannerBusy) errors.push("Finish preparing your artwork before launching.");
+  if (address && nativeBalance === 0n) errors.push(`Add ${NATIVE_SYMBOL} to your wallet on ${CHAIN_LABEL} for network gas.`);
+  if (address && nativeBalance === undefined) errors.push(ethBal.isError ? `Could not check your ${NATIVE_SYMBOL} gas balance. Retry below.` : `Checking your ${NATIVE_SYMBOL} gas balance…`);
   // the market row this launch will have, for the preview: the same card it gets on the board
   const previewRow = previewLaunch({ chain, name, symbol: symbolClean, description, image, banner, website, xHandle: xParsed.ok ? xParsed.handle || null : null, fdvQuote: fdvPreview, quote: { key: quote.key, symbol: quote.symbol, decimals: quote.decimals, usd: quoteUsd }, lpFee: feePips, launcher: address ?? null });
   const split = useMemo(() => buildRecipients(rows), [rows]);
@@ -358,7 +377,9 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   const hasRow = (payout: string) => rows.some((r) => r.payout.trim().toLowerCase() === payout.toLowerCase());
 
   async function launch() {
-    if (TOKEN_PREVIEW || !valid || !address || !cfg.factory || startTick === null) return;
+    if (submitting.current || inFlight || draft.pending || !draft.ready || TOKEN_PREVIEW || !valid || !address || !cfg.factory || startTick === null) return;
+    submitting.current = true;
+    setPhase({ k: "saving" });
     const FACTORY_ADDRESS = cfg.factory;
     let salt = saltRef.current ?? (saltRef.current = randomSalt());
     let metaKey = metaKeyRef.current ?? (metaKeyRef.current = randomSalt());
@@ -428,11 +449,13 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
       setPhase({ k: "signing" });
       const wallet = await getWalletClient(config, { chainId: CHAIN.id });
       const hash = await wallet.writeContract(request);
+      submittedHash.current = hash;
       setPhase({ k: "sent", hash });
       const receipt = await pub.waitForTransactionReceipt({ hash });
-      if (receipt.status !== "success") throw new Error("Transaction reverted on-chain.");
+      if (receipt.status !== "success") { submittedHash.current = null; throw new Error("Transaction reverted on-chain. No token was created by this transaction."); }
       const [ev] = parseEventLogs({ abi: LAUNCH_FACTORY_ABI, eventName: "Launched", logs: receipt.logs });
       const token = (ev?.args.token ?? meta.token ?? "").toLowerCase();
+      draft.clear();
 
       // Optional first buy. The launch is already on-chain: whatever happens here must not read as a launch failure.
       let buyHash: Hex | null = null;
@@ -452,14 +475,37 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
       await fetch(`/api/launch/sync?chain=${chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
       if (buyHash) await fetch(`/api/launch/sync?chain=${chain}&tx=${buyHash}`, { method: "POST" }).catch(() => {});
       setPhase({ k: "done", hash, token });
-      toast({ kind: "launch", title: `${name.trim()} is live on ${CHAIN_LABEL}`, sub: "Liquidity locked forever. Taking you to your token.", chain, token, symbol: symbolClean, celebrate: true });
+      setResultNote(buyProblem ? `Your launch succeeded. The optional first buy did not go through: ${buyProblem} You can try a buy on the token page.` : bought ? `Your first buy is confirmed: ${bought.exact ? "" : "about "}${fmtCompact(Number(bought.out) / 1e18)} ${symbolClean}.` : null);
+      toast({ kind: "launch", title: `${name.trim()} is live on ${CHAIN_LABEL}`, sub: "Liquidity locked forever. Your token is ready to share.", chain, token, symbol: symbolClean, celebrate: true });
       if (bought !== null) toast({ kind: "buy", title: `You bought ${bought.exact ? "" : "about "}${fmtCompact(Number(bought.out) / 1e18)} ${symbolClean}`, sub: "Buy confirmed on " + CHAIN_LABEL, chain, token, symbol: symbolClean });
       if (buyProblem) toast({ kind: "info", title: "Launched, but the first buy did not go through", sub: `${buyProblem} You can buy on the token page.`, chain, token, symbol: symbolClean });
-      startNav();
-      router.push(`/t/${chain}/${token}`);
     } catch (err) {
-      setPhase({ k: "error", message: friendlyError(err) });
+      setPhase(submittedHash.current ? { k: "pending", hash: submittedHash.current, message: "Your transaction was submitted, but confirmation is unavailable. Check its status before taking another action." } : { k: "error", message: friendlyError(err) });
+    } finally {
+      submitting.current = false;
     }
+  }
+
+  async function checkConfirmation() {
+    if (phase.k !== "pending" || submitting.current) return;
+    const hash = phase.hash;
+    submitting.current = true;
+    setPhase({ k: "sent", hash });
+    try {
+      const pub = getPublicClient(config, { chainId: CHAIN.id })!;
+      const receipt = await pub.waitForTransactionReceipt({ hash });
+      if (receipt.status !== "success") { submittedHash.current = null; setPhase({ k: "error", message: "The launch transaction reverted. No token was created by this transaction. Review your settings before trying again." }); return; }
+      const [event] = parseEventLogs({ abi: LAUNCH_FACTORY_ABI, eventName: "Launched", logs: receipt.logs });
+      if (!event?.args.token) throw new Error("Launch event not available yet");
+      const token = event.args.token.toLowerCase();
+      draft.clear();
+      setPhase({ k: "indexing", hash });
+      await fetch(`/api/launch/sync?chain=${chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
+      setResultNote("Launch confirmation recovered. No additional buy was submitted. Open trading to review your token.");
+      setPhase({ k: "done", hash, token });
+    } catch {
+      setPhase({ k: "pending", hash, message: "Confirmation is still unavailable. Your original transaction remains the only launch submitted. Check the explorer or try checking again." });
+    } finally { submitting.current = false; }
   }
 
 
@@ -467,6 +513,13 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   // wide screens and the last step shows it on phones; CSS draws one copy at a time.
   const action = (
     <div className="space-y-3">
+      <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[.08em] text-muted">Before you launch</p>
+        <ul className="space-y-2 text-xs">
+          {[{ ok: done.token && done.price && done.fees && done.buy, label: "Token details & launch settings" }, { ok: isConnected && onChain, label: isConnected ? onChain ? `Wallet on ${CHAIN_LABEL}` : `Switch wallet to ${CHAIN_LABEL}` : "Connect your wallet" }, { ok: nativeBalance !== undefined && nativeBalance > 0n, label: !address ? `${NATIVE_SYMBOL} needed for network gas` : nativeBalance === undefined ? ethBal.isError ? "Gas balance unavailable" : "Checking gas balance…" : nativeBalance === 0n ? `Add ${NATIVE_SYMBOL} for gas` : `${NATIVE_SYMBOL} available · exact gas checked before signing` }, { ok: !logoBusy && !bannerBusy, label: logoBusy || bannerBusy ? "Preparing artwork…" : "Artwork ready · optional" }].map(item => <li key={item.label} className="flex items-start gap-2"><span className={item.ok ? "mt-px text-up" : "mt-px text-muted"}>{item.ok ? <Check size={13} aria-hidden="true" /> : <Circle size={12} aria-hidden="true" />}</span><span className={item.ok ? "text-body" : "text-muted"}>{item.label}</span></li>)}
+        </ul>
+        {ethBal.isError && address ? <button type="button" onClick={() => void ethBal.refetch()} className="mt-2 min-h-10 text-xs font-medium text-brand underline underline-offset-2">Retry gas balance</button> : null}
+      </div>
       {quoteKey === "stock" && !stock ? (
         <div className="rounded-xl border border-warm/40 bg-warm-soft px-3.5 py-2.5 text-xs text-warm-ink font-semibold" role="status">
           {STOCK_PICK_MESSAGE}
@@ -488,19 +541,26 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
         connected={isConnected}
         onChain={onChain}
         connecting={switching}
-        valid={valid}
+        valid={valid && draft.ready && !draft.pending}
         phase={phase}
         onConnect={() => setPickerOpen(true)}
         onSwitch={() => void switchChainAsync({ chainId: CHAIN.id })}
         label={initialBuyRaw ? "Launch + first buy" : "Launch for free, gas only"}
       />
       <PhaseNote phase={phase} chain={chain} />
+      {phase.k === "pending" ? <button type="button" onClick={() => void checkConfirmation()} className={`${btn.secondary} w-full`}>Check launch confirmation</button> : null}
     </div>
   );
   // what a preset opens at once the price snaps to the pool's tick spacing, in the quote: "$25K" opens at 9.433 ETH
   const presetOpens = (v: number) => cap(fdvForStartTick(startTickForFdv(capToQuote(v, entry), quote.decimals), quote.decimals)).detail;
 
+  if (phase.k === "done") return <LaunchSuccess chain={chain} token={phase.token} hash={phase.hash} name={name.trim()} symbol={symbolClean} buyNote={resultNote} />;
+
   return (
+    <>
+    <div className="mb-5 rounded-2xl border border-line bg-card px-4 py-3 sm:px-5">
+      {draft.pending ? <div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><p className="flex items-center gap-2 text-sm font-semibold text-ink"><Save size={15} aria-hidden="true" />Pick up where you left off.</p><p className="mt-1 break-words text-xs leading-relaxed text-muted">{draft.pending.name || "Your token"} · details and artwork saved in this browser. Review pairing, price and fees again.</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={() => { if(draft.pending) applyDraft(draft.pending); draft.restored(); }} className={btn.primarySm}>Restore draft</button><button type="button" onClick={() => { applyDraft({name:"",symbol:"",description:"",image:"",banner:"",website:"",x:"",chain:initialChain}); draft.clear(); }} className={btn.secondarySm}>Start fresh</button></div></div> : <p role="status" className="flex items-start gap-2 text-xs leading-relaxed text-muted"><Save size={14} className="mt-0.5 shrink-0" aria-hidden="true" />{draft.storageError ? "This browser is blocking saved drafts. Keep this page open until you’re done." : draft.saved ? "Details and artwork saved in this browser. Pairing, price, fees and first-buy amounts are reviewed each visit." : "Your token details and artwork save automatically on this browser as you work."}</p>}
+    </div>
     <div className="grid lg:grid-cols-[minmax(0,1fr)_23rem] gap-6 lg:gap-10 items-start">
       <form
         id="launch-form"
@@ -510,12 +570,13 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
           void launch();
         }}
       >
+        <fieldset disabled={inFlight || Boolean(draft.pending) || !draft.ready} className="min-w-0 disabled:pointer-events-none">
         <ol className="space-y-5">
           {/* 1 · chain + quote */}
           <Step n={1} done={done.chain}>
             <section className={`${card} p-5 space-y-4`}>
               <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                <h2 className="text-sm font-semibold text-ink">Chain</h2>
+                <div className="flex items-center gap-1"><h2 className="text-sm font-semibold text-ink">Chain</h2><FieldHelp title="Network and pairing">The network determines where your token lives. The pairing asset is what people trade against your token and the currency in which pool fees accrue. Hold the network’s gas token for transactions.</FieldHelp></div>
                 <span className="text-xs text-muted">same launch, same rules, on every chain</span>
               </div>
               <div className="grid sm:grid-cols-3 gap-2">
@@ -743,14 +804,14 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
               </div>
               <div>
                 <p className={label}>
-                  Artwork <span className="text-muted font-normal">· optional, but tokens with a logo get traded</span>
+                  Artwork <span className="text-muted font-normal">· optional, square logo and wide banner</span>
                 </p>
                 {/* the logo and the banner side by side, the way the card wears them */}
                 <div className="grid gap-3 sm:grid-cols-[11rem_minmax(0,1fr)]">
-                  <ImageUpload value={image} onChange={setImage} wallet={address} stacked />
-                  <ImageUpload kind="banner" value={banner} onChange={setBanner} wallet={address} stacked />
+                  <ImageUpload value={image} onChange={setImage} wallet={address} stacked onBusyChange={setLogoBusy} disabled={inFlight || Boolean(draft.pending) || !draft.ready} />
+                  <ImageUpload kind="banner" value={banner} onChange={setBanner} wallet={address} stacked onBusyChange={setBannerBusy} disabled={inFlight || Boolean(draft.pending) || !draft.ready} />
                 </div>
-                <p className={helper}>The logo marks your token everywhere; the banner runs across the top of its card and page.</p>
+                <p className={helper}>Crop and position each image before upload. Your logo and banner update the preview as soon as they’re saved.</p>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -779,7 +840,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
           <Step n={3} done={done.price}>
             <section className={`${card} p-5 space-y-4`}>
               <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                <h2 className="text-sm font-semibold text-ink">Starting market cap</h2>
+                <div className="flex items-center gap-1"><h2 className="text-sm font-semibold text-ink">Starting market cap</h2><FieldHelp title="Starting market cap">This sets the initial price multiplied by the full token supply. It is a starting valuation, not money raised or available cash. Trading changes the price immediately after launch.</FieldHelp></div>
                 <span className="text-xs text-muted">1,000,000,000 supply · all of it in the pool</span>
               </div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -965,7 +1026,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
           <Step n={6} done={false} last icon={<Rocket size={14} strokeWidth={2.2} />}>
             <section className={`${card} p-5 space-y-4`}>
               <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                <h2 className="text-sm font-semibold text-ink">Launch</h2>
+                <div className="flex items-center gap-1"><h2 className="text-sm font-semibold text-ink">Launch</h2><FieldHelp title="Locked liquidity">The pool’s liquidity position is locked in an ownerless contract and cannot be withdrawn. Trading can still change the token price. Review the allocation and fee routing before signing; the onchain launch settings are permanent.</FieldHelp></div>
                 <span className="text-xs text-muted">what happens when you sign</span>
               </div>
               <ul className="space-y-2.5 text-[13px] text-body">
@@ -984,7 +1045,6 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
                   </li>
                 ))}
               </ul>
-              <div className="border-t border-line pt-4 lg:hidden">{action}</div>
               <p className="text-xs text-muted leading-relaxed">
                 One transaction on {CHAIN_LABEL}: deploys the token, creates the Uniswap v4 pool ({quote.symbol} / your token), locks 100% of the supply in it forever, and registers the fee routing. Cost: gas only, usually a few cents.
                 Nothing is refundable and nothing can be edited afterwards.
@@ -993,11 +1053,16 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
             </section>
           </Step>
         </ol>
+        </fieldset>
+        {/* Keep recovery and wallet actions outside the locked settings fieldset on phones. */}
+        <div className={`${card} mt-5 p-5 lg:hidden`}>{action}</div>
       </form>
 
       {/* the console: the preview, what the launch sets, and on wide screens the launch button, always in reach */}
       <aside className="lg:sticky lg:top-20 min-w-0 order-first lg:order-none">
         <div className={`${card} p-4`}>
+          <button type="button" aria-expanded={mobilePreviewOpen} aria-controls="launch-live-preview" onClick={() => setMobilePreviewOpen(value => !value)} className="flex min-h-11 w-full items-center justify-between gap-3 text-left lg:hidden"><span><span className="block text-sm font-semibold text-ink">Live token preview</span><span className="mt-1 block text-xs text-muted">See your artwork and launch settings together.</span></span><ChevronDown size={17} aria-hidden="true" className={`shrink-0 text-muted transition-transform motion-reduce:transition-none ${mobilePreviewOpen ? "rotate-180" : ""}`} /></button>
+          <div id="launch-live-preview" className={`${mobilePreviewOpen ? "mt-4 block" : "hidden"} lg:mt-0 lg:block`}>
           <LaunchPreview row={previewRow} />
           <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-4">
             <p className="text-xs font-medium text-ink">At launch</p>
@@ -1014,10 +1079,12 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
             <Mini k="Platform fee" v="0" sub="always" accent />
           </dl>
           <div className="mt-4 hidden border-t border-line pt-4 lg:block">{action}</div>
+          </div>
         </div>
       </aside>
       {pickerOpen ? <WalletPicker onClose={() => setPickerOpen(false)} /> : null}
     </div>
+    </>
   );
 }
 
@@ -1116,6 +1183,7 @@ function SubmitButton({
     buying: "Launched! Buying your first tokens…",
     indexing: "Almost there…",
     done: "Launched!",
+    pending: "Transaction submitted",
   };
   const busy = busyLabel[phase.k];
   return (
@@ -1132,6 +1200,11 @@ function SubmitButton({
 }
 
 function PhaseNote({ phase, chain }: { phase: Phase; chain: ChainKey }) {
+  if (phase.k === "saving" || phase.k === "simulating" || phase.k === "signing") {
+    const note = phase.k === "saving" ? "Preparing token details. No launch transaction has been submitted." : phase.k === "simulating" ? "Checking your launch and estimating gas onchain before requesting a signature." : "Open your wallet and review the launch transaction. Nothing is sent until you confirm.";
+    return <p role="status" className="rounded-xl border border-line bg-paper px-3 py-2.5 text-xs leading-relaxed text-body">{note}</p>;
+  }
+  if (phase.k === "pending") return <div role="status" className="rounded-xl border border-warm/30 bg-warm-soft px-3 py-3 text-xs leading-relaxed text-warm-ink"><p>{phase.message}</p><a href={explorerTx(chain,phase.hash)} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-11 items-center font-medium underline underline-offset-2">View submitted transaction</a></div>;
   if (phase.k === "error")
     return (
       <p className="rounded-xl bg-down-soft border border-down/20 text-down-ink text-sm px-3 py-2" role="alert">
@@ -1140,13 +1213,13 @@ function PhaseNote({ phase, chain }: { phase: Phase; chain: ChainKey }) {
     );
   if (phase.k === "sent" || phase.k === "buying" || phase.k === "indexing" || phase.k === "done")
     return (
-      <p className="text-xs text-muted">
+      <p role="status" className="text-xs leading-relaxed text-muted">
         {phase.k === "buying" && phase.step === "sent" ? "Launched. Buy " : phase.k === "buying" ? "Launch " : "Transaction "}
         <a href={explorerTx(chain, phase.k === "buying" && phase.step === "sent" ? phase.buyHash : phase.hash)} target="_blank" rel="noreferrer" className="font-code underline underline-offset-2 hover:text-ink">
           {(phase.k === "buying" && phase.step === "sent" ? phase.buyHash : phase.hash).slice(0, 10)}…
         </a>
         {phase.k === "done"
-          ? " confirmed. Taking you to your token."
+          ? " confirmed. Your token is ready to share."
           : phase.k === "buying"
             ? phase.step === "quote"
               ? " confirmed. Pricing your first buy…"
@@ -1155,7 +1228,7 @@ function PhaseNote({ phase, chain }: { phase: Phase; chain: ChainKey }) {
                 : phase.step === "sign"
                   ? " confirmed. Confirm the buy in your wallet…"
                   : " sent, waiting for confirmation…"
-            : " sent."}
+            : phase.k === "indexing" ? " confirmed. Preparing your token page…" : " submitted. Waiting for network confirmation…"}
       </p>
     );
   return null;

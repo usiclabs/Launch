@@ -8,6 +8,7 @@ import { bpsToPct, isBurnAddress, type SplitResult } from "@/lib/launchpad/recip
 import { shortAddr } from "@/lib/chainPublic";
 import { card } from "@/components/ui";
 import styles from "./LaunchFeeSettings.module.css";
+import FieldHelp from "./FieldHelp";
 
 export type FeeBeneficiary = "burn" | "me" | "custom";
 
@@ -36,7 +37,7 @@ export default function LaunchFeeSettings({ feePips, beneficiary, address, split
   return (
     <section className={`${card} ${styles.section}`} aria-labelledby={`${id}-heading`}>
       <div className={styles.heading}>
-        <h2 id={`${id}-heading`}>Trading fee</h2>
+        <div className="flex items-center gap-1"><h2 id={`${id}-heading`}>Trading fee</h2><FieldHelp title="Trading fees">This pool fee applies to buys and sells. Choose who receives it, or burn it when collected. LAUNCH takes no platform cut. The fee rate and beneficiaries cannot be changed after launch.</FieldHelp></div>
         <span className={styles.platform}>0% platform fee</span>
       </div>
       <p className={styles.intro}>Choose what traders pay on each buy and sell.</p>
