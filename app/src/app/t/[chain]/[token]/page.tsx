@@ -57,6 +57,7 @@ import { BOOST_CHAIN } from "@/lib/launchpad/boost";
 import { gitlawbUsd } from "@/lib/launchpad/gitlawbServer";
 import { twigUsdFromGitlawb } from "@/lib/launchpad/twig";
 import type { ProofKey } from "@/lib/launchpad/proof";
+import styles from "./TokenDetail.module.css";
 
 /** Where GITLAWB lives, as said beside a GITLAWB-quoted pool. */
 
@@ -168,12 +169,12 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       {/* the token's tint (from its logo) is a CSS variable per theme: the ring, the chart line, the proof marks. Never an action colour. */}
       <div className="relative isolate overflow-x-clip [--tok:var(--tok-light)] dark:[--tok:var(--tok-dark)]" style={{ "--tok-light": tint.light, "--tok-dark": tint.dark } as React.CSSProperties}>
-      <main className="bb-market bb-mid bb-page pt-5 pb-28 sm:pt-7 lg:pb-16">
+      <main className={`${styles.detail} bb-market bb-mid bb-page pt-5 pb-28 sm:pt-7 lg:pb-16`}>
         {/* The hero: the same cover the token wears on its market card (the creator's banner, else its logo's colours),
             the way back and the chain on it, and the mark over its lower edge. PendingTokenHeader holds this frame while
             the page loads, so the mark and name that morph in from the market row land in place. */}
-        <header className="relative mb-6 overflow-hidden rounded-3xl border border-line bg-card">
-          <div className="relative h-24 overflow-hidden sm:h-28">
+        <header className={`${styles.hero} relative mb-6 overflow-hidden rounded-3xl border border-line bg-card`}>
+          <div className={`${styles.cover} relative h-24 overflow-hidden sm:h-28`}>
             <Banner token={l.token} image={l.image_url} banner={l.banner_url} />
             {/* the cover melts into the card, so the mark and the name read on one surface */}
             <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-b from-transparent via-card/50 to-card" />
@@ -218,7 +219,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
                 <span><span className="font-mono text-body tnum">{l.holders.toLocaleString("en-US")}</span> holders, <span className="font-mono text-body tnum">{(l.buys + l.sells).toLocaleString("en-US")}</span> trades</span>
               </p>
             </div>
-            <div className="flex max-w-full flex-wrap items-center gap-2">
+            <div className={`${styles.actions} flex max-w-full flex-wrap items-center gap-2`}>
               <WatchButton token={{ chain, token: l.token, name: l.name, symbol: l.symbol }} labelled />
               {/* the token's links as one bar, the Watch button's height: share, copy the address, the explorer */}
               <div className="inline-flex h-10 max-w-full items-stretch overflow-hidden rounded-xl border border-line bg-card text-xs font-medium text-body sm:h-9">
@@ -236,7 +237,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
           <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1">
             <TokenChart key={`${chain}:${l.token}`} chain={chain} token={l.token} symbol={l.symbol} poolId={l.pool_id} quote={l.quote} launchedAt={l.block_time} hasTrades={l.buys + l.sells > 0} />
             {/* hairlines between the cells come from the gap over a line-coloured grid, so they hold in both layouts */}
-            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
+            <dl className={`${styles.stats} grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4`}>
               <Stat k="Price" v={priceUsd !== null ? fmtUsd(priceUsd) : `${fmtPrice(l.price_quote)} ${quote.symbol}`} sub={`${fmtPrice(l.price_quote)} ${quote.symbol}`} />
               <Stat k="24h volume" v={l.volume_24h_usd !== null ? marketUsd(l.volume_24h_usd) : fmtQuote(l.volume_24h, quote.decimals, quote.symbol)} sub={fmtQuote(l.volume_24h, quote.decimals, quote.symbol)} />
               <Stat k="Total volume" v={l.volume_usd !== null ? marketUsd(l.volume_usd) : fmtQuote(l.volume_quote, quote.decimals, quote.symbol)} sub={fmtQuote(l.volume_quote, quote.decimals, quote.symbol)} />
