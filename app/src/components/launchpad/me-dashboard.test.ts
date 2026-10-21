@@ -76,7 +76,8 @@ test("dashboard controls, tables and responsive styling remain accessible and th
   assert.match(css, /:focus-visible/);
   assert.match(css, /@media \(max-width: 399px\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.doesNotMatch(css, /gradient\(|box-shadow|text-shadow|#[\da-f]{3,8}\b|animation:/i);
+  assert.match(css, /box-shadow: var\(--surface-lift\)/);
+  assert.doesNotMatch(css, /text-shadow|#[\da-f]{3,8}\b|animation:/i);
   assert.doesNotMatch(css, /background(?:-color)?: var\(--color-brand\)/);
   assert.doesNotMatch(source + css + page, /font-display/);
 });

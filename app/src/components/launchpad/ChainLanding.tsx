@@ -99,7 +99,7 @@ export default async function ChainLanding({ chain }: { chain: ChainKey }) {
 
 function Fact({ term, value, note }: { term: string; value: string; note: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper p-5">
+    <div className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
       <dt className="text-xs uppercase tracking-wide text-muted">{term}</dt>
       <dd className="mt-1 font-mono text-lg font-bold text-ink tnum">{value}</dd>
       <dd className="mt-2 text-xs leading-relaxed text-muted text-pretty">{note}</dd>

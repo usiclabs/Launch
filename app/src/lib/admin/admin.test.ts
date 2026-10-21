@@ -222,7 +222,10 @@ test("sign-in: same-origin, rate-limited, nonce spent only after the signature c
 
 test("the admin page renders no panel without a session", () => {
   const s = src("app/admin/page.tsx");
-  const gate = s.slice(s.indexOf("if (!admin) {"), s.indexOf("  return (\n    <main className=\"mx-auto max-w-3xl"));
+  const start = s.indexOf("if (!admin) {");
+  const end = s.indexOf("\n  }\n", start);
+  assert.ok(start >= 0 && end > start, "the signed-out branch must be present");
+  const gate = s.slice(start, end);
   assert.match(gate, /<AdminSignIn \/>/);
   for (const panel of ["AdminQueue", "ProfileQueue", "PointsAdmin", "BoostAdmin", "PairsAdmin", "PairReviewAdmin", "AdminWalletProvider"]) assert.doesNotMatch(gate, new RegExp(`<${panel}`), panel);
   assert.match(s, /<AdminWalletProvider wallet=\{admin\.wallet\}>\n\s*<AdminQueue \/>[\s\S]*<PairReviewAdmin \/>\n\s*<\/AdminWalletProvider>/);

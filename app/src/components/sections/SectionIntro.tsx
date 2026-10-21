@@ -2,15 +2,16 @@ import type { ReactNode } from "react";
 import styles from "./SectionShell.module.css";
 
 /** Shared page header for the supporting product pages: a small label chip, the title, one paragraph and the page's actions. */
-export default function SectionIntro({ eyebrow, icon, title, description, children }: {
+export default function SectionIntro({ eyebrow, icon, title, description, children, compact = false }: {
   eyebrow: string;
   /** a small mark for the chip; the same icon the navigation uses for the page */
   icon?: ReactNode;
   title: string;
   description: ReactNode;
   children?: ReactNode;
+  compact?: boolean;
 }) {
-  return <header className={styles.intro}>
+  return <header className={`bb-page-heading ${styles.intro} ${compact ? styles.compact : ""}`}>
     <p className={styles.eyebrow}>{icon ? <span aria-hidden="true" className={styles.eyebrowIcon}>{icon}</span> : null}{eyebrow}</p>
     <div className={styles.introRow}>
       <div className={styles.introCopy}>

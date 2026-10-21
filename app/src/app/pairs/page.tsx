@@ -65,7 +65,7 @@ export default async function PairsPage() {
 function PairCard({ p, s }: { p: PairPublic; s: PairStats | undefined }) {
   const volUsd = s && p.usd !== null ? units(s.volume_quote, p.decimals) * p.usd : null;
   return (
-    <li className="rounded-2xl border border-line bg-paper p-5">
+    <li className="bb-pair-card rounded-3xl border border-line bg-card p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <Link href={pairPath(p.chain, p.address)} className="flex min-w-0 items-center gap-3">
           {p.logo ? (

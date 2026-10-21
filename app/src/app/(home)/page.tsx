@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
 
   return (
     <>
-      <main className="bb-mid bb-page relative space-y-6 pb-16 sm:space-y-8">
+      <main className="bb-market bb-mid bb-page relative space-y-6 pb-16 sm:space-y-8">
         <LaunchHero configured={LAUNCHPAD_CONFIGURED} />
         <RecentTokens />
         {/* what is hot first (names and numbers to act on), then the last half hour as it happens, then every launch */}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./design-polish.css";
 
 /* ── LAUNCH / MyUSIC accent ──────────────────────────────────────────────────────────────
    LIGHT is the default and the unclassed base: every value in @theme is the
@@ -187,7 +188,7 @@ html {
 }
 
 body {
-  background: var(--color-paper);
+  background-color: var(--color-paper);
   color: var(--color-body);
   font-family: var(--font-sans);
   font-size: 14px;

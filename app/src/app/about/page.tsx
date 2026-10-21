@@ -46,7 +46,7 @@ export default function AboutPage() {
         <h2 id="different-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">What makes {BRAND} different</h2>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2">
           {DIFFERENCES.map(([title, body]) => (
-            <li key={title} className="rounded-2xl border border-line bg-paper p-5">
+            <li key={title} className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
               <h3 className="text-sm font-semibold text-ink">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted text-pretty">{body}</p>
             </li>
@@ -59,7 +59,7 @@ export default function AboutPage() {
         <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">The same contract design is deployed on every chain, each paired with that chain&apos;s canonical Uniswap v4 contracts. Addresses and verification records are listed on the <Link href="/rules#contracts" className="text-brand underline decoration-line-strong underline-offset-4 hover:text-ink">contracts section</Link> of the how-it-works page.</p>
         <dl className="mt-6 grid gap-3 sm:grid-cols-3">
           {CHAIN_KEYS.map((chain) => (
-            <div key={chain} className="rounded-2xl border border-line bg-paper p-5">
+            <div key={chain} className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
               <dt className="text-sm font-semibold text-ink">{hasChainPage(chain) ? <Link href={chainLandingPath(chain)} className="hover:text-brand underline decoration-line-strong underline-offset-4">{CHAIN_LABELS[chain]}</Link> : CHAIN_LABELS[chain]}</dt>
               <dd className="mt-1 font-mono text-xs text-muted tnum">Chain ID {CHAINS[chain].id}</dd>
             </div>
@@ -77,17 +77,17 @@ export default function AboutPage() {
         <h2 id="official-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">Official channels</h2>
         <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">These are the only places {BRAND} speaks from. Accounts, domains and repositories with similar names are not affiliated with {BRAND}, and links here identify this deployment.</p>
         <ul className="mt-6 grid gap-3 sm:grid-cols-3">
-          <li className="rounded-2xl border border-line bg-paper p-5">
+          <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Website</p>
             <Link href="/" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">{BRAND_DOMAIN}</Link>
             <p className="mt-2 text-xs leading-relaxed text-muted">The current LAUNCH deployment.</p>
           </li>
-          <li className="rounded-2xl border border-line bg-paper p-5">
+          <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">X</p>
             <a href={`https://x.com/${BRAND_X}`} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">@{BRAND_X} <ArrowUpRight size={13} aria-hidden="true" /></a>
             <p className="mt-2 text-xs leading-relaxed text-muted">Launch notes and updates.</p>
           </li>
-          <li className="rounded-2xl border border-line bg-paper p-5">
+          <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Source code</p>
             <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">usiclabs/Launch <ArrowUpRight size={13} aria-hidden="true" /></a>
             <p className="mt-2 text-xs leading-relaxed text-muted">MIT-licensed LAUNCH source, forked from OpenLaunch.</p>

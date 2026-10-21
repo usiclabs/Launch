@@ -1,5 +1,5 @@
 /* The token chart card: a readout that follows the crosshair, the plot, then one row of intervals and view chips. */
-.terminal { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--color-line); border-radius: 16px; background: var(--color-card); color: var(--color-ink); }
+.terminal { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--color-line); border-radius: 24px; background: var(--color-card); color: var(--color-ink); box-shadow: var(--surface-lift); }
 .header { min-width: 0; padding: 16px 18px 4px; }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .value { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 14px; }

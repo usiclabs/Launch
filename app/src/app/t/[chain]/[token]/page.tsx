@@ -168,7 +168,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       {/* the token's tint (from its logo) is a CSS variable per theme: the ring, the chart line, the proof marks. Never an action colour. */}
       <div className="relative isolate overflow-x-clip [--tok:var(--tok-light)] dark:[--tok:var(--tok-dark)]" style={{ "--tok-light": tint.light, "--tok-dark": tint.dark } as React.CSSProperties}>
-      <main className="bb-mid bb-page pt-5 pb-28 sm:pt-7 lg:pb-16">
+      <main className="bb-market bb-mid bb-page pt-5 pb-28 sm:pt-7 lg:pb-16">
         {/* The hero: the same cover the token wears on its market card (the creator's banner, else its logo's colours),
             the way back and the chain on it, and the mark over its lower edge. PendingTokenHeader holds this frame while
             the page loads, so the mark and name that morph in from the market row land in place. */}
@@ -208,7 +208,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
                 </p>
               </div>
             </div>
-            <div className="md:row-span-2 md:text-right">
+            <div className="bb-token-summary md:row-span-2 md:text-right">
               <p className="text-xs text-muted">Market cap</p>
               <p className="mt-1 font-mono text-3xl font-bold tracking-[-0.03em] text-ink tnum sm:text-4xl" title={cap.usd !== null ? fmtUsd(cap.usd) : cap.main}>{cap.main}</p>
               <p className="mt-1 font-mono text-[11px] text-muted tnum">{cap.detail}</p>

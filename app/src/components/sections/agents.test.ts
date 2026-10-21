@@ -65,14 +65,15 @@ test("agent sections have native focus targets and accessible copy-only referenc
   assert.doesNotMatch(page, /"use client"/);
 });
 
-test("agent code stays width-constrained and uses the existing flat theme", () => {
+test("agent code stays width-constrained and uses theme-based surface depth", () => {
   assert.match(css, /grid-template-columns: 176px minmax\(0, 1fr\)/);
   assert.match(css, /\.code \{ max-width: 100%; min-width: 0;[^}]*overflow-x: auto/);
   assert.match(css, /\.copyButton \{[^}]*min-height: 44px/);
   assert.match(css, /\.network dd a \{[^}]*min-height: 44px/);
   assert.match(css, /\.code:focus-visible/);
   assert.match(css, /@media \(max-width: 479px\)/);
-  assert.doesNotMatch(css, /box-shadow|text-shadow|gradient\(|animation:|#[\da-f]{3,8}\b/i);
+  assert.match(css, /box-shadow: var\(--surface-lift\)/);
+  assert.doesNotMatch(css, /text-shadow|animation:|#[\da-f]{3,8}\b/i);
   assert.doesNotMatch(css, /background(?:-color)?: var\(--color-brand\)/);
   assert.doesNotMatch(page + codePanel + css, /font-display|font-unbounded|\u2014/);
 });

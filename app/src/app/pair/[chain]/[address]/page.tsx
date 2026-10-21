@@ -120,7 +120,7 @@ export default async function PairPage({ params }: { params: Promise<{ chain: st
 
 function Fact({ term, value, note, href }: { term: string; value: string; note: string; href?: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper p-5">
+    <div className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
       <dt className="text-xs uppercase tracking-wide text-muted">{term}</dt>
       <dd className="mt-1 font-mono text-lg font-bold text-ink tnum">{href ? <a href={href} target="_blank" rel="noopener noreferrer" className="hover:text-brand">{value}</a> : value}</dd>
       <dd className="mt-2 text-xs leading-relaxed text-muted text-pretty">{note}</dd>

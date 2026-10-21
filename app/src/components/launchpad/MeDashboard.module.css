@@ -1,4 +1,15 @@
 .dashboard { min-width: 0; color: var(--color-body); }
+.welcome, .walletBar, .ledger { box-shadow: var(--surface-lift); }
+.dashboard .welcome { border-radius: 28px; }
+.dashboard .welcomeMain { background: radial-gradient(ellipse at 0 0, color-mix(in srgb, var(--color-brand-soft) 65%, transparent), transparent 70%); }
+.dashboard .walletMark { width: 56px; height: 56px; border-radius: 18px; box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-brand-soft) 50%, transparent); }
+.dashboard .welcomeGuide { background: color-mix(in srgb, var(--color-paper) 60%, var(--color-card)); }
+.dashboard .capabilities { display: grid; gap: 10px; margin-top: 16px; }
+.dashboard .capabilities li { padding: 16px; border: 1px solid var(--color-line); border-radius: 16px; background: var(--color-card); }
+.dashboard .capIcon { border-radius: 12px; background: var(--color-paper); }
+.dashboard .stats { gap: 12px; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+.dashboard .stat { border: 1px solid var(--color-line); border-radius: 20px; box-shadow: var(--surface-lift); }
+.dashboard .walletBar, .dashboard .ledger { border-radius: 24px; }
 .dashboard :is(a, button, [tabindex]):focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; border-radius: 6px; }
 /* signed out: one card, the invitation on the left and what connecting unlocks on the right */
 .welcome { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--color-line); border-radius: 16px; background: var(--color-card); overflow: hidden; }

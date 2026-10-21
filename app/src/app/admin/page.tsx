@@ -37,14 +37,14 @@ export default async function AdminPage() {
   const admin = await currentAdmin();
   if (!admin) {
     return (
-      <main className="mx-auto max-w-md px-4 pt-12 sm:pt-16 pb-16">
+      <main className="bb-utility mx-auto max-w-md px-4 pt-12 sm:pt-16 pb-16">
         <AdminSignIn />
       </main>
     );
   }
   return (
-    <main className="mx-auto max-w-3xl px-4 pt-8 sm:pt-10 pb-16 space-y-6">
-      <header>
+    <main className="bb-utility mx-auto max-w-3xl px-4 pt-8 sm:pt-10 pb-16 space-y-6">
+      <header className="bb-page-heading">
         <h1 className="font-display font-bold tracking-[-0.02em] text-ink text-3xl">Moderation</h1>
         <p className="mt-2 text-base text-body">Reported posts, profiles, season points, the Boosted lane and community pairs. Every action is a signature from the signed-in admin wallet.</p>
       </header>

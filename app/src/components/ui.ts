@@ -22,7 +22,7 @@ export const btn = {
   dangerSm: `${btnBase} min-h-9 px-3.5 text-[13px] bg-card text-down-ink border border-down/40 hover:border-down hover:bg-down-soft`,
 };
 
-export const card = "rounded-2xl bg-card border border-line shadow-card";
+export const card = "bb-surface rounded-2xl bg-card border border-line shadow-card";
 export const cardPad = `${card} p-5`;
 
 /** Small uppercase eyebrow label (Inter 11px). Use sparingly. */

@@ -18,13 +18,14 @@ export default function Error({
   }, [error]);
   const digest = sanitizeDigest(error.digest);
   return (
-    <main aria-label={errorRegionLabel("route")} className="mx-auto max-w-3xl px-4 py-24 text-center space-y-5">
-      <h1 className="font-display font-bold text-7xl text-brand-soft [text-shadow:0_1px_0_#d6d3d1]">500</h1>
+    <main aria-label={errorRegionLabel("route")} className="bb-not-found mx-auto max-w-3xl px-4 py-20 text-center space-y-5">
+      <span className="bb-kicker">500 · Something went wrong</span>
+      <h1 className="font-display font-semibold text-ink">Let’s try that again.</h1>
       <p role="alert" className="text-[15px] text-body">{errorBody("route")}</p>
       {digest ? (
         <p className="text-xs text-muted">Error ID: {digest}</p>
       ) : null}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-3">
         <button type="button" onClick={reset} className={btn.primary}>
           Try again
         </button>

@@ -59,13 +59,14 @@ test("the contract registry retains every configured explorer and verifier path"
   assert.doesNotMatch(page, /Identical bytecode/);
 });
 
-test("rules styling stays flat, theme-aware and accessible at compact widths", () => {
+test("rules styling uses theme-based surface depth and stays accessible at compact widths", () => {
   assert.match(css, /:focus-visible/);
   assert.match(css, /min-height: 44px/);
   assert.match(css, /overflow-wrap: anywhere/);
   assert.match(css, /@media \(max-width: 639px\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.doesNotMatch(css, /box-shadow|text-shadow|gradient\(|#[\da-f]{3,8}\b/i);
+  assert.match(css, /box-shadow: var\(--surface-lift\)/);
+  assert.doesNotMatch(css, /text-shadow|#[\da-f]{3,8}\b/i);
   assert.doesNotMatch(css, /background(?:-color)?: var\(--color-brand\)/);
   assert.doesNotMatch(page + css, /\u2014/);
 });

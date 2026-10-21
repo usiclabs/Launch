@@ -72,7 +72,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   return (
     <NamesProvider names={{ [p.wallet]: ownName }}>
       <main className={shell.page}>
-        <section aria-labelledby="profile-name" className="rounded-2xl border border-line bg-card p-5 sm:p-7">
+        <section aria-labelledby="profile-name" className="bb-profile-hero rounded-3xl border border-line bg-card p-6 sm:p-9">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <WhoAvatar address={p.wallet} size={88} />
             <div className="min-w-0 flex-1">

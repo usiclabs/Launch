@@ -32,6 +32,15 @@
 .posts { list-style: none; margin: 0; padding: 0; }
 .posts > li + li { border-top: 1px solid var(--color-line); }
 .post { min-width: 0; }
+.toolbar { background: linear-gradient(110deg, var(--color-card), color-mix(in srgb, var(--color-paper) 70%, var(--color-card))); }
+.titleIcon { box-shadow: 0 1px 2px rgb(0 0 0 / .025); color: var(--color-brand); }
+.layout .postBody { border: 1px solid var(--color-line); background: color-mix(in srgb, var(--color-paper) 80%, var(--color-card)); }
+.postArrow { transition: transform 180ms ease, color 180ms ease; }
+.postLink:hover .postArrow { transform: translate(2px, -2px); }
+.aside .guide, .aside .note { border-radius: 24px; box-shadow: var(--surface-lift); }
+.aside .note { background: linear-gradient(145deg, var(--color-card), color-mix(in srgb, var(--color-brand-soft) 25%, var(--color-card))); }
+@media (min-width: 1024px) { .aside { position: sticky; top: 112px; } }
+@media (prefers-reduced-motion: reduce) { .postArrow { transition: none; } .postLink:hover .postArrow { transform: none; } }
 .postLink { display: block; padding: 24px; transition: background-color 160ms; }
 .postLink:hover { background: color-mix(in srgb, var(--color-ink) 3%, transparent); }
 .postHeading { display: flex; align-items: center; gap: 12px; }

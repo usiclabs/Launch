@@ -6,6 +6,8 @@
    line, one shown at each size: the hidden one is display:none, so nothing reads or tabs through it twice). */
 .layout { display: grid; align-items: center; column-gap: 2.5rem; row-gap: 1.25rem; grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "stage" "totals" "ticker"; }
 .copyArea { grid-area: copy; min-width: 0; }
+.hero { position: relative; isolation: isolate; }
+.hero::before { content: ""; position: absolute; inset: -32px -16px 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 78% 30%, color-mix(in srgb, var(--color-brand) 3%, transparent), transparent 58%); }
 .totalsArea { grid-area: totals; min-width: 0; }
 /* the line used to sit outside the grid, 16px (phones) or 20px under it: the negative margin keeps that spacing against the row gap */
 .tickerArea { grid-area: ticker; min-width: 0; margin-top: -0.25rem; }
