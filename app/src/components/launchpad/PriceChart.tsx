@@ -33,6 +33,8 @@ export default function PriceChart({ chain, token, symbol, launchedAt }: { chain
     const id = ++generation.current;
     request.current?.abort();
     const controller = new AbortController();
+    let timedOut=false;
+    const timeout=setTimeout(()=>{timedOut=true;controller.abort();},12000);
     request.current = controller;
     fetching.current = true;
     if (!tailOnly) { setLoading(true); setFailure(null); }
@@ -53,9 +55,10 @@ export default function PriceChart({ chain, token, symbol, launchedAt }: { chain
       setResult((current) => ({ key: requestKey,
         data: mergeChartPayload(current?.key === requestKey ? current.data : null, payload, tailOnly) }));
     } catch (error) {
-      if (id !== generation.current || controller.signal.aborted) return;
-      setFailure({ key: requestKey, message: error instanceof Error ? error.message : "Chart unavailable." });
+      if (id !== generation.current || (controller.signal.aborted && !timedOut)) return;
+      setFailure({ key: requestKey, message: timedOut ? "Chart request timed out. Retry to reconnect." : error instanceof Error ? error.message : "Chart unavailable." });
     } finally {
+      clearTimeout(timeout);
       if (id === generation.current) { fetching.current = false; setLoading(false); }
     }
   }, [requestKey, chain, token, interval, range, address, launchT]);

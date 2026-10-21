@@ -37,6 +37,7 @@ import { friendlyError } from "@/lib/errors";
 import { Spinner } from "@/components/Skeleton";
 import { useLaunchDraft } from "./useLaunchDraft";
 import type { DraftDetails } from "@/lib/launchpad/launch-draft";
+import LaunchSectionNav from "./LaunchSectionNav";
 import LaunchSuccess from "./LaunchSuccess";
 import FieldHelp from "./FieldHelp";
 import WalletPicker from "@/components/WalletPicker";
@@ -571,6 +572,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
         }}
       >
         <fieldset disabled={inFlight || Boolean(draft.pending) || !draft.ready} className="min-w-0 disabled:pointer-events-none">
+        <LaunchSectionNav complete={[done.chain,done.token,done.price,done.fees,done.buy,valid && isConnected && onChain]} />
         <ol className="space-y-5">
           {/* 1 · chain + quote */}
           <Step n={1} done={done.chain}>
@@ -1109,7 +1111,7 @@ function Mini({ k, v, sub, accent }: { k: string; v: string; sub?: string | null
  */
 function Step({ n, done, last = false, icon, children }: { n: number; done: boolean; last?: boolean; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <li className="sm:grid sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-4">
+    <li id={`launch-step-${n}`} tabIndex={-1} className="scroll-mt-48 outline-none sm:grid sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-4">
       <div aria-hidden="true" className="relative hidden sm:block">
         {last ? null : <span className={`absolute left-1/2 top-12 -bottom-9 w-px -translate-x-1/2 transition-colors duration-300 motion-reduce:transition-none ${done ? "bg-up/50" : "bg-line-strong"}`} />}
         <span className={`relative mt-4 grid size-8 place-items-center rounded-full border text-xs font-semibold tnum transition-colors duration-300 motion-reduce:transition-none ${done ? "border-up/40 bg-up-soft text-up" : icon ? "border-brand/40 bg-brand-soft text-brand" : "border-line-strong bg-card text-muted"}`}>

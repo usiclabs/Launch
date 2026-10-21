@@ -33,14 +33,18 @@ export default function TokenChart(props: Props) {
 
   async function check() {
     setLookup("checking");
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),10000);
     try {
       const query = new URLSearchParams({ chain, token, pool: props.poolId, quote: props.quote });
-      const response = await fetch(`/api/launch/chart-provider?${query}`, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
+      const response = await fetch(`/api/launch/chart-provider?${query}`, { cache: "no-store", signal: controller.signal });
       const result: unknown = response.ok ? await response.json() : null;
       const status = result && typeof result === "object" && "status" in result ? String(result.status) : "";
       setLookup(["ready", "unlisted", "inverted", "unpriced"].includes(status) ? status as GeckoStatus : "error");
     } catch {
       setLookup("error");
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
@@ -57,6 +61,7 @@ export default function TokenChart(props: Props) {
           {source === "gecko" && lookup !== "ready" && lookup !== "idle" ? (
             <p role="status" className="mr-auto text-xs text-muted">{lookup === "checking" ? "Finding this pool on GeckoTerminal…" : `${notAvailable[lookup]} Showing our own chart.`}</p>
           ) : null}
+          {source === "gecko" && lookup !== "ready" && lookup !== "checking" && lookup !== "idle"?<button type="button" onClick={()=>void check()} className="min-h-11 text-xs text-brand">Retry chart lookup</button>:null}
           <ToggleGroup aria-label="Chart source" value={[source]} onValueChange={(values) => { const next = values[0]; if (next === "onchain" || next === "gecko") pick(next); }}>
             <ToggleGroupItem value="onchain" className="px-2.5 text-[11px]">On-chain</ToggleGroupItem>
             <ToggleGroupItem value="gecko" className="px-2.5 text-[11px]">GeckoTerminal</ToggleGroupItem>

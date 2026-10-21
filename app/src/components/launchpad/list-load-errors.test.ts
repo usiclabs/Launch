@@ -14,8 +14,8 @@ test("a non-OK list or live response is caught, never thrown into render", () =>
   const selection = list.slice(list.indexOf("function loadSelection"), list.indexOf("const nq = normalizeQuery(q);"));
   assert.match(selection, /if \(!res\.ok\) throw new Error\("List unavailable"\);/);
   assert.match(selection, /\.catch\(\(\) => \{[^\n]*setLoadError\(/, "the rejection lands in the inline error");
-  assert.match(live, /if \(!res\.ok\) return;/, "the shared poll keeps the last snapshot");
-  assert.match(live, /catch \{\s*\/\* offline; keep last \*\//);
+  assert.match(live, /if \(!res\.ok\) throw new Error\("Live update unavailable"\);/);
+  assert.match(live, /catch \{\s*setConnection\(\{state:"stale",refreshing:false\}\)/, "failed reads keep the snapshot and expose a retry state");
 });
 
 test("the inline error is an alert with a retry for both a failed view and a failed page", () => {

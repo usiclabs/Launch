@@ -1,4 +1,5 @@
 "use client";
+import TradeFeeSummary from "./TradeFeeSummary";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
@@ -49,7 +50,7 @@ type Phase =
 const PERMIT_EXPIRY_S = 30 * 24 * 3600;
 
 
-export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeRoute, quote, ethUsd, onTraded }: { chain: ChainKey; token: Address; symbol: string; poolKey: PoolKey; poolId: Hex; feeRoute: string; quote: Quote; ethUsd: number | null; onTraded?: () => void }) {
+export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeRoute, recipients, quote, ethUsd, onTraded }: { chain: ChainKey; token: Address; symbol: string; poolKey: PoolKey; poolId: Hex; feeRoute: string; recipients?: {payout:string;bps:number}[]|null; quote: Quote; ethUsd: number | null; onTraded?: () => void }) {
   const CHAIN = CHAINS[chain];
   const CHAIN_LABEL = CHAIN_LABELS[chain];
   const V4 = launchpad(chain).v4;
@@ -88,6 +89,8 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   // `sqrtPriceX96` is the pool's spot price read beside the quote (null if StateView could not answer): it gives price impact
   const [quote_, setQuote] = useState<{ out: bigint; forKey: string; sqrtPriceX96: bigint | null } | null>(null);
   const [quoting, setQuoting] = useState(false);
+  const [quoteFailure,setQuoteFailure]=useState<string|null>(null);
+  const [quoteAttempt,setQuoteAttempt]=useState(0);
   const [phase, setPhase] = useState<Phase>({ k: "idle" });
   // a trade that moves the price past IMPACT_CONFIRM takes a second tap; this holds the quote the first tap armed
   const [armed, setArmed] = useState<string | null>(null);
@@ -122,6 +125,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
     const quoter = V4.quoter;
     const t = setTimeout(async () => {
       setQuoting(true);
+      setQuoteFailure(null);
       try {
         const pub = getPublicClient(config, { chainId: CHAIN.id })!;
         // an ETH buy is quoted over the whole route, the exact path the router will take; it crosses more than this pool,
@@ -139,13 +143,13 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
         ]);
         if (my === seq.current) setQuote({ out: result[0], forKey: quoteKey, sqrtPriceX96 });
       } catch {
-        if (my === seq.current) setQuote(null);
+        if (my === seq.current) {setQuote(null);setQuoteFailure(quoteKey);}
       } finally {
         if (my === seq.current) setQuoting(false);
       }
     }, 400);
     return () => { clearTimeout(t); seq.current = my + 1; };
-  }, [amountIn, side, poolKey, poolId, config, amount, V4.quoter, V4.stateView, CHAIN.id, quoteKey, viaEth, ethRoute]);
+  }, [amountIn, side, poolKey, poolId, config, amount, V4.quoter, V4.stateView, CHAIN.id, quoteKey, viaEth, ethRoute, quoteAttempt]);
 
   // What selling the whole position would return right now, re-quoted whenever the balance changes
   const tokenBalance = tok.data as bigint | undefined;
@@ -319,6 +323,9 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
           <div className="mt-1 min-h-4 text-[10px] text-muted">{inUsd ?? outUsd ?? "Quote includes the pool trading fee."}</div>
         </div>
       </div>
+      {quoteFailure===quoteKey && amountIn!==null?<div role="status" className="rounded-xl border border-line px-3 py-2 text-xs text-muted">Couldn’t load this quote. Try again, or reduce the amount.<button type="button" disabled={quoting||busy} onClick={()=>setQuoteAttempt(value=>value+1)} className="mt-1 block min-h-11 font-medium text-brand disabled:opacity-50">{quoting?"Retrying…":"Retry quote"}</button></div>:null}
+      {address && balance===undefined?<div role="status" className="text-[11px] text-muted">{(side==="sell"?tok.isError:pay.native?eth.isError:qbal.isError)?<>Balance unavailable. <button type="button" className="min-h-11 text-brand" onClick={()=>{if(side==="sell")void tok.refetch();else if(pay.native)void eth.refetch();else void qbal.refetch();}}>Retry balance</button></>:"Checking wallet balance…"}</div>:null}
+      <TradeFeeSummary chain={chain} feePips={poolKey.fee} recipients={recipients} inputSymbol={side==="buy"?quote.symbol:symbol} multihop={viaEth}/>
       <dl className="space-y-2.5 px-1 text-[11px]">
         <div className="flex justify-between gap-3"><dt className="text-muted">Price impact</dt><dd className={`flex items-center gap-1.5 text-right font-mono tnum ${level === "warn" || level === "confirm" ? "text-warm-ink" : "text-body"}`}>{level === "warn" || level === "confirm" ? <span aria-hidden className="size-1.5 rounded-full bg-warm" /> : null}{impact === null ? "—" : fmtImpact(impact)}</dd></div>
         <div className="flex justify-between gap-3"><dt className="text-muted">Trading fee</dt><dd className="text-right text-body">{feeRoute}</dd></div>

@@ -14,6 +14,8 @@ import { buildPaletteGroups, isSearchableQuery, paletteTokenFrom, type PaletteGr
 import { useOpenBridge } from "./bridge/BridgeProvider";
 import { useEarnInfo } from "./earn/earnInfo";
 import { useBoostOn } from "./launchpad/useBoostOn";
+import { clearRecentSearches, rememberSearch, useRecentSearches } from "./launchpad/useBrowserHistory";
+import { isContractAddress } from "@/lib/launchpad/browser-history";
 
 type LaunchesResponse = { launches?: Parameters<typeof paletteTokenFrom>[0][] };
 
@@ -27,20 +29,26 @@ export default function CommandPalette({ open, onOpenChange }: { open: boolean; 
   const openBridge = useOpenBridge();
   const hintId = useId();
   const [query, setQuery] = useState("");
+  const history=useRecentSearches();
+  const [clipboardHint,setClipboardHint]=useState("");
+  const [searchAttempt,setSearchAttempt]=useState(0);
   const [trending, setTrending] = useState<PaletteToken[] | null>(null);
+  const [trendingFailed,setTrendingFailed]=useState(false);
   const [results, setResults] = useState<{ q: string; tokens: PaletteToken[]; failed: boolean } | null>(null);
 
   // What is trending fills the list before anything is typed. Fetched once, on the first open.
   useEffect(() => {
     if (!open || trending !== null) return;
     const ac = new AbortController();
+    let timedOut=false;
+    const timeout=setTimeout(()=>{timedOut=true;ac.abort();},12000);
     fetch("/api/launch/list?sort=trending&limit=6", { signal: ac.signal, cache: "no-store" })
-      .then((r) => (r.ok ? (r.json() as Promise<LaunchesResponse>) : null))
-      .then((j) => setTrending((j?.launches ?? []).map(paletteTokenFrom)))
+      .then((r) => (r.ok ? (r.json() as Promise<LaunchesResponse>) : Promise.reject(new Error("unavailable"))))
+      .then((j) => {if(!ac.signal.aborted){setTrendingFailed(false);setTrending((j?.launches ?? []).map(paletteTokenFrom));}})
       .catch(() => {
-        if (!ac.signal.aborted) setTrending([]);
-      });
-    return () => ac.abort();
+        if (!ac.signal.aborted||timedOut) {setTrendingFailed(true);setTrending([]);}
+      }).finally(()=>clearTimeout(timeout));
+    return () => {clearTimeout(timeout);ac.abort();};
   }, [open, trending]);
 
   // Token search, debounced; a late answer for an older query is dropped.
@@ -48,20 +56,23 @@ export default function CommandPalette({ open, onOpenChange }: { open: boolean; 
   useEffect(() => {
     if (!open || !isSearchableQuery(q)) return;
     const ac = new AbortController();
+    let timedOut=false;
+    const timeout=setTimeout(()=>{timedOut=true;ac.abort();},12000);
     const timer = setTimeout(() => {
       // order=holders: among equally relevant names, the token people actually hold comes first
       fetch(`/api/launch/search?q=${encodeURIComponent(q)}&order=holders`, { signal: ac.signal, cache: "no-store" })
         .then((r) => (r.ok ? (r.json() as Promise<LaunchesResponse>) : Promise.reject(new Error(String(r.status)))))
-        .then((j) => setResults({ q, tokens: (j.launches ?? []).slice(0, 8).map(paletteTokenFrom), failed: false }))
+        .then((j) => {if(!ac.signal.aborted)setResults({ q, tokens: (j.launches ?? []).slice(0, 8).map(paletteTokenFrom), failed: false });})
         .catch(() => {
-          if (!ac.signal.aborted) setResults({ q, tokens: [], failed: true });
-        });
+          if (!ac.signal.aborted||timedOut) setResults({ q, tokens: [], failed: true });
+        }).finally(()=>clearTimeout(timeout));
     }, 160);
     return () => {
       clearTimeout(timer);
+      clearTimeout(timeout);
       ac.abort();
     };
-  }, [open, q]);
+  }, [open, q, searchAttempt]);
 
   const current = results && results.q === q ? results : null;
   const searching = isSearchableQuery(q) && !current;
@@ -70,15 +81,18 @@ export default function CommandPalette({ open, onOpenChange }: { open: boolean; 
   const earn = useEarnInfo(open)?.enabled === true;
   // the Boosted entry follows the live poll's switch: no request of its own
   const boost = useBoostOn();
-  const groups = useMemo(() => buildPaletteGroups({ query, tokens: current?.tokens ?? [], trending: trending ?? [], theme, earn, boost }), [query, current, trending, theme, earn, boost]);
+  const groups = useMemo(() => buildPaletteGroups({ query, tokens: current?.tokens ?? [], trending: trending ?? [], theme, earn, boost, recentSearches:history.items }), [query, current, trending, theme, earn, boost,history.items]);
   const status = searching ? "Searching tokens…" : current?.failed ? "Token search is unavailable right now. Pages and actions still work." : "";
 
   const close = () => {
     onOpenChange(false);
     setQuery("");
+    setClipboardHint("");
   };
 
   const run = (item: PaletteItem) => {
+    if(item.kind==="search"){setQuery(item.query);return;}
+    if(isSearchableQuery(q))rememberSearch(q);
     close();
     if (item.kind === "token") {
       const t = item.token;
@@ -126,11 +140,16 @@ export default function CommandPalette({ open, onOpenChange }: { open: boolean; 
                   placeholder="Search tokens by name, symbol or address"
                   className="h-14 w-full border-0 bg-transparent text-base text-ink outline-none! placeholder:text-muted"
                 />
-                <Dialog.Close className="shrink-0 rounded-md border border-line-strong px-1.5 py-0.5 font-mono text-[11px] text-muted hover:text-ink">Esc</Dialog.Close>
+                <button type="button" aria-label="Paste contract address" onClick={async()=>{try{const value=(await navigator.clipboard.readText()).trim();if(!isContractAddress(value)){setClipboardHint("Copy a full 0x contract address, or type a name or symbol.");return;}setQuery(value);setClipboardHint("");}catch{setClipboardHint("Paste directly into the search field using your keyboard.");}}} className="min-h-11 shrink-0 text-xs text-muted hover:text-ink">Paste</button>
+                <Dialog.Close className="min-h-11 shrink-0 rounded-md px-1.5 font-mono text-[11px] text-muted hover:text-ink">Esc</Dialog.Close>
               </Autocomplete.InputGroup>
 
               <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-2 [scroll-padding-block:0.5rem]">
                 <Autocomplete.Status className="px-4 pt-1 pb-2 text-xs text-muted empty:hidden">{status}</Autocomplete.Status>
+                {clipboardHint?<p role="status" className="px-4 py-2 text-xs text-muted">{clipboardHint}</p>:null}
+                {current?.failed?<button type="button" className="mx-4 min-h-11 text-xs text-brand" onClick={()=>{setResults(null);setSearchAttempt(value=>value+1);}}>Retry token search</button>:null}
+                {!q && trendingFailed?<div className="px-4 text-xs text-muted">Trending tokens are unavailable. <button type="button" className="min-h-11 text-brand" onClick={()=>setTrending(null)}>Retry trending</button></div>:null}
+                {!q && history.items.length>0?<button type="button" className="mx-4 min-h-11 text-xs text-muted hover:text-ink" onClick={clearRecentSearches}>Clear recent searches</button>:null}
                 <Autocomplete.Empty>
                   <div className="px-4 py-8 text-center text-sm text-muted">
                     {searching ? "Searching tokens…" : <>Nothing matches “{q}”. Try a token symbol or paste its contract address.</>}
@@ -190,12 +209,12 @@ function PaletteRow({ item }: { item: PaletteItem }) {
       </>
     );
   }
-  const Icon = item.kind === "page" ? FileText : item.action === "bridge" ? ArrowLeftRight : item.label.includes("light") ? Sun : Moon;
+  const Icon = item.kind === "search" ? Search : item.kind === "page" ? FileText : item.action === "bridge" ? ArrowLeftRight : item.label.includes("light") ? Sun : Moon;
   return (
     <>
       <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-card text-body group-data-[highlighted]:text-ink"><Icon size={15} aria-hidden /></span>
       <span className="min-w-0 flex-1 truncate">{item.label}</span>
-      <span className="shrink-0 text-xs text-muted">{item.kind === "page" ? "Page" : "Action"}</span>
+      <span className="shrink-0 text-xs text-muted">{item.kind === "search" ? "Search again" : item.kind === "page" ? "Page" : "Action"}</span>
     </>
   );
 }

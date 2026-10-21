@@ -7,6 +7,7 @@
 export type PaletteToken = { chain: string; token: string; name: string; symbol: string; image: string | null; capUsd: number | null; change: number; holders: number };
 
 export type PaletteItem =
+  | { kind: "search"; id: string; label: string; query: string }
   | { kind: "token"; id: string; label: string; token: PaletteToken }
   | { kind: "page"; id: string; label: string; href: string; keywords: string }
   | { kind: "action"; id: string; label: string; action: "bridge" | "theme"; keywords: string };
@@ -65,7 +66,7 @@ export const BOOST_PAGE = { id: "page:boosted", label: "Boosted tokens", href: "
  * Results in reading order: tokens first (search hits, or what is trending before anything is
  * typed), then pages, then actions. Empty groups are dropped.
  */
-export function buildPaletteGroups({ query, tokens, trending, theme, earn = false, boost = false }: { query: string; tokens: PaletteToken[]; trending: PaletteToken[]; theme: "light" | "dark"; earn?: boolean; boost?: boolean }): PaletteGroup[] {
+export function buildPaletteGroups({ query, tokens, trending, theme, earn = false, boost = false, recentSearches = [] }: { query: string; tokens: PaletteToken[]; trending: PaletteToken[]; theme: "light" | "dark"; earn?: boolean; boost?: boolean; recentSearches?: string[] }): PaletteGroup[] {
   const q = query.trim();
   const tokenList = q ? (isSearchableQuery(q) ? tokens : []) : trending;
   const tokenItems: PaletteItem[] = tokenList.map((t) => ({ kind: "token", id: `token:${t.chain}:${t.token}`, label: t.name, token: t }));
@@ -76,6 +77,7 @@ export function buildPaletteGroups({ query, tokens, trending, theme, earn = fals
     { kind: "action" as const, id: "action:theme", label: `Switch to the ${next} theme`, action: "theme" as const, keywords: `theme ${next} mode appearance colors` },
   ].filter((a) => !q || matchesQuery(q, `${a.label} ${a.keywords}`));
   return [
+    { value: "Recent searches", items: q ? [] : recentSearches.slice(0,4).map((value):PaletteItem=>({kind:"search",id:`search:${value}`,label:value,query:value})) },
     { value: q ? "Tokens" : "Trending now", items: tokenItems },
     { value: "Pages", items: pages },
     { value: "Actions", items: actions },

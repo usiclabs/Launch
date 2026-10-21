@@ -4,7 +4,7 @@ import Link from "next/link";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "motion/react";
 import { Bubbles, List, LockKeyhole, Waves } from "lucide-react";
-import { useLive } from "./LiveProvider";
+import { LiveConnectionNotice, useLive } from "./LiveProvider";
 import TokenAvatar from "./TokenAvatar";
 import { TapeList } from "./LaunchTape";
 import RiverFeed from "./RiverFeed";
@@ -140,6 +140,7 @@ export default function LiveRiver({ initial, recent: seed = initial, serverNow, 
           </ToggleGroup>
         </div>
       </div>
+      <LiveConnectionNotice />
       {view === "bubbles" ? (
         <div ref={body} className="grid gap-x-6 gap-y-4 pt-4 sm:gap-y-5 sm:pt-5 lg:grid-cols-[minmax(0,1fr)_17rem]">
           <div className="min-w-0">

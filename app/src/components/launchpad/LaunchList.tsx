@@ -56,7 +56,7 @@ export type ListView = "market" | "watchlist";
  */
 export default function LaunchList({ initial, initialHasMore = false, initialSort, initialWindow, initialChain, initialFilter = null, initialView = "market", initialLayout = "list", frame = "rounded-2xl border border-line bg-paper", bare = false, hasDb, serverNow }: { initial: L[]; serverNow: number; frame?: string; bare?: boolean; initialHasMore?: boolean; initialSort: LaunchSort; initialWindow: VolumeWindow; initialChain: ChainKey | null; initialFilter?: LaunchFilter | null; initialView?: ListView; initialLayout?: ListLayout; ethUsd?: number | null; hasDb: boolean }) {
   const router = useRouter();
-  const { live, setListParams, subscribe } = useLive();
+  const { live, connection, setListParams, subscribe } = useLive();
   const [selection, setSelection] = useState<Selection>({ sort: initialSort, window: initialWindow, chain: initialChain, filter: initialFilter });
   const { sort, window: window_, chain, filter } = selection;
   const [view, setView] = useState<ListView>(initialView);
@@ -322,7 +322,7 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
       {view === "watchlist" ? <WatchlistPanel chain={chain} onBrowse={() => pick(sort, window_, chain, filter, "market")} /> : <>
       <div role="status" className={`flex min-h-9 items-center justify-between gap-2 border-t border-line text-[11px] text-muted ${pad}`}>
         <span className="inline-flex items-center gap-2">{updating || searching ? <><Spinner size={11} />{searching ? "Searching all launches…" : "Updating view…"}</> : nq ? <><span className="font-mono tnum">{shown.length}</span> matches</> : <><span className="font-mono tnum">{shown.length}</span> shown · {chain ? CHAIN_SHORT[chain] : "all chains"}</>}</span>
-        <span className="shrink-0">{holding ? "Order held while browsing" : "Updates every 5s"}</span>
+        <span className="shrink-0">{holding ? "Order held while browsing" : connection.state==="stale"?"Live updates paused":"Updates every 5s"}</span>
       </div>
       {layout === "list" ? <LaunchListHeader window={showWindow ? window_ : "all"} /> : null}
       <ul ref={listRef} aria-label="Token launches" aria-busy={updating} className={layout === "cards" ? `grid grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] gap-4 border-t border-line pt-4 ${pad}` : undefined} onPointerEnter={(e) => { if (e.pointerType === "mouse") interaction.current.pointer = true; }} onPointerLeave={() => { interaction.current.pointer = false; interaction.current.at = Date.now(); }} onPointerDown={() => { interaction.current.at = Date.now(); }} onFocusCapture={() => { interaction.current.focus = true; }} onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) { interaction.current.focus = false; interaction.current.at = Date.now(); } }}>

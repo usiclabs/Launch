@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isAddress, type Address } from "viem";
-import { ArrowLeft, ArrowUpRight, Globe, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Globe } from "lucide-react";
+import TokenShare from "@/components/launchpad/TokenShare";
+import { RecordTokenVisit } from "@/components/launchpad/RecentTokens";
 import TokenAvatar from "@/components/launchpad/TokenAvatar";
 import { MorphAvatar, MorphName } from "@/components/launchpad/TokenMorph";
 import { feeModeOf } from "@/components/launchpad/FeeChip";
@@ -19,7 +21,6 @@ import TokenTrades from "@/components/launchpad/TokenTrades";
 import LaunchReceipt from "@/components/launchpad/LaunchReceipt";
 import TokenAbout from "@/components/launchpad/TokenAbout";
 import NamesProvider from "@/components/profile/NamesProvider";
-import { intentUrl } from "@/lib/profiles/xpost";
 import { namesFor, type NameEntry } from "@/lib/profiles/server";
 import { getHolderPanel } from "@/lib/launchpad/holdersServer";
 import { memo } from "@/lib/launchpad/memo";
@@ -130,7 +131,6 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
   const poolKey = { currency0: l.quote as Address, currency1: l.token as Address, fee: l.lp_fee, tickSpacing: TICK_SPACING, hooks: NATIVE as Address };
   const priceUsd = l.price_usd;
   const chainLabel = CHAIN_LABELS[chain];
-  const shareText = `${l.name} ($${l.symbol}) on ${chainLabel}. ${l.lp_fee === 0 ? "0% fee" : mode === "burn" ? "fees burned" : "no platform fee"}, liquidity locked forever`;
 
   const supplyLabel = fmtCompact(Number(BigInt(l.supply)) / 1e18, 0);
   const feeRoute = mode === "free" ? "No trading fee" : `${pipsToPct(l.lp_fee)} trading fee → ${mode === "burn" ? "burned" : mode === "split" ? "beneficiaries" : "beneficiary"}`;
@@ -222,7 +222,8 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
               <WatchButton token={{ chain, token: l.token, name: l.name, symbol: l.symbol }} labelled />
               {/* the token's links as one bar, the Watch button's height: share, copy the address, the explorer */}
               <div className="inline-flex h-10 max-w-full items-stretch overflow-hidden rounded-xl border border-line bg-card text-xs font-medium text-body sm:h-9">
-                <a href={intentUrl(shareText, { url: `${SITE_URL}/t/${chain}/${l.token}` })} target="_blank" rel="noreferrer" className={`inline-flex ${segment}`} aria-label="Share token on X"><Share2 size={13} aria-hidden="true" /><span className="hidden sm:inline">Share</span></a>
+                <TokenShare chain={chain} token={l.token} name={l.name} symbol={l.symbol} className={`inline-flex ${segment}`} />
+                <RecordTokenVisit chain={chain} token={l.token} name={l.name} symbol={l.symbol} image={l.image_url} />
                 <CopyChip value={l.token} className={`inline-flex ${segment} border-l border-line font-code`} />
                 {/* phones keep one row of actions; the explorer link is also in About & contracts */}
                 <a href={explorerAddress(chain, l.token)} target="_blank" rel="noreferrer" className={`hidden sm:inline-flex ${segment} border-l border-line`}>{explorerName(chain)}<ArrowUpRight size={13} aria-hidden="true" /></a>
@@ -233,7 +234,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
 
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_23.75rem] lg:gap-6 lg:grid-rows-[min-content_1fr]">
           <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1">
-            <TokenChart chain={chain} token={l.token} symbol={l.symbol} poolId={l.pool_id} quote={l.quote} launchedAt={l.block_time} hasTrades={l.buys + l.sells > 0} />
+            <TokenChart key={`${chain}:${l.token}`} chain={chain} token={l.token} symbol={l.symbol} poolId={l.pool_id} quote={l.quote} launchedAt={l.block_time} hasTrades={l.buys + l.sells > 0} />
             {/* hairlines between the cells come from the gap over a line-coloured grid, so they hold in both layouts */}
             <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
               <Stat k="Price" v={priceUsd !== null ? fmtUsd(priceUsd) : `${fmtPrice(l.price_quote)} ${quote.symbol}`} sub={`${fmtPrice(l.price_quote)} ${quote.symbol}`} />
@@ -249,7 +250,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
           <aside className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             {/* a beam in the token's colour travels the trade box border; the box itself keeps the action colours */}
             <div className="relative rounded-2xl">
-              <TradePanel chain={chain} token={l.token as Address} symbol={l.symbol} poolKey={poolKey} poolId={l.pool_id as `0x${string}`} feeRoute={tradeFee} quote={quote} ethUsd={usd} />
+              <TradePanel chain={chain} token={l.token as Address} symbol={l.symbol} poolKey={poolKey} poolId={l.pool_id as `0x${string}`} feeRoute={tradeFee} recipients={l.recipients} quote={quote} ethUsd={usd} />
               <BorderBeam size={120} duration={9} colorFrom="var(--tok)" colorTo="var(--tok)" />
             </div>
             {/* the token at a glance beside the trade box, as other launchpads keep it; the full record is in the About tab */}

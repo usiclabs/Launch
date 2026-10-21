@@ -36,6 +36,7 @@ type ListParams = { sort: LaunchSort; window: VolumeWindow; chain: ChainKey | nu
 type Listener = (live: Live) => void;
 type Ctx = {
   live: Live;
+  connection: {state:"connecting"|"live"|"stale";refreshing:boolean};
   setListParams: (p: ListParams | null) => void;
   refresh: () => void;
   /** Called after every successful tick with the fresh snapshot. Use for setState from a callback (never from an effect body). */
@@ -48,6 +49,7 @@ const POLL_MS = 5_000;
 
 export default function LiveProvider({ initial, children }: { initial: Omit<Live, "launches" | "sort" | "window" | "chain"> & Partial<Pick<Live, "launches" | "sort" | "window" | "chain">>; children: React.ReactNode }) {
   const [live, setLive] = useState<Live>({ launches: null, sort: null, window: "all", chain: null, ...initial });
+  const [connection,setConnection]=useState<Ctx["connection"]>({state:"connecting",refreshing:false});
   const params = useRef<ListParams | null>(initial.sort ? { sort: initial.sort, window: initial.window ?? "all", chain: initial.chain ?? null, filter: initial.filter ?? null, limit: initial.limit ?? 40 } : null);
   const inflight = useRef(false);
   const listeners = useRef(new Set<Listener>());
@@ -57,13 +59,16 @@ export default function LiveProvider({ initial, children }: { initial: Omit<Live
   const tick = useCallback(async () => {
     if (inflight.current || document.visibilityState !== "visible") return;
     inflight.current = true;
+    setConnection(value=>({...value,refreshing:true}));
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),12000);
     try {
       const p = params.current;
       const parts = p ? [`sort=${p.sort}`, `window=${p.window}`, `limit=${p.limit}`, ...(p.chain ? [`chain=${p.chain}`] : []), ...(p.filter ? [`filter=${p.filter}`] : [])] : [];
       if (boostWanted.current > 0) parts.push("boost=1");
       const q = parts.length ? `?${parts.join("&")}` : "";
-      const res = await fetch(`/api/launch/live${q}`, { cache: "no-store" });
-      if (!res.ok) return;
+      const res = await fetch(`/api/launch/live${q}`, { cache: "no-store",signal:controller.signal });
+      if (!res.ok) throw new Error("Live update unavailable");
       const data = (await res.json()) as Live;
       // a list for a sort we no longer want is dropped, not shown
       if (data.launches && p && (data.sort !== p.sort || data.window !== p.window || (data.chain ?? null) !== p.chain || (data.filter ?? null) !== p.filter)) data.launches = null;
@@ -74,11 +79,13 @@ export default function LiveProvider({ initial, children }: { initial: Omit<Live
       const merged: Live = { ...data, totals: { ...last.current.totals, ...data.totals, by_chain: { ...last.current.totals.by_chain, ...data.totals?.by_chain } }, launches: data.launches ?? (p ? last.current.launches : null), boost_on: data.boost_on ?? last.current.boost_on };
       last.current = merged;
       setLive(merged);
+      setConnection({state:"live",refreshing:false});
       listeners.current.forEach((fn) => fn(merged));
     } catch {
-      /* offline; keep last */
+      setConnection({state:"stale",refreshing:false});
     } finally {
       inflight.current = false;
+      clearTimeout(timeout);
     }
   }, []);
 
@@ -115,7 +122,7 @@ export default function LiveProvider({ initial, children }: { initial: Omit<Live
     };
   }, []);
 
-  const value = useMemo(() => ({ live, setListParams, refresh: () => void tick(), subscribe, wantBoost }), [live, setListParams, tick, subscribe, wantBoost]);
+  const value = useMemo(() => ({ live, connection, setListParams, refresh: () => void tick(), subscribe, wantBoost }), [live, connection, setListParams, tick, subscribe, wantBoost]);
   return <LiveCtx.Provider value={value}>{children}</LiveCtx.Provider>;
 }
 
@@ -124,3 +131,5 @@ export function useLive(): Ctx {
   if (!c) throw new Error("useLive outside LiveProvider");
   return c;
 }
+
+export function LiveConnectionNotice(){const {connection,refresh}=useLive();return connection.state==="stale"?<div role="status" className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-paper px-3 text-xs text-muted"><span>Live updates paused. Showing the last available activity.</span><button type="button" disabled={connection.refreshing} onClick={refresh} className="min-h-11 text-brand disabled:opacity-50">{connection.refreshing?"Reconnecting…":"Retry live updates"}</button></div>:null;}

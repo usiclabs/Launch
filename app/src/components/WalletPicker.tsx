@@ -25,6 +25,8 @@ export default function WalletPicker({ onClose }: { onClose: () => void }) {
   const { connect, connectors, isPending, reset } = useConnect({ mutation: { onSuccess: onClose } });
   const [error, setError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [pageLink,setPageLink]=useState("");
+  const [copyNote,setCopyNote]=useState("");
   // window.ethereum can appear after the sheet opens (a wallet that injects late fires the EIP-1193
   // "ethereum#initialized" event; EIP-6963 wallets announce themselves). Re-read it on either signal.
   const hasInjectedProvider = useSyncExternalStore(
@@ -77,6 +79,7 @@ export default function WalletPicker({ onClose }: { onClose: () => void }) {
       </ul>
       {!hasInjectedProvider && choices.every((c) => c.kind === "coinbase") ? <p className="mt-3 text-xs text-muted leading-relaxed">{NO_WALLET_NOTE}</p> : null}
       {choices.length === 0 ? <p className="text-sm text-muted">No wallet option is available right now. Reload the page and try again.</p> : null}
+      <details className="mt-4 rounded-xl border border-line bg-paper px-3 text-xs text-muted"><summary className="min-h-11 cursor-pointer py-3 font-medium text-body">Connecting from a phone?</summary><ol className="list-decimal space-y-2 pb-3 pl-4 leading-relaxed"><li>Open this page in your wallet app’s built-in browser.</li><li>Tap Connect and choose the wallet your browser provides.</li><li>Choose the requested network in your wallet, then review any transaction before signing.</li></ol><button type="button" onClick={async()=>{const value=window.location.href;setPageLink(value);try{await navigator.clipboard.writeText(value);setCopyNote("Page link copied. Open it in your wallet browser.");}catch{setCopyNote("Select and copy this link into your wallet browser.");}}} className="mb-2 min-h-11 text-brand">Copy this page link</button>{pageLink?<input aria-label="Page link for wallet browser" readOnly value={pageLink} onFocus={event=>event.currentTarget.select()} className="mb-2 h-11 w-full rounded-lg border border-line bg-card px-2 text-xs text-ink"/>:null}<p role="status" className="pb-3 leading-relaxed">{copyNote||"Coinbase Smart Wallet also supports connecting with a passkey."}</p></details>
       <p role="alert" aria-live="assertive" className={`mt-3 text-[13px] leading-relaxed text-down-ink ${error ? "" : "sr-only"}`}>{error ?? ""}</p>
       <p className="mt-4 text-[11px] text-muted leading-relaxed">Connecting lets this site read your address. Transactions and edits always need your signature.</p>
     </Sheet>

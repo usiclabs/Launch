@@ -420,6 +420,7 @@ test("the agents' notes name the lane's fields as they are", () => {
 
 test("one X intent builder: the booster's post and the token page's Share both go through intentUrl", () => {
   assert.match(read("../../lib/launchpad/boost.ts"), /return intentUrl\(boostShareText\(symbol, raw\), \{ url: pageUrl, via: BRAND_X \}\);/);
-  assert.match(tokenPage, /<a href=\{intentUrl\(shareText, \{ url: `\$\{SITE_URL\}\/t\/\$\{chain\}\/\$\{l\.token\}` \}\)\} target="_blank"/);
-  for (const f of ["../../lib/launchpad/boost.ts", "../../app/t/[chain]/[token]/page.tsx"]) assert.doesNotMatch(read(f), /https:\/\/x\.com\/intent/, f);
+  assert.match(tokenPage, /<TokenShare chain=\{chain\} token=\{l\.token\}/);
+  assert.match(read("./TokenShare.tsx"), /href=\{intentUrl\(/);
+  for (const f of ["../../lib/launchpad/boost.ts", "./TokenShare.tsx"]) assert.doesNotMatch(read(f), /https:\/\/x\.com\/intent/, f);
 });
