@@ -9,7 +9,7 @@ const llms = readFileSync(new URL("../../app/llms.txt/route.ts", import.meta.url
 
 // The entity page: brand from brand.ts (never hard-coded), official channels from the same constants.
 test("about page is the brand entity page, built from brand.ts constants", () => {
-  assert.match(page, /import \{ BRAND, BRAND_DOMAIN, BRAND_GITHUB, BRAND_X, LEGACY_DOMAIN \} from "@\/lib\/brand"/);
+  assert.match(page, /import \{ BRAND, BRAND_GITHUB, BRAND_X \} from "@\/lib\/brand"/);
   assert.match(page, /title=\{`What \$\{BRAND\} is`\}/);
   assert.match(page, /pageMetadata\(\{\s*path: "\/about"/);
   assert.match(page, /https:\/\/x\.com\/\$\{BRAND_X\}/);
@@ -27,7 +27,7 @@ test("about page states facts, not value claims", () => {
 
 test("the brand appears as a plain word above the fold and links to the entity page", () => {
   assert.match(hero, /<Link href="\/about"[^>]*>LAUNCH<\/Link> is open source on Base, Robinhood Chain and Arc/);
-  assert.ok(footer.includes('{ href: "/about", label: "About openlaunch" }'), "footer links the about page");
-  assert.match(llms, /> openlaunch \(\$\{BRAND_DOMAIN\}\) is an open-source/);
+  assert.ok(footer.includes('{ href: "/about", label: "About LAUNCH" }'), "footer links the about page");
+  assert.match(llms, /> LAUNCH is an open-source/);
   assert.match(llms, /About page: \$\{SITE_URL\}\/about/);
 });

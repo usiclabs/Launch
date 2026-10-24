@@ -139,7 +139,7 @@ export function isPairApplyAction(v: unknown): v is PairApplyAction {
 /** What the applicant signs. The application's fields are in it, so a signature covers exactly what is stored. */
 export function buildPairApplyMessage(p: { action: PairApplyAction; chain: ChainKey; address: string; wallet: string; nonce: string; ts: number; id?: number; source?: string; website?: string; x_handle?: string; logo?: string; description?: string; proof?: string }): string {
   return [
-    `openlaunch.lol community pair application`,
+    `LAUNCH community pair application`,
     ``,
     `Action: ${p.action}`,
     `Token: ${p.chain}:${p.address.toLowerCase()}`,
@@ -161,7 +161,7 @@ export function isPairReviewDecision(v: unknown): v is PairReviewDecision {
 }
 /** What an admin signs to decide an application. */
 export function buildPairReviewMessage(p: { decision: PairReviewDecision; id: number; wallet: string; nonce: string; ts: number; reason: string }): string {
-  return [`openlaunch.lol community pair review`, ``, `Decision: ${p.decision}`, `Application: ${p.id}`, `Reason: ${p.reason || "-"}`, `Admin: ${p.wallet.toLowerCase()}`, `Nonce: ${p.nonce}`, `Issued: ${new Date(p.ts).toISOString()}`].join("\n");
+  return [`LAUNCH community pair review`, ``, `Decision: ${p.decision}`, `Application: ${p.id}`, `Reason: ${p.reason || "-"}`, `Admin: ${p.wallet.toLowerCase()}`, `Nonce: ${p.nonce}`, `Issued: ${new Date(p.ts).toISOString()}`].join("\n");
 }
 
 /* ─────────────────────────────── words ─────────────────────────────── */

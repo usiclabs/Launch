@@ -174,7 +174,7 @@ test("admin message: its own wording, and every listing field the server stores 
   assert.equal(
     m,
     [
-      "openlaunch.lol community pairs",
+      "LAUNCH community pairs",
       "",
       "Action: list",
       "Pair: base:0x9cb41fd9dc6891bae8187029461bfaadf6cc0c69",

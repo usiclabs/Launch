@@ -34,7 +34,7 @@ test("bridge keeps one lazily loaded controller across desktop/mobile and dismis
 });
 
 test("bridge review names minimum, separate gas, recipient, risk and expiry", () => {
-  for (const content of ["Minimum received", "Source gas", "Receiving wallet", "0.5% slippage", "carries risk", "This quote expired", "Refresh quote", "0 Openlaunch fee"]) assert.ok(panel.includes(content), content);
+  for (const content of ["Minimum received", "Source gas", "Receiving wallet", "0.5% slippage", "carries risk", "This quote expired", "Refresh quote", "0 LAUNCH fee"]) assert.ok(panel.includes(content), content);
   assert.match(panel, /reviewing \? b.approvalRequired \? b.approve\(\) : b.confirm\(\) : b.requestQuote\(\)/);
   assert.doesNotMatch(panel, /dangerouslySetInnerHTML|setInterval|sendTransaction/);
 });
@@ -132,7 +132,7 @@ test("stuck records have a bounded discard path, and the hook avoids APIs missin
   assert.match(hook, /if \(!transferCanDiscard\(current, fresh, Date\.now\(\)\)\) throw/);
   assert.match(hook, /if \(!approvalCanDiscard\(current, fresh, Date\.now\(\)\)\) throw/);
   assert.match(panel, /Keep the Transfer ID below/);
-  assert.match(panel, /Openlaunch does not operate Relay, holds no funds in transit, and is not responsible for delays, refunds or losses/);
+  assert.match(panel, /LAUNCH does not operate Relay, holds no funds in transit, and is not responsible for delays, refunds or losses/);
   assert.doesNotMatch(hook, /AbortSignal\.(any|timeout)/);
   assert.match(hook, /linkedTimeoutSignal\(signal, 20_000\)/);
   assert.match(hook, /anchorQuoteExpiry\(body, requestedAt\)/);

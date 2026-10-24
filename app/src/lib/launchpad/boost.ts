@@ -13,7 +13,7 @@
  */
 import { TWIG_ADDRESS, TWIG_DECIMALS, TWIG_SYMBOL } from "./twig.ts";
 import { CHAIN_IDS } from "../chainKeys.ts";
-import { BRAND_DOMAIN, BRAND_X } from "../brand.ts";
+import { BRAND, BRAND_X } from "../brand.ts";
 import { intentUrl } from "../profiles/xpost.ts";
 
 /** Boosts exist on Base only: TWIG has not been bridged anywhere. */
@@ -251,7 +251,7 @@ export const BOOST_PANEL_CLICKS_MIN = 10;
  * whether or not the boost brought the token into the lane yet.
  */
 export function boostShareText(symbol: string, raw: bigint | string): string {
-  return `Boosted $${symbol} with ${fmtBoostTwig(raw)} on ${BRAND_DOMAIN}. The legacy wrapper went to 0x…dEaD.`;
+  return `Boosted $${symbol} with ${fmtBoostTwig(raw)} on ${BRAND}. The legacy wrapper went to 0x…dEaD.`;
 }
 
 /** The X intent for that post: the token's page as its link, via the official account (the one intent builder, xpost.ts). */
@@ -353,7 +353,7 @@ export function isBoostModAction(v: unknown): v is BoostModAction {
 /** The text an admin wallet signs to hide a token from the lane or show it again. Its own wording, so a posts signature never replays here. */
 export function buildBoostModMessage(p: { action: BoostModAction; token: string; wallet: string; nonce: string; ts: number }): string {
   return [
-    `openlaunch.lol boosted lane`,
+    `LAUNCH boosted lane`,
     ``,
     `Action: ${p.action}`,
     `Token: ${BOOST_CHAIN}:${p.token.toLowerCase()}`,

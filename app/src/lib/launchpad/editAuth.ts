@@ -9,7 +9,7 @@
 import { parseXHandle } from "./xHandle.ts";
 
 export const EDIT_TTL_MS = 5 * 60_000;
-export const EDIT_DOMAIN = "openlaunch.lol";
+export const EDIT_DOMAIN = "LAUNCH";
 
 export type EditFields = { description?: string; image_url?: string; banner_url?: string; website?: string; x_handle?: string };
 

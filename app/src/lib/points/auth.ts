@@ -27,7 +27,7 @@ export function normalizeSeasonId(raw: unknown): number {
  */
 export function buildPointsAdminMessage(p: { action: PointsAdminAction; wallet: string; nonce: string; ts: number; days?: number; seasonId?: number }): string {
   return [
-    `openlaunch.lol points`,
+    `LAUNCH points`,
     ``,
     `Action: ${p.action}`,
     ...(p.action === "start" ? [`Season length: ${normalizeSeasonDays(p.days)} days`] : []),

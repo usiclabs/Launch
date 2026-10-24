@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUp, ArrowUpRight, FileCode2 } from "lucide-react";
-import { BRAND, BRAND_DOMAIN, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
+import { BRAND, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
 import { CHAIN_KEYS, CHAIN_LABELS, CHAINS, explorerAddress } from "@/lib/chainPublic";
 import { hasChainPage, launchpad } from "@/lib/launchpad/config";
 import { chainLandingPath } from "@/lib/chainLanding";
@@ -68,7 +68,7 @@ export default function Footer() {
           })}
         </div>
 
-        <Link href="/" aria-label={`${BRAND_DOMAIN} home`} className={styles.signature}>
+        <Link href="/" aria-label={`${BRAND} home`} className={styles.signature}>
           <span aria-hidden="true">{BRAND}</span>
         </Link>
 

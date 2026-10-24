@@ -107,12 +107,12 @@ test("the card shows only while the switch is on, and the sheet loads on first u
   assert.equal((dashboard.match(/<SeasonCard address=\{address\} \/>\n\s*<EarnCard address=\{address\} \/>/g) ?? []).length, 2);
 });
 
-test("the copy states the risk and the absence of any openlaunch fee, and makes no promise", () => {
+test("the copy states the risk and the absence of any LAUNCH fee, and makes no promise", () => {
   assert.match(panel, /Deposits can lose money\./);
-  assert.match(panel, /openlaunch never holds your funds, cannot move them and cannot guarantee a withdrawal/);
-  assert.match(panel, /<dt>openlaunch fee<\/dt><dd>None<\/dd>/);
-  assert.match(dialog, /0 openlaunch fee/);
-  assert.match(card, /Can lose money\. No openlaunch fee\./);
+  assert.match(panel, /LAUNCH never holds your funds, cannot move them and cannot guarantee a withdrawal/);
+  assert.match(panel, /<dt>LAUNCH fee<\/dt><dd>None<\/dd>/);
+  assert.match(dialog, /0 LAUNCH fee/);
+  assert.match(card, /Can lose money\. No LAUNCH fee\./);
   for (const src of [card, dialog, panel]) {
     assert.doesNotMatch(src, /Base Earn|Coinbase|high[- ]yield|guaranteed (?:return|yield|rate)|risk[- ]free|\bsafe\b/i);
   }

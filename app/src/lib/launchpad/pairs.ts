@@ -243,7 +243,7 @@ export type PairListing = { logo: string; website: string; x_handle: string; des
 export function buildPairAdminMessage(p: { action: PairAdminAction; chain: ChainKey; address: string; wallet: string; nonce: string; ts: number; reason?: string; listing?: PairListing }): string {
   const l = p.listing;
   return [
-    `openlaunch.lol community pairs`,
+    `LAUNCH community pairs`,
     ``,
     `Action: ${p.action}`,
     `Pair: ${p.chain}:${p.address.toLowerCase()}`,

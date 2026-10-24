@@ -66,7 +66,7 @@ test("validateProfile normalizes everything at once", () => {
 // ── messages ─────────────────────────────────────────────────────────────────
 test("the profile message names the wallet, nonce, time and every field", () => {
   const m = buildProfileMessage({ wallet: "0xABC", nonce: "a".repeat(32), ts: Date.UTC(2026, 9, 7), fields: { username: "kevin", display_name: "Kevin", bio: "a\nb", avatar_key: null, x_handle: "kevincodex" } });
-  assert.match(m, /^openlaunch\.lol wants you to save your public profile\./);
+  assert.match(m, /^LAUNCH wants you to save your public profile\./);
   for (const s of ["Wallet: 0xabc", `Nonce: ${"a".repeat(32)}`, "Issued: 2026-10-07T00:00:00.000Z", "username: kevin", "name: Kevin", "bio: a / b", "x: kevincodex", "moves no funds"]) assert.ok(m.includes(s), s);
 });
 

@@ -196,7 +196,7 @@ test("an admin signature names the action, the token and the admin, and cannot p
   assert.ok(isBoostModAction("hide") && isBoostModAction("unhide"));
   assert.equal(isBoostModAction("mute"), false);
   const m = buildBoostModMessage({ action: "hide", token: "0xABC", wallet: "0xDEF", nonce: "n1", ts: Date.parse("2026-10-15T00:00:00Z") });
-  assert.equal(m, ["openlaunch.lol boosted lane", "", "Action: hide", "Token: base:0xabc", "Admin: 0xdef", "Nonce: n1", "Issued: 2026-10-15T00:00:00.000Z"].join("\n"));
+  assert.equal(m, ["LAUNCH boosted lane", "", "Action: hide", "Token: base:0xabc", "Admin: 0xdef", "Nonce: n1", "Issued: 2026-10-15T00:00:00.000Z"].join("\n"));
   assert.ok(!m.includes("post:"));
 });
 
@@ -351,13 +351,13 @@ test("a card credits the wallet that sent the most TWIG in the window; a tie goe
 
 test("a booster's post says what was sent and where it went, links the token's page, and tags the official account", () => {
   const raw = 1_000_000n * E18 + ID;
-  assert.equal(boostShareText("MUSEWORLD", raw), "Boosted $MUSEWORLD with 1M TWIG on openlaunch.lol. The TWIG went to 0x…dEaD.");
-  assert.equal(boostShareText("BSTR", (426_248n * E18).toString()), "Boosted $BSTR with 426.25K TWIG on openlaunch.lol. The TWIG went to 0x…dEaD.");
+  assert.equal(boostShareText("MUSEWORLD", raw), "Boosted $MUSEWORLD with 1M Legacy wrapper on LAUNCH. The legacy wrapper went to 0x…dEaD.");
+  assert.equal(boostShareText("BSTR", (426_248n * E18).toString()), "Boosted $BSTR with 426.25K Legacy wrapper on LAUNCH. The legacy wrapper went to 0x…dEaD.");
   const url = new URL(boostShareUrl("A&B #1", raw, "https://openlaunch.lol/t/base/0xabc"));
   assert.equal(url.origin + url.pathname, "https://x.com/intent/post", "the same intent the token page's Share uses");
-  assert.equal(url.searchParams.get("text"), "Boosted $A&B #1 with 1M TWIG on openlaunch.lol. The TWIG went to 0x…dEaD.", "a symbol never breaks out of its parameter");
+  assert.equal(url.searchParams.get("text"), "Boosted $A&B #1 with 1M Legacy wrapper on LAUNCH. The legacy wrapper went to 0x…dEaD.", "a symbol never breaks out of its parameter");
   assert.equal(url.searchParams.get("url"), "https://openlaunch.lol/t/base/0xabc");
-  assert.equal(url.searchParams.get("via"), "openlaunch_lol");
+  assert.equal(url.searchParams.get("via"), "mobilelaunchxyz");
   const banned = /\b(moon|rally|buyback|guarantee[ds]?|pump|gem|100x|profit|invest(ment)?|returns?|yield|airdrop|reward)\b/i;
   assert.doesNotMatch(boostShareText("X", raw), banned);
 });

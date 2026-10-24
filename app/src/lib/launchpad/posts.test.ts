@@ -56,7 +56,7 @@ test("normalized post bodies retain their byte-exact signed message", () => {
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.equal(buildPostMessage({ chain: "base", token: "0xAB", wallet: "0xCD", nonce: "n", ts: 0, parentId: 7, body: result.body }), [
-    "openlaunch.lol \u2014 sign to post. Free, no transaction.",
+    "LAUNCH \u2014 sign to post. Free, no transaction.",
     "",
     "Chain: base",
     "Token: 0xab",
@@ -72,10 +72,10 @@ test("normalized post bodies retain their byte-exact signed message", () => {
 test("copy cleanup preserves byte-exact wallet signature headers and user text", () => {
   const body = "hello \u2014 world";
   const message = buildPostMessage({ chain: "base", token: "0xAB", wallet: "0xCD", nonce: "n", ts: 0, parentId: null, body });
-  assert.equal(message.split("\n")[0], "openlaunch.lol \u2014 sign to post. Free, no transaction.");
+  assert.equal(message.split("\n")[0], "LAUNCH \u2014 sign to post. Free, no transaction.");
   assert.ok(message.endsWith(body));
-  assert.equal(buildReportMessage({ postId: 3, wallet: "0xCD", nonce: "n", ts: 0, reason: "scam" }).split("\n")[0], "openlaunch.lol \u2014 sign to report a post.");
-  assert.equal(buildModMessage({ action: "hide", target: "post:3", wallet: "0xCD", nonce: "n", ts: 0 }).split("\n")[0], "openlaunch.lol \u2014 sign a moderation action.");
+  assert.equal(buildReportMessage({ postId: 3, wallet: "0xCD", nonce: "n", ts: 0, reason: "scam" }).split("\n")[0], "LAUNCH \u2014 sign to report a post.");
+  assert.equal(buildModMessage({ action: "hide", target: "post:3", wallet: "0xCD", nonce: "n", ts: 0 }).split("\n")[0], "LAUNCH \u2014 sign a moderation action.");
 });
 
 test("tsFresh within ±5 minutes", () => {

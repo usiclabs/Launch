@@ -7,7 +7,7 @@ import { readImage } from "@/lib/launchpad/imageStore";
 import { getProfile } from "@/lib/profiles/server";
 import { walletFacts } from "@/lib/profiles/stats";
 import { usernameFromPath } from "@/lib/profiles/validate";
-import { BRAND, BRAND_DOMAIN, BRAND_TLD } from "@/lib/brand";
+import { BRAND, BRAND_TLD } from "@/lib/brand";
 import { walletHue, walletMark } from "@/lib/wallet-mark";
 
 export const alt = "profile on LAUNCH";
@@ -97,7 +97,7 @@ export default async function ProfileOg({ params }: { params: Promise<{ username
           <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 64px", fontSize: 40, color: MUTED }}>Profile not found</div>
         )}
         <div style={{ padding: "0 64px 40px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: 20, color: MUTED }}>{p ? `${BRAND_DOMAIN}/u/${p.username}` : BRAND_DOMAIN}</span>
+          <span style={{ fontSize: 20, color: MUTED }}>{p ? `LAUNCH /u/${p.username}` : BRAND}</span>
           <span style={{ display: "flex", alignItems: "center", height: 52, padding: "0 26px", borderRadius: 999, background: BLUE, color: "#fff", fontSize: 22, fontWeight: 700 }}>Free token launches · no platform fee →</span>
         </div>
       </div>

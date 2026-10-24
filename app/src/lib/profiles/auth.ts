@@ -9,7 +9,7 @@
  */
 import type { ProfileFields } from "./validate.ts";
 
-export const PROFILE_DOMAIN = "openlaunch.lol";
+export const PROFILE_DOMAIN = "LAUNCH";
 export const PROFILE_TS_SKEW_MS = 5 * 60_000;
 
 /** A client nonce: exactly 32 lowercase hex characters. */

@@ -3,7 +3,7 @@
  * Every write is a wallet-signed message: post, report, mute, admin action.
  */
 export const POST_MAX = 500;
-export const POST_DOMAIN = "openlaunch.lol";
+export const POST_DOMAIN = "LAUNCH";
 export const POST_TS_SKEW_MS = 5 * 60_000; // signed timestamp must be within ±5 min
 export const AUTO_HIDE_REPORTS = 5; // distinct wallets
 export const POST_MIN_GAP_MS = 20_000; // per wallet

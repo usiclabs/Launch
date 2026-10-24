@@ -17,7 +17,7 @@ import { memo } from "@/lib/launchpad/memo";
 import { fmtUsd } from "@/lib/launchpad/math";
 import { ago, nowMs } from "@/lib/launchpad/time";
 import { CHAIN_SHORT, SITE_URL, explorerTx } from "@/lib/chainPublic";
-import { BRAND_DOMAIN, BRAND_X } from "@/lib/brand";
+import { BRAND, BRAND_X } from "@/lib/brand";
 import { publicSeason, walletPoints } from "@/lib/points/server";
 import { Trophy } from "lucide-react";
 
@@ -36,14 +36,14 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   const p = await load(username);
   if (!p) return { title: "Profile not found", robots: { index: false } };
   const title = `${p.display_name} (${p.username})`;
-  const description = p.bio || `${p.display_name} on ${BRAND_DOMAIN}: tokens launched and trades, straight from the chain.`;
+  const description = p.bio || `${p.display_name} on ${BRAND}: tokens launched and trades, straight from the chain.`;
   return {
     title,
     description,
     alternates: { canonical: `${SITE_URL}/u/${p.username}` },
     // unverified profiles stay out of search: anyone can make one, only the X post proves who it is
     robots: p.x_state === "verified" ? undefined : { index: false, follow: true },
-    openGraph: { siteName: BRAND_DOMAIN, type: "profile", title, description, url: `${SITE_URL}/u/${p.username}` },
+    openGraph: { siteName: BRAND, type: "profile", title, description, url: `${SITE_URL}/u/${p.username}` },
     twitter: { card: "summary_large_image", site: `@${BRAND_X}`, title, description },
   };
 }

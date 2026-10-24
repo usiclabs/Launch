@@ -5,7 +5,7 @@
 
 import { CHAIN_KEYS, CHAIN_LABELS, isChainKey, type ChainKey } from "./chainKeys.ts";
 import { chainLandingPath } from "./chainLanding.ts";
-import { BRAND_DOMAIN, BRAND_X, SITE_TITLE } from "./brand.ts";
+import { BRAND, BRAND_X, SITE_TITLE } from "./brand.ts";
 import { clampSocial } from "./launchpad/ogcard.ts";
 
 export { isChainKey, type ChainKey };
@@ -264,7 +264,7 @@ export function pageMetadata({ path, title, description }: { path: string; title
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { siteName: BRAND_DOMAIN, type: "website", title, description: social, url: path, images: [SITE_SHARE_IMAGE] },
+    openGraph: { siteName: BRAND, type: "website", title, description: social, url: path, images: [SITE_SHARE_IMAGE] },
     twitter: { card: "summary_large_image", site: `@${BRAND_X}`, title, description: social, images: [SITE_SHARE_IMAGE] },
   };
 }

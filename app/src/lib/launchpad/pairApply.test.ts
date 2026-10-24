@@ -102,7 +102,7 @@ test("reviews: up to 3, within 60 days of paying, and only after changes were as
 test("proof: a code, a post text that names us, and only links to posts on X", () => {
   assert.match(applicationCode(12, () => 0), /^OL-12-AAAA$/);
   assert.match(applicationCode(7), /^OL-7-[A-Z2-9]{4}$/);
-  assert.equal(proofPostText("OL-7-K7QX", "NOICE"), "We applied to list $NOICE as a community pair on @openlaunch_lol. Application OL-7-K7QX");
+  assert.equal(proofPostText("OL-7-K7QX", "NOICE"), "We applied to list $NOICE as a community pair on @mobilelaunchxyz. Application OL-7-K7QX");
   assert.equal(proofPostUrl("https://twitter.com/noicedotso/status/1234567890?s=20"), "https://x.com/noicedotso/status/1234567890");
   assert.equal(proofPostUrl(" https://x.com/noicedotso/status/1234567890 "), "https://x.com/noicedotso/status/1234567890");
   for (const bad of ["http://x.com/a/status/1234567890", "https://evil.com/x.com/a/status/1234567890", "https://x.com/a", "https://x.com.evil.io/a/status/1234567890", "javascript:alert(1)"]) assert.equal(proofPostUrl(bad), null, bad);
@@ -115,12 +115,12 @@ test("messages: the application's fields are what is signed, and the price line 
   assert.ok(admin.split("\n").includes(`Price: ${sourceLabel(src0)}`), admin);
   assert.equal(
     buildPairApplyMessage({ action: "apply", chain: "base", address: "0xAA", wallet: "0xBB", nonce: "0123456789abcdef0123456789abcdef", ts: Date.UTC(2026, 9, 16), source: "univ3 0xp against 0xq", website: "https://noice.so", x_handle: "noicedotso", logo: "", description: "Noice." }),
-    ["openlaunch.lol community pair application", "", "Action: apply", "Token: base:0xaa", "Price pool: univ3 0xp against 0xq", "Website: https://noice.so", "X: noicedotso", "Logo: -", "About: Noice.", "Wallet: 0xbb", "Nonce: 0123456789abcdef0123456789abcdef", "Issued: 2026-10-16T00:00:00.000Z"].join("\n"),
+    ["LAUNCH community pair application", "", "Action: apply", "Token: base:0xaa", "Price pool: univ3 0xp against 0xq", "Website: https://noice.so", "X: noicedotso", "Logo: -", "About: Noice.", "Wallet: 0xbb", "Nonce: 0123456789abcdef0123456789abcdef", "Issued: 2026-10-16T00:00:00.000Z"].join("\n"),
   );
   assert.match(buildPairApplyMessage({ action: "proof", chain: "base", address: "0xAA", wallet: "0xBB", nonce: "n", ts: 0, id: 7, proof: "https://x.com/a/status/1" }), /\nApplication: 7\nProof post: https:\/\/x\.com\/a\/status\/1\n/);
   assert.equal(
     buildPairReviewMessage({ decision: "changes", id: 7, wallet: "0xCC", nonce: "n", ts: 0, reason: "No proof post." }),
-    ["openlaunch.lol community pair review", "", "Decision: changes", "Application: 7", "Reason: No proof post.", "Admin: 0xcc", "Nonce: n", "Issued: 1970-01-01T00:00:00.000Z"].join("\n"),
+    ["LAUNCH community pair review", "", "Decision: changes", "Application: 7", "Reason: No proof post.", "Admin: 0xcc", "Nonce: n", "Issued: 1970-01-01T00:00:00.000Z"].join("\n"),
   );
 });
 
@@ -233,11 +233,11 @@ test("an admin can approve an unpaid application with the fee waived, and an alr
   assert.match(decide, /\(decision === "changes" \|\| decision === "reject"\) && !reason/, "approving and waiving need no reason");
   assert.match(src("../../components/launchpad/PairReviewAdmin.tsx"), /\{!isPaid\(a\.paid_usd, a\.fee_usd\) && !a\.settling_until \? <button type="button" disabled=\{!address \|\| busy\} onClick=\{\(\) => void decide\(a\.id, "waive"\)\} className=\{btn\.primarySm\}[^>]*>Approve without fee</, "only offered when the fee is not paid and not being paid");
   assert.match(src("../../components/launchpad/PairApplication.tsx"), /app\.status === "approved" && app\.paid_usd < app\.fee_usd \* 0\.98 \? <p className="text-sm text-up">\{app\.paid_usd > 0 \? PAIR_APPLY_COPY\.waivedRest\(app\.paid_usd\) : PAIR_APPLY_COPY\.waived\}/, "a partial payment is shown, and only the rest is waived");
-  assert.equal(PAIR_APPLY_COPY.waivedRest(12.5), "Paid: $12.50. openlaunch waived the rest of the fee.");
+  assert.equal(PAIR_APPLY_COPY.waivedRest(12.5), "Paid: $12.50. LAUNCH waived the rest of the fee.");
   // a listing that throws (not only one refused) puts the application back
   assert.match(decide, /\} catch \(e\) \{\n\s*await restore\(\);\n\s*throw e;/);
   assert.match(decide, /if \(!w\.ok\) \{\n\s*await restore\(\);/);
-  assert.match(buildPairReviewMessage({ decision: "waive", id: 1, wallet: "0xA", nonce: "n", ts: 0, reason: "" }), /^openlaunch\.lol community pair review\n\nDecision: waive\nApplication: 1\nReason: -\n/);
+  assert.match(buildPairReviewMessage({ decision: "waive", id: 1, wallet: "0xA", nonce: "n", ts: 0, reason: "" }), /^LAUNCH community pair review\n\nDecision: waive\nApplication: 1\nReason: -\n/);
 });
 
 test("a fee is never waived while the applicant may be paying it: under a live quote or in the hour after it", () => {

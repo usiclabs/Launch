@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Info } from "lucide-react";
 import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
-import { BRAND, BRAND_DOMAIN, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
+import { BRAND, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
 import { CHAIN_KEYS, CHAIN_LABELS, CHAINS } from "@/lib/chainPublic";
 import { chainLandingPath } from "@/lib/chainLanding";
 import { hasChainPage } from "@/lib/launchpad/config";
@@ -79,8 +79,8 @@ export default function AboutPage() {
         <ul className="mt-6 grid gap-3 sm:grid-cols-3">
           <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Website</p>
-            <Link href="/" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">{BRAND_DOMAIN}</Link>
-            <p className="mt-2 text-xs leading-relaxed text-muted">The current LAUNCH deployment.</p>
+            <Link href="/" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">LAUNCH</Link>
+            <p className="mt-2 text-xs leading-relaxed text-muted">The official LAUNCH website.</p>
           </li>
           <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">X</p>
@@ -90,7 +90,7 @@ export default function AboutPage() {
           <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Source code</p>
             <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">usiclabs/Launch <ArrowUpRight size={13} aria-hidden="true" /></a>
-            <p className="mt-2 text-xs leading-relaxed text-muted">MIT-licensed LAUNCH source, forked from OpenLaunch.</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted">LAUNCH source code, available under the MIT license.</p>
           </li>
         </ul>
       </section>

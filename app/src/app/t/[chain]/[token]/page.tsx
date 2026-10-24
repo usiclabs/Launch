@@ -40,7 +40,7 @@ import { marketUsd } from "@/lib/launchpad/market-format";
 import { CHAIN_LABELS, SITE_URL, chainIdOf, explorerAddress, explorerName, explorerTx, isChainKey, shortAddr } from "@/lib/chainPublic";
 import { jsonLdHtml, tokenCanonical } from "@/lib/seo";
 import { stockByAddress } from "@/lib/launchpad/stocksServer";
-import { BRAND_DOMAIN, BRAND_X } from "@/lib/brand";
+import { BRAND, BRAND_X } from "@/lib/brand";
 import { clampSocial } from "@/lib/launchpad/ogcard";
 import { capDisplay } from "@/lib/launchpad/market-cap";
 import { launchpad } from "@/lib/launchpad/config";
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: { params: Promise<{ chain: st
     title,
     description,
     alternates: { canonical: tokenCanonical(SITE_URL, l.chain, l.token) },
-    openGraph: { siteName: BRAND_DOMAIN, type: "website", title, description: clampSocial(description), url: `${SITE_URL}/t/${l.chain}/${l.token}` },
+    openGraph: { siteName: BRAND, type: "website", title, description: clampSocial(description), url: `${SITE_URL}/t/${l.chain}/${l.token}` },
     twitter: { card: "summary_large_image", site: `@${BRAND_X}`, title, description: clampSocial(description) },
   };
 }

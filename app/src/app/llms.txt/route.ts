@@ -1,7 +1,7 @@
 import { PLATFORM_TOKEN } from "@/lib/launchpad/platformToken";
 import { SITE_URL } from "@/lib/chainPublic";
 import { launchpad } from "@/lib/launchpad/config";
-import { BRAND_DOMAIN, BRAND_GITHUB } from "@/lib/brand";
+import { BRAND, BRAND_GITHUB } from "@/lib/brand";
 import { boostEnabled } from "@/lib/launchpad/boostServer";
 import { BOOST_FLOOR_TWIG, BOOST_TOKEN, BOOST_WINDOW_H } from "@/lib/launchpad/boost";
 import { applicationsOpen } from "@/lib/launchpad/pairApplyServer";
@@ -46,9 +46,9 @@ export function GET() {
   const b = launchpad("base");
   const r = launchpad("robinhood");
   const a = launchpad("arc");
-  const body = `# ${BRAND_DOMAIN}
+  const body = `# ${BRAND}
 
-> LAUNCH (${BRAND_DOMAIN}) is an open-source (MIT: ${BRAND_GITHUB}), zero-fee token launchpad on Base (8453), Robinhood Chain (4663) and Arc (5042). One transaction deploys a token and locks 100% of its supply as
+> LAUNCH is an open-source (MIT: ${BRAND_GITHUB}), zero-fee token launchpad on Base (8453), Robinhood Chain (4663) and Arc (5042). One transaction deploys a token and locks 100% of its supply as
 > Uniswap v4 liquidity, forever. No platform fee: the factory and locker have no fee address at all. About page: ${SITE_URL}/about
 
 ## Source verification
