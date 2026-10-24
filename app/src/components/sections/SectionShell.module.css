@@ -24,6 +24,12 @@
 .panelHeading { min-height: 64px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--color-line); color: var(--color-ink); font-size: 14px; font-weight: 600; }
 .anchorSection { scroll-margin-top: 104px; }
 .page :is(a, button, summary, input, textarea):focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .intro .eyebrow { animation: intro-arrive 360ms 35ms ease-out both; }
+  .introCopy { animation: intro-arrive 420ms 80ms ease-out both; }
+  .intro .actions { animation: intro-arrive 420ms 140ms ease-out both; }
+  @keyframes intro-arrive { from { opacity: .6; translate: 0 5px; } to { opacity: 1; translate: 0 0; } }
+}
 @media (min-width: 640px) { .page { padding-top: 40px; padding-inline: 24px; } .description { font-size: 15px; } }
 @media (max-width: 1023px) { .introRow { align-items: flex-start; flex-direction: column; } }
-@media (prefers-reduced-motion: reduce) { .action { transition: none; } .action:active { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .intro .eyebrow, .introCopy, .intro .actions { animation: none; translate: none; } .action { transition: none; } .action:active { transform: none; } }

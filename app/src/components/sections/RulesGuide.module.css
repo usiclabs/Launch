@@ -6,6 +6,16 @@
 @media (min-width: 1024px) { .guide .contents { padding: 16px; border: 1px solid var(--color-line); border-radius: 20px; background: var(--color-card); box-shadow: var(--surface-lift); } }
 .guide :is(a, summary):focus-visible { outline: 2px solid var(--color-brand); outline-offset: 4px; border-radius: 6px; }
 .guide p { text-wrap: pretty; }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .article > section {
+      animation: guide-section-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 18%;
+    }
+    @keyframes guide-section-enter { from { opacity: .65; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+  }
+}
 .layout { display: grid; grid-template-columns: 196px minmax(0, 1fr); gap: 48px; }
 .contents { position: sticky; top: 112px; align-self: start; }
 /* a section's label: sentence case with its mark, never a tracked all-caps eyebrow */
@@ -149,5 +159,6 @@
   .closing { flex-direction: column; align-items: flex-start; padding: 22px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .article > section { animation: none; translate: none; }
   .questions summary > svg, .questions summary, .contents li a, .contents li a span { transition: none; }
 }

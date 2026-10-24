@@ -41,8 +41,9 @@
 .aside .note { background: linear-gradient(145deg, var(--color-card), color-mix(in srgb, var(--color-brand-soft) 25%, var(--color-card))); }
 @media (min-width: 1024px) { .aside { position: sticky; top: 112px; } }
 @media (prefers-reduced-motion: reduce) { .postArrow { transition: none; } .postLink:hover .postArrow { transform: none; } }
-.postLink { display: block; padding: 24px; transition: background-color 160ms; }
+.postLink { display: block; padding: 24px; transition: background-color 160ms, transform 180ms cubic-bezier(.2,.7,.2,1); }
 .postLink:hover { background: color-mix(in srgb, var(--color-ink) 3%, transparent); }
+@media (hover: hover) and (pointer: fine) { .postLink:hover { transform: translateY(-1px); } }
 .postHeading { display: flex; align-items: center; gap: 12px; }
 .postAuthor { flex: 1; min-width: 0; }
 .postAuthor h3 { color: var(--color-ink); font: 500 13px var(--font-code); overflow-wrap: anywhere; }
@@ -78,4 +79,4 @@
 .note .caution { padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--color-line); }
 @media (max-width: 1023px) { .layout { grid-template-columns: minmax(0, 1fr); } .aside { grid-template-columns: 1fr 1fr; align-items: start; } }
 @media (max-width: 639px) { .toolbar, .filters { padding-inline: 16px; } .feedTitle > span:last-child { display: none; } .resultLine { padding-inline: 16px; } .resultLine > span { display: none; } .empty { padding: 32px 18px; } .empty h3 { font-size: 21px; } .aside { grid-template-columns: 1fr; } .postLink { padding: 20px 16px; } .postBody { font-size: 14px; } }
-@media (prefers-reduced-motion: reduce) { .postLink, .refresh, .search { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .postLink, .refresh, .search { transition: none; } .postLink:hover { transform: none; } }
