@@ -13,6 +13,7 @@ test("mobile Launch closes its menu and route changes reset persistent header st
   assert.match(header, /<LaunchCta block onNavigate=\{\(\) => setOpen\(false\)\} \/>/);
   const launchCta = header.slice(header.indexOf("function LaunchCta"), header.indexOf("function Mobile"));
   assert.match(launchCta, /href="\/launch"\s+onClick=\{onNavigate\}/);
+  assert.match(launchCta, /bg-brand text-white/, "filled launch buttons keep white text and inherited icon contrast in both themes");
   assert.match(header, /<Mobile key=\{pathname\}/);
   assert.match(header, /quietCta=\{heroCtaOnScreen\}/, "the hero/header CTA handoff is preserved");
 });

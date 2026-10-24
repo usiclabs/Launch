@@ -219,7 +219,7 @@ function LaunchCta({ compact = false, block = false, quiet = false, onNavigate }
       className={cn(
         "group relative inline-flex items-center justify-center gap-1.5 overflow-hidden font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100",
         // filled: the same rocket and sheen as the hero button it takes over from
-        quiet ? "border border-line bg-card text-body hover:text-ink hover:border-line-strong" : "bb-sheen bg-brand text-inverse shadow-[inset_0_1px_0_rgb(255_255_255/0.2)] hover:bg-brand-strong",
+        quiet ? "border border-line bg-card text-body hover:text-ink hover:border-line-strong" : "bb-sheen bg-brand text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)] hover:bg-brand-strong",
         block ? "w-full min-h-12 rounded-xl text-[15px]" : "h-9 rounded-full text-[13px]",
         block ? "" : compact ? "px-3.5" : "px-4",
       )}

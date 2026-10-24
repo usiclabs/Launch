@@ -45,7 +45,8 @@ test("launch merge retains chain-scoped marks and honest optional-buy copy", () 
   assert.match(source, /const typedBuy = typedBuyFor && typedBuyFor\.quoteId === quoteId \? typedBuyFor\.amount : ""/);
   assert.match(source, /setTypedBuyFor\(\{ amount: v, quoteId \}\)/);
   assert.match(source, /No first buy/);
-  assert.match(source, /Clear it and the launch stays free/);
+  assert.match(source, /A first buy can create an initial trade and holder/);
+  assert.match(source, /Clear the amount to skip it; your token still launches/);
   // a cleared suggestion is visible and reversible; only the explicit button persists for the session
   assert.match(source, /suggestion\.reason === "declined" && !typedBuy/);
   assert.match(source, /onClick=\{suggestAgain\}/);
@@ -55,8 +56,8 @@ test("launch merge retains chain-scoped marks and honest optional-buy copy", () 
   assert.match(source, /useSyncExternalStore\(subscribeFirstBuyDeclined, getFirstBuyDeclined, getFirstBuyDeclinedServer\)/);
   assert.doesNotMatch(source, /sessionStorage/, "the form never touches sessionStorage directly");
   assert.match(source, /suggestion\.reason === "unknown-balance"/);
-  assert.match(source, /Other traders can buy before you/);
-  assert.match(source, /First-buy slippage tolerance: \{FIRST_BUY_SLIPPAGE_BPS \/ 100\}%/);
+  assert.match(source, /Other traders may trade before your buy confirms/);
+  assert.match(source, /Slippage limit: \{FIRST_BUY_SLIPPAGE_BPS \/ 100\}%/);
   assert.match(source, /Network gas and pool fees apply/);
   assert.doesNotMatch(source, /first holder/i);
   // (no em-dash policing: the site copy voice is the maintainers' call)

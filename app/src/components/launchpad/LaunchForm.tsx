@@ -955,9 +955,9 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
             <section className={`${card} p-5 space-y-4`}>
               <div className="flex items-baseline justify-between gap-3 flex-wrap">
                 <h2 className="text-sm font-semibold text-ink">
-                  First buy <span className="font-normal text-muted">· {buySource === "suggested" ? "suggested" : "optional"}</span>
+                  First buy <span className="font-normal text-muted">· {buySource === "suggested" ? "suggested, optional" : "optional"}</span>
                 </h2>
-                <span className="text-xs text-muted">a second transaction, right after the launch confirms</span>
+                <span className="text-xs text-muted">separate wallet confirmation after launch</span>
               </div>
               {BUY_PRESETS[quote.key].length ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -1019,8 +1019,8 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
               ) : suggestion.reason === "declined" && !typedBuy ? (
                 <p className={helper}>No first buy. The launch stays free.{defaultFirstBuy(quote) ? <> <button type="button" onClick={suggestAgain} className="font-medium text-brand underline underline-offset-4 hover:text-ink">Suggest {fmtQuoteUnits(Number(defaultFirstBuy(quote)), quote.decimals)} {quote.symbol} again</button></> : null}</p>
               ) : null}
-              <p className={helper}>A token with no holders and no price move looks dead on every screener and sits under quiet launches on the home page. Your first buy opens the chart. Clear it and the launch stays free.</p>
-              <p className={helper}>Other traders can buy before you. First-buy slippage tolerance: {FIRST_BUY_SLIPPAGE_BPS / 100}%. Network gas and pool fees apply.</p>
+              <p className={helper}>A first buy can create an initial trade and holder, but it does not guarantee future buyers or trading activity. It spends the amount shown in a separate transaction after launch. Clear the amount to skip it; your token still launches.</p>
+              <p className={helper}>Other traders may trade before your buy confirms. Slippage limit: {FIRST_BUY_SLIPPAGE_BPS / 100}%. Network gas and pool fees apply.</p>
             </section>
           </Step>
 
