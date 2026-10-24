@@ -1,4 +1,4 @@
-import { ArrowUpRight, Coins, LockKeyhole, UserRound, UsersRound, Zap, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Clock3, Coins, LockKeyhole, UserRound, UsersRound, Zap, type LucideIcon } from "lucide-react";
 import type { ProofFact, ProofKey } from "@/lib/launchpad/proof";
 import { fmtShare } from "@/lib/launchpad/holders";
 
@@ -15,12 +15,15 @@ export type ProofLink = { href: string; label: string; external?: boolean };
  * The token's Proof panel (server component): five facts read from the chain, one line each, with a link to check
  * it. No score. A fact worth a second look is marked in amber, using the same thresholds as the Holders tab.
  */
-export default function TokenProof({ facts, holdersReady, links, bar }: { facts: ProofFact[]; holdersReady: boolean; links: Partial<Record<ProofKey, ProofLink>>; bar: { top10Bps: number; poolBps: number } | null }) {
+export default function TokenProof({ facts, holdersReady, links, freshness, bar }: { facts: ProofFact[]; holdersReady: boolean; links: Partial<Record<ProofKey, ProofLink>>; freshness: { label: string; delayed: boolean }; bar: { top10Bps: number; poolBps: number } | null }) {
   return (
     <section aria-labelledby="proof-heading" className="min-w-0 overflow-hidden rounded-2xl border border-line bg-card">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line px-5 py-3.5">
         <h2 id="proof-heading" className="text-sm font-semibold text-ink">Proof</h2>
-        <span className="text-[11px] text-muted">Every line links to where you can check it</span>
+        <span className={`inline-flex items-center gap-1.5 text-[11px] ${freshness.delayed ? "text-warm-ink" : "text-muted"}`} title="Freshness describes the LAUNCH activity index. Onchain records remain the source of truth.">
+          {freshness.delayed ? <Clock3 size={12} aria-hidden="true" /> : <CheckCircle2 size={12} aria-hidden="true" />}
+          {freshness.label}
+        </span>
       </div>
       <ul className="divide-y divide-line">
         {facts.map((fact) => {
@@ -45,6 +48,7 @@ export default function TokenProof({ facts, holdersReady, links, bar }: { facts:
         })}
       </ul>
       {!holdersReady ? <p className="border-t border-line px-5 py-3 text-[11px] leading-relaxed text-muted text-pretty">Creator holdings, holder spread and launch-window buyers appear once this token&apos;s transfer history is indexed. Missing data is not a clean bill of health.</p> : null}
+      {freshness.delayed ? <p className="border-t border-line px-5 py-3 text-[11px] leading-relaxed text-warm-ink text-pretty">Market activity may be behind while indexing catches up. Use the transaction, factory and locker links to verify current onchain state.</p> : null}
     </section>
   );
 }

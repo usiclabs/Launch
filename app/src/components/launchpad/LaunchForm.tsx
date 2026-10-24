@@ -1047,8 +1047,20 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
                   </li>
                 ))}
               </ul>
+              <div className="rounded-xl border border-line bg-paper px-4 py-3.5" aria-label="Final launch review">
+                <p className="text-[11px] font-semibold uppercase tracking-[.08em] text-muted">Final review</p>
+                <dl className="mt-2 divide-y divide-line text-xs">
+                  <ReviewLine k="Network" v={`${CHAIN_LABEL} · ${quote.symbol} pair`} />
+                  <ReviewLine k="Opens at" v={fdvPreview !== null ? `${cap(fdvPreview).main} · ${cap(fdvPreview).detail}` : "Complete the starting price"} />
+                  <ReviewLine k="Fixed supply" v={`${fmtCompact(Number(DEFAULT_SUPPLY) / 1e18, 0)} ${symbolClean || "tokens"}`} />
+                  <ReviewLine k="Trading fee" v={feePips === 0 ? "0% · no recipients" : `${FEE_PRESETS.find((f) => f.pips === feePips)?.label ?? "Selected fee"} · ${recipients.length ? describeShares(recipients, shortAddr) : "complete recipient routing"}`} />
+                  <ReviewLine k="Platform fee" v="0%" />
+                  <ReviewLine k="Network gas" v="Exact estimate appears in your wallet before you sign" />
+                  {initialBuyRaw ? <ReviewLine k="Optional first buy" v={`${initialBuyLabel} ${quote.symbol} · separate transaction`} /> : null}
+                </dl>
+              </div>
               <p className="text-xs text-muted leading-relaxed">
-                One transaction on {CHAIN_LABEL}: deploys the token, creates the Uniswap v4 pool ({quote.symbol} / your token), locks 100% of the supply in it forever, and registers the fee routing. Cost: gas only, usually a few cents.
+                One transaction on {CHAIN_LABEL}: deploys the token, creates the Uniswap v4 pool ({quote.symbol} / your token), locks 100% of the supply in it forever, and registers the fee routing. You pay network gas only; the wallet shows its exact estimate before signing.
                 Nothing is refundable and nothing can be edited afterwards.
                 {initialBuyRaw ? ` Then a second transaction buys ${initialBuyLabel} of your token${quote.key !== "eth" ? " (with a one-time approval the first time)" : ""}; if you reject it, the launch still stands.` : ""}
               </p>
@@ -1203,8 +1215,22 @@ function SubmitButton({
 
 function PhaseNote({ phase, chain }: { phase: Phase; chain: ChainKey }) {
   if (phase.k === "saving" || phase.k === "simulating" || phase.k === "signing") {
+    const steps = [
+      { key: "saving", label: "Artwork & metadata" },
+      { key: "simulating", label: "Simulation & gas estimate" },
+      { key: "signing", label: "Your wallet signature" },
+      { key: "sent", label: "Network confirmation" },
+    ] as const;
+    const at = steps.findIndex((s) => s.key === phase.k);
     const note = phase.k === "saving" ? "Preparing token details. No launch transaction has been submitted." : phase.k === "simulating" ? "Checking your launch and estimating gas onchain before requesting a signature." : "Open your wallet and review the launch transaction. Nothing is sent until you confirm.";
-    return <p role="status" className="rounded-xl border border-line bg-paper px-3 py-2.5 text-xs leading-relaxed text-body">{note}</p>;
+    return <div role="status" aria-live="polite" className="rounded-xl border border-line bg-paper px-3 py-3">
+      <p className="text-xs leading-relaxed text-body">{note}</p>
+      <ol aria-label="Launch progress" className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-4">
+        {steps.map((step, index) => <li key={step.key} aria-current={index === at ? "step" : undefined} className={`flex items-center gap-1.5 text-[10px] leading-tight ${index < at ? "text-up" : index === at ? "font-semibold text-ink" : "text-muted"}`}>
+          <span className={`grid size-4 shrink-0 place-items-center rounded-full border text-[9px] ${index < at ? "border-up/30 bg-up-soft" : index === at ? "border-brand/40 bg-brand-soft" : "border-line-strong"}`}>{index < at ? "✓" : index + 1}</span>{step.label}
+        </li>)}
+      </ol>
+    </div>;
   }
   if (phase.k === "pending") return <div role="status" className="rounded-xl border border-warm/30 bg-warm-soft px-3 py-3 text-xs leading-relaxed text-warm-ink"><p>{phase.message}</p><a href={explorerTx(chain,phase.hash)} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-11 items-center font-medium underline underline-offset-2">View submitted transaction</a></div>;
   if (phase.k === "error")
@@ -1234,4 +1260,8 @@ function PhaseNote({ phase, chain }: { phase: Phase; chain: ChainKey }) {
       </p>
     );
   return null;
+}
+
+function ReviewLine({ k, v }: { k: string; v: string }) {
+  return <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 first:pt-0 last:pb-0"><dt className="text-muted">{k}</dt><dd className="max-w-full text-right font-medium text-ink sm:max-w-[70%]">{v}</dd></div>;
 }

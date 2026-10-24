@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, Check, Copy, ExternalLink, LockKeyhole, Rocket, Share2 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Copy, ExternalLink, LockKeyhole, Rocket, Share2, UserRound } from "lucide-react";
 import { CHAIN_LABELS, SITE_URL, explorerAddress, explorerTx, type ChainKey } from "@/lib/chainPublic";
 import { btn } from "@/components/ui";
 import Mark from "./Mark";
@@ -10,15 +10,21 @@ import Mark from "./Mark";
 export default function LaunchSuccess({ chain, token, hash, name, symbol, buyNote }: { chain: ChainKey; token: string; hash: string; name: string; symbol: string; buyNote?: string | null }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
   const path = `/t/${chain}/${token}`;
   const url = `${SITE_URL}${path}`;
   const share = `https://x.com/intent/post?text=${encodeURIComponent(`${name} ($${symbol}) just launched on ${CHAIN_LABELS[chain]} through LAUNCH.\n\nExplore the token:`)}&url=${encodeURIComponent(url)}`;
   useEffect(() => {heading.current?.focus();}, []);
   useEffect(() => {if(!copied) return; const timer=window.setTimeout(()=>setCopied(false),2500);return()=>window.clearTimeout(timer);}, [copied]);
+  useEffect(() => {if(!linkCopied) return; const timer=window.setTimeout(()=>setLinkCopied(false),2500);return()=>window.clearTimeout(timer);}, [linkCopied]);
   async function copy() {
     try { await navigator.clipboard.writeText(token); setCopied(true);setCopyError(""); }
     catch { setCopyError("Copy isn’t available here. Select and copy the contract address below."); }
+  }
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(url); setLinkCopied(true); setCopyError(""); }
+    catch { setCopyError("Copy isn’t available here. Open your token page to copy its address."); }
   }
   return <section aria-labelledby="launch-success-heading" className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-line-strong bg-card shadow-card bb-rise">
     <div className="relative overflow-hidden border-b border-line bg-brand-soft px-5 pb-8 pt-9 text-center sm:px-8 sm:pt-12">
@@ -38,6 +44,14 @@ export default function LaunchSuccess({ chain, token, hash, name, symbol, buyNot
         <div className="mt-3 flex flex-wrap gap-x-5"><a href={explorerAddress(chain,token)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1.5 text-xs text-muted hover:text-ink">View contract<ExternalLink size={12} aria-hidden="true" /></a><a href={explorerTx(chain,hash)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1.5 text-xs text-muted hover:text-ink">Launch transaction<ExternalLink size={12} aria-hidden="true" /></a></div>
       </div>
       <div className="flex flex-wrap items-center gap-3"><a href={share} target="_blank" rel="noreferrer" className={`${btn.secondary} flex-1`}><Share2 size={15} aria-hidden="true" />Share on X</a><Link href="/me" className={`${btn.secondary} flex-1`}>Your dashboard<ArrowRight size={15} aria-hidden="true" /></Link></div>
+      <section aria-labelledby="creator-next-steps" className="rounded-2xl border border-line bg-card p-4">
+        <h3 id="creator-next-steps" className="text-xs font-semibold text-ink">Your launch, ready to share</h3>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <button type="button" onClick={() => void copyLink()} className={`${btn.secondarySm} min-h-11 justify-center`}><Copy size={13} aria-hidden="true" />{linkCopied ? "Page link copied" : "Copy page link"}</button>
+          <Link href={`${path}#contracts`} className={`${btn.secondarySm} min-h-11 justify-center`}><ExternalLink size={13} aria-hidden="true" />Pool & onchain record</Link>
+          <Link href="/me" className={`${btn.secondarySm} min-h-11 justify-center`}><UserRound size={13} aria-hidden="true" />Complete your profile</Link>
+        </div>
+      </section>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3"><p className="flex items-center gap-1.5 text-[11px] text-muted"><Check size={12} aria-hidden="true" />Launch confirmed. Ready to share.</p><a href="/launch" className="inline-flex min-h-11 items-center gap-1.5 text-xs font-medium text-ink hover:text-brand"><Rocket size={13} aria-hidden="true" />Launch another</a></div>
     </div>
   </section>;

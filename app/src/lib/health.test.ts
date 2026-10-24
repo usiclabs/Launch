@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { healthBody, lagBlocks } from "./health.ts";
 
-const base = { dbConfigured: true, dbOk: true, chain: true, launchpad: true };
+const base = { dbConfigured: true, dbOk: true, chain: true, launchpad: true, uploads: true };
 const sync = (o: Partial<{ cursor_block: number | null; head_block: number | null; last_run_at: string | null; last_error: string | null }> = {}) => ({
   cursor_block: 100,
   head_block: 110,
@@ -30,6 +30,14 @@ test("db unconfigured → alive, db:false, no alert", () => {
   assert.equal(r.status, 200);
   assert.equal(r.body.db, false);
   assert.deepEqual(r.body.alerts, []);
+});
+
+test("missing image storage is reported without marking the HTTP service down", () => {
+  const r = healthBody({ ...base, uploads: false, sync: sync() });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.ok, false);
+  assert.equal(r.body.uploads, false);
+  assert.deepEqual(r.body.alerts, ["image_uploads_off"]);
 });
 
 test("lag beyond limit / last_error → ok:false but 200", () => {

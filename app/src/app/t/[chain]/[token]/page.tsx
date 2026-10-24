@@ -25,7 +25,7 @@ import { namesFor, type NameEntry } from "@/lib/profiles/server";
 import { getHolderPanel } from "@/lib/launchpad/holdersServer";
 import { memo } from "@/lib/launchpad/memo";
 import { ago, nowMs } from "@/lib/launchpad/time";
-import { getLaunch, getSwaps } from "@/lib/launchpad/queries";
+import { getLaunch, getSwaps, launchSyncCursors } from "@/lib/launchpad/queries";
 import { ethUsd } from "@/lib/launchpad/ethPrice";
 import { NATIVE, SWAP_SITES, TICK_SPACING, type Quote } from "@/lib/launchpad/config";
 import UnlistedPairBadge from "@/components/launchpad/UnlistedPairBadge";
@@ -38,6 +38,7 @@ import { fmtCompact, fmtPrice, fmtQuote, fmtUsd, pipsToPct } from "@/lib/launchp
 import { marketCount as count } from "@/lib/launchpad/token-market";
 import { marketUsd } from "@/lib/launchpad/market-format";
 import { CHAIN_LABELS, SITE_URL, chainIdOf, explorerAddress, explorerName, explorerTx, isChainKey, shortAddr } from "@/lib/chainPublic";
+import { syncLagAlertBlocks } from "@/lib/config";
 import { jsonLdHtml, tokenCanonical } from "@/lib/seo";
 import { stockByAddress } from "@/lib/launchpad/stocksServer";
 import { BRAND, BRAND_X } from "@/lib/brand";
@@ -104,12 +105,13 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
   const stockQuote = quote.key === "stock" ? stockByAddress(chain, l.quote) : null;
   // Boost (Base only, while the switch is on): the token's line and TWIG's price for the dialog; a failed read shows no panel
   const boostable = chain === BOOST_CHAIN && boostEnabled();
-  const [swaps, holders, tint, boost, twigUsd] = await Promise.all([
+  const [swaps, holders, tint, boost, twigUsd, syncCursors] = await Promise.all([
     getSwaps(chain, l.token, quote.decimals, 40),
     memo(`holders:${chain}:${l.token}`, 5_000, () => getHolderPanel(chain, l.token)),
     tokenTint(l.image_url, l.token),
     boostable ? getTokenBoost(l.token).catch((): TokenBoost | null => null) : null,
     boostable ? gitlawbUsd().then(twigUsdFromGitlawb).catch(() => null) : null,
+    launchSyncCursors().catch(() => []),
   ]);
   const boostOpen = (await searchParams).boost === "1";
   // names for every wallet the server renders (trades, creator, fee recipients, top holders): the first paint shows them
@@ -122,6 +124,13 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
   const cap = capDisplay(l.fdv_quote, l.quote_usd, { key: l.quote_key, symbol: l.quote_symbol, decimals: l.quote_decimals });
   const proof = proofFacts({ holders, symbol: l.symbol, launcher: l.launcher, launcherName: names[l.launcher.toLowerCase()]?.u ?? null, lpFee: l.lp_fee, mode, recipients: l.recipients.length });
   const locker = launchpad(chain).locker;
+  const factory = launchpad(chain).factory;
+  const sync = syncCursors.find((c) => c.chain === chain);
+  const lagBlocks = sync?.head_block === null || sync?.head_block === undefined ? null : Math.max(0, sync.head_block - sync.cursor_block);
+  const indexDelayed = !sync || Boolean(sync.last_error) || (lagBlocks !== null && lagBlocks > syncLagAlertBlocks(chain));
+  const freshness = sync?.last_run_at
+    ? { label: indexDelayed ? `Indexing delayed · updated ${ago(sync.last_run_at, nowMs())} ago` : `Indexed ${ago(sync.last_run_at, nowMs())} ago`, delayed: indexDelayed }
+    : { label: "Index status unavailable · verify the onchain record below", delayed: true };
   const proofLinks: Partial<Record<ProofKey, ProofLink>> = {
     ...(locker ? { lock: { href: explorerAddress(chain, locker), label: "View locker", external: true } } : {}),
     creator: { href: explorerAddress(chain, l.launcher), label: "Creator wallet", external: true },
@@ -245,7 +254,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
                 <BuySellBar buys={l.buys} sells={l.sells} />
               </Stat>
             </dl>
-            <TokenProof facts={proof.facts} holdersReady={proof.holdersReady} links={proofLinks} bar={proof.holdersReady && holders ? { top10Bps: holders.top10Bps, poolBps: holders.poolBps } : null} />
+            <TokenProof facts={proof.facts} holdersReady={proof.holdersReady} links={proofLinks} freshness={freshness} bar={proof.holdersReady && holders ? { top10Bps: holders.top10Bps, poolBps: holders.poolBps } : null} />
           </div>
 
           <aside className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
@@ -279,6 +288,8 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
                   <Row k="Creator" v={<A href={explorerAddress(chain, l.launcher)}>{shortAddr(l.launcher)} ↗</A>} />
                   <Row k="Token contract" v={<A href={explorerAddress(chain, l.token)}>{shortAddr(l.token)} ↗</A>} />
                   <Row k="Launch transaction" v={<A href={explorerTx(chain, l.tx_hash)}>{shortAddr(l.tx_hash)} ↗</A>} />
+                  {factory ? <Row k="Launch factory" v={<A href={explorerAddress(chain, factory)}>{shortAddr(factory)} ↗</A>} /> : null}
+                  {locker ? <Row k="Liquidity locker" v={<A href={explorerAddress(chain, locker)}>{shortAddr(locker)} ↗</A>} /> : null}
                   <Row k="Pool ID" v={<CopyChip value={l.pool_id} />} />
                   <Row k="Market" v={`${quote.symbol} / ${l.symbol} · Uniswap v4 · no hook`} />
                   {unlisted ? <Row k="Pair token" v={<A href={explorerAddress(chain, l.quote)}>{shortAddr(l.quote)} ↗</A>} /> : null}

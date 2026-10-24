@@ -15,6 +15,7 @@ export type HealthInput = {
   dbOk: boolean;
   chain: boolean;
   launchpad: boolean;
+  uploads?: boolean;
   sync?: SyncHealthInput | null;
   /** additional chains (first one goes in `sync` for backwards compatibility) */
   chains?: SyncHealthInput[];
@@ -26,6 +27,7 @@ export type HealthBody = {
   db: boolean;
   chain: boolean;
   launchpad: boolean;
+  uploads: boolean;
   sync: { cursor_block: number | null; head_block: number | null; lag_blocks: number | null; last_run_at: string | null; last_error: string | null };
   chains: { chain: string; cursor_block: number | null; head_block: number | null; lag_blocks: number | null; last_error: string | null }[];
   alerts: string[];
@@ -50,6 +52,7 @@ export function healthBody(i: HealthInput): { status: number; body: HealthBody }
   const lag = lagBlocks(s.head_block, s.cursor_block);
   const alerts: string[] = [];
   if (i.dbConfigured && !i.dbOk) alerts.push("db_unreachable");
+  if (i.uploads === false) alerts.push("image_uploads_off");
   const all = i.chains ?? (i.sync ? [i.sync] : []);
   const chains = all.map((c) => ({ chain: c.chain ?? DEFAULT_CHAIN, cursor_block: c.cursor_block, head_block: c.head_block, lag_blocks: lagBlocks(c.head_block, c.cursor_block), last_error: c.last_error }));
   if (i.dbConfigured && i.dbOk && i.launchpad) {
@@ -66,6 +69,7 @@ export function healthBody(i: HealthInput): { status: number; body: HealthBody }
       db: i.dbConfigured ? i.dbOk : false,
       chain: i.chain,
       launchpad: i.launchpad,
+      uploads: i.uploads ?? false,
       sync: { cursor_block: s.cursor_block, head_block: s.head_block, lag_blocks: lag, last_run_at: s.last_run_at, last_error: s.last_error },
       chains,
       alerts,
