@@ -2,8 +2,8 @@ import { isAddress, type Address } from "viem";
 import { PLATFORM_TOKEN } from "./platformToken";
 import { CHAIN_KEYS, SITE_URL, isChainKey, type ChainKey } from "@/lib/chainPublic";
 import { unlistedQuote } from "./unlisted-quote";
-import { GITLAWB_ADDRESS, GITLAWB_ADDRESS_ROBINHOOD, GITLAWB_DECIMALS, GITLAWB_LOGO_PATH, GITLAWB_NAME, GITLAWB_SYMBOL } from "./gitlawb";
-import { TWIG_ADDRESS, TWIG_DECIMALS, TWIG_LOGO_PATH, TWIG_NAME, TWIG_SYMBOL } from "./twig";
+import { GITLAWB_ADDRESS, GITLAWB_ADDRESS_ROBINHOOD, GITLAWB_DECIMALS, GITLAWB_NAME, GITLAWB_SYMBOL } from "./gitlawb";
+import { TWIG_ADDRESS, TWIG_DECIMALS, TWIG_NAME, TWIG_SYMBOL } from "./twig";
 
 /**
  * CLIENT-SAFE launchpad config, per chain. Only NEXT_PUBLIC_* vars are read here.

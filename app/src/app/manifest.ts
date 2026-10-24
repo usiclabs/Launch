@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { BRAND, BRAND_DOMAIN, TAGLINE } from "@/lib/brand";
+import { BRAND, TAGLINE } from "@/lib/brand";
 
 /** PWA manifest. Icons reuse the existing Next app-icon routes. */
 export default function manifest(): MetadataRoute.Manifest {

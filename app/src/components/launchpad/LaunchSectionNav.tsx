@@ -32,9 +32,9 @@ export default function LaunchSectionNav({ complete }: { complete: boolean[] }) 
         <span>Your launch, step by step</span>
         <span>{count} / 6 configured</span>
       </div>
-      <ol className="flex gap-1 overflow-x-auto bb-scroll">
+      <ol className="grid grid-cols-6 gap-1 sm:flex sm:overflow-x-auto sm:bb-scroll">
         {LABELS.map((label, index) => (
-          <li key={label} className="min-w-max flex-1">
+          <li key={label} className="min-w-0 sm:min-w-max sm:flex-1">
             <a
               href={`#launch-step-${index + 1}`}
               aria-current={active === index + 1 ? "step" : undefined}
@@ -49,12 +49,12 @@ export default function LaunchSectionNav({ complete }: { complete: boolean[] }) 
                 });
                 setActive(index + 1);
               }}
-              className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 text-[11px] transition-colors motion-reduce:transition-none ${active === index + 1 ? "bg-brand text-white" : "text-muted hover:bg-card hover:text-ink"}`}
+              className={`flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 text-[10px] leading-tight transition-colors motion-reduce:transition-none sm:flex-row sm:gap-1.5 sm:px-2 sm:text-[11px] ${active === index + 1 ? "bg-brand text-white" : "text-muted hover:bg-card hover:text-ink"}`}
             >
-              <span className="grid size-4 place-items-center rounded-full border border-current text-[9px]">
+              <span className="grid size-4 shrink-0 place-items-center rounded-full border border-current text-[9px]">
                 {complete[index] ? <Check size={10} aria-hidden="true" /> : index + 1}
               </span>
-              {label}
+              <span className="min-w-0 text-center sm:whitespace-nowrap">{label}</span>
             </a>
           </li>
         ))}

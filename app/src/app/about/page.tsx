@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Info } from "lucide-react";
 import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
-import { BRAND, BRAND_DOMAIN, BRAND_GITHUB, BRAND_X, LEGACY_DOMAIN } from "@/lib/brand";
+import { BRAND, BRAND_DOMAIN, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
 import { CHAIN_KEYS, CHAIN_LABELS, CHAINS } from "@/lib/chainPublic";
 import { chainLandingPath } from "@/lib/chainLanding";
 import { hasChainPage } from "@/lib/launchpad/config";
