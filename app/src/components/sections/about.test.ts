@@ -26,7 +26,7 @@ test("about page states facts, not value claims", () => {
 });
 
 test("the brand appears as a plain word above the fold and links to the entity page", () => {
-  assert.match(hero, /<Link href="\/about"[^>]*>openlaunch<\/Link> is the free, open-source launchpad/);
+  assert.match(hero, /<Link href="\/about"[^>]*>LAUNCH<\/Link> is open source on Base, Robinhood Chain and Arc/);
   assert.ok(footer.includes('{ href: "/about", label: "About openlaunch" }'), "footer links the about page");
   assert.match(llms, /> openlaunch \(\$\{BRAND_DOMAIN\}\) is an open-source/);
   assert.match(llms, /About page: \$\{SITE_URL\}\/about/);

@@ -45,7 +45,7 @@ export default function LaunchHero({ configured }: { configured: boolean }) {
           </h1>
           <p className={HERO.copy}>
             {/* the brand as a plain word, once, above the fold: the title and footer alone read as a domain */}
-            <Link href="/about" className="font-semibold text-ink hover:text-brand underline decoration-line-strong underline-offset-4">LAUNCH</Link> is the free, open-source launchpad on Base, Robinhood Chain and Arc. One transaction: your token, a Uniswap v4 pool, and a liquidity position locked forever. 100% of the supply goes into the pool at launch. You only pay gas.
+            One transaction creates your token and Uniswap v4 pool, puts 100% of the supply into it, and locks the liquidity position permanently. <Link href="/about" className="font-semibold text-ink hover:text-brand underline decoration-line-strong underline-offset-4">LAUNCH</Link> is open source on Base, Robinhood Chain and Arc. No launch fee; you pay network gas.
           </p>
           <div className={HERO.actions}>
             {/* the header watches this id: while it is on screen the header CTA stays quiet (one filled blue per screen) */}

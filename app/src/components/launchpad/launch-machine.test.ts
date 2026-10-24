@@ -15,8 +15,8 @@ const metrics = read("./LaunchMechanism.tsx");
 const hero = read("./LaunchHero.tsx");
 
 test("hero separates the permanent position lock from circulating token supply", () => {
-  assert.match(hero, /liquidity position locked forever/i);
-  assert.match(hero, /100% of the supply goes into the pool at launch/i);
+  assert.match(hero, /locks the liquidity position permanently/i);
+  assert.match(hero, /puts 100% of the supply into it/i);
   assert.match(machine, /liquidity position stays in an ownerless locker forever/i);
   assert.match(machine, /Tokens remain tradeable/);
   assert.doesNotMatch(hero + machine, /100% of (?:the )?supply[, ]+forever|supply locked forever/i);
