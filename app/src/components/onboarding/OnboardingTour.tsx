@@ -127,7 +127,7 @@ export default function OnboardingTour() {
 function Scene({ step }: { step: number }) {
   if (step === 0) return <div className={styles.orbit}>
     <span className={styles.orbitRing} /><span className={styles.orbitRingInner} />
-    <span className={styles.orbitDot} /><div className={styles.coin}><Mark size={70} tile={false} /></div>
+    <span className={styles.orbitDot} /><div className={styles.coin}><Mark size={70} /></div>
     <span className={styles.floatingLabel}><Rocket size={13} /> Your next idea</span>
   </div>;
   if (step === 1) return <div className={styles.marketPreview}>

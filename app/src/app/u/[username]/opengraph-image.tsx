@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { brandImage } from "@/lib/brandImage";
 import { rasterSharp } from "@/lib/launchpad/imageProcess";
 import { loadOgFonts } from "@/lib/ogFonts";
 import { memo } from "@/lib/launchpad/memo";
@@ -49,11 +50,7 @@ export default async function ProfileOg({ params }: { params: Promise<{ username
       <div style={{ width: "100%", height: "100%", background: PAPER, display: "flex", flexDirection: "column", fontFamily: "Geist, sans-serif", position: "relative", overflow: "hidden", color: INK }}>
         <div style={{ position: "absolute", top: -320, left: -120, width: 900, height: 640, borderRadius: "50%", background: "radial-gradient(closest-side, #EAF0FF 0%, rgba(234,240,255,0) 100%)" }} />
         <div style={{ display: "flex", alignItems: "center", padding: "40px 64px 0", gap: 12 }}>
-          <svg width={40} height={40} viewBox="0 0 32 32">
-            <rect width="32" height="32" rx="7" fill={BLUE} />
-            <rect x="10" y="6" width="4.6" height="20" rx="1.4" fill="#FFFFFF" />
-            <rect x="10" y="21.4" width="13" height="4.6" rx="1.4" fill="#FFFFFF" />
-          </svg>
+          <img src={await brandImage()} width={40} height={40} alt="" style={{ borderRadius: "50%" }} />
           <span style={{ fontSize: 26, fontWeight: 700, display: "flex" }}>
             {BRAND}
             <span style={{ color: BLUE }}>{BRAND_TLD}</span>

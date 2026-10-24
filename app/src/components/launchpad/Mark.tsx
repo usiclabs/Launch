@@ -1,12 +1,8 @@
-/** LAUNCH mark: white geometric L on the MyUSIC accent tile. */
-export default function Mark({ size = 24, className = "", title = "LAUNCH", tile = true, color = "#FFFFFF" }: { size?: number; className?: string; title?: string; tile?: boolean; color?: string }) {
-  const fg = tile ? "#FFFFFF" : color;
+/** The supplied LAUNCH coin artwork, shared by navigation, onboarding and launch receipts. */
+export default function Mark({ size = 24, className = "", title = "LAUNCH" }: { size?: number; className?: string; title?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className={className} role="img" aria-label={title}>
-      {tile ? <rect width="32" height="32" rx="7" fill="#FA003E" /> : null}
-      <rect x="10" y="6" width="4.6" height="20" rx="1.4" fill={fg} />
-      <rect x="10" y="21.4" width="13" height="4.6" rx="1.4" fill={fg} />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/brand/launch-mark.webp" width={size} height={size} alt={title} className={className} style={{ width: size, height: size, borderRadius: "50%", flexShrink: 0, objectFit: "cover" }} />
   );
 }
 

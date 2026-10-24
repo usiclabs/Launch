@@ -4,6 +4,7 @@ import { getLaunchTotals } from "@/lib/launchpad/queries";
 import { ethUsd } from "@/lib/launchpad/ethPrice";
 import { fmtUsd } from "@/lib/launchpad/math";
 import { BRAND, BRAND_TLD, SITE_TITLE } from "@/lib/brand";
+import { brandImage } from "@/lib/brandImage";
 
 export const alt = SITE_TITLE;
 export const size = { width: 1200, height: 630 };
@@ -18,17 +19,8 @@ const LINE = "#E7E5E4";
 const BLUE = "#FA003E";
 const UP = "#15803D";
 
-function MarkSvg({ size: s }: { size: number }) {
-  return (
-    <svg width={s} height={s} viewBox="0 0 32 32">
-      <rect width="32" height="32" rx="7" fill={BLUE} />
-      <rect x="10" y="6" width="4.6" height="20" rx="1.4" fill="#FFFFFF" />
-      <rect x="10" y="21.4" width="13" height="4.6" rx="1.4" fill="#FFFFFF" />
-    </svg>
-  );
-}
-
 export default async function OgImage() {
+  const mark = await brandImage();
   const usd = await ethUsd();
   const [totals, fonts] = await Promise.all([getLaunchTotals(usd).catch(() => null), loadOgFonts()]);
   const stat = totals && totals.launches > 0 ? `${totals.launches} launches · ${fmtUsd(totals.volume_usd, { compact: true })} traded · $0 in fees, ever` : "no platform fee, ever";
@@ -41,7 +33,7 @@ export default async function OgImage() {
         {/* header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "40px 64px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <MarkSvg size={46} />
+            <img src={mark} width={46} height={46} alt="" style={{ borderRadius: "50%" }} />
             <span style={{ fontSize: 30, fontWeight: 700, display: "flex", letterSpacing: -0.5 }}>
               {BRAND}
               <span style={{ color: BLUE }}>{BRAND_TLD}</span>
