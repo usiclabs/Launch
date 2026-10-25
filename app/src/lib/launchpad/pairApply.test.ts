@@ -102,7 +102,7 @@ test("reviews: up to 3, within 60 days of paying, and only after changes were as
 test("proof: a code, a post text that names us, and only links to posts on X", () => {
   assert.match(applicationCode(12, () => 0), /^OL-12-AAAA$/);
   assert.match(applicationCode(7), /^OL-7-[A-Z2-9]{4}$/);
-  assert.equal(proofPostText("OL-7-K7QX", "NOICE"), "We applied to list $NOICE as a community pair on @mobilelaunchxyz. Application OL-7-K7QX");
+  assert.equal(proofPostText("OL-7-K7QX", "NOICE"), "We applied to list $NOICE as a community pair on @launchxyz. Application OL-7-K7QX");
   assert.equal(proofPostUrl("https://twitter.com/noicedotso/status/1234567890?s=20"), "https://x.com/noicedotso/status/1234567890");
   assert.equal(proofPostUrl(" https://x.com/noicedotso/status/1234567890 "), "https://x.com/noicedotso/status/1234567890");
   for (const bad of ["http://x.com/a/status/1234567890", "https://evil.com/x.com/a/status/1234567890", "https://x.com/a", "https://x.com.evil.io/a/status/1234567890", "javascript:alert(1)"]) assert.equal(proofPostUrl(bad), null, bad);

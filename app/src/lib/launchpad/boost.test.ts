@@ -357,7 +357,7 @@ test("a booster's post says what was sent and where it went, links the token's p
   assert.equal(url.origin + url.pathname, "https://x.com/intent/post", "the same intent the token page's Share uses");
   assert.equal(url.searchParams.get("text"), "Boosted $A&B #1 with 1M Legacy wrapper on LAUNCH. The legacy wrapper went to 0x…dEaD.", "a symbol never breaks out of its parameter");
   assert.equal(url.searchParams.get("url"), "https://openlaunch.lol/t/base/0xabc");
-  assert.equal(url.searchParams.get("via"), "mobilelaunchxyz");
+  assert.equal(url.searchParams.get("via"), "launchxyz");
   const banned = /\b(moon|rally|buyback|guarantee[ds]?|pump|gem|100x|profit|invest(ment)?|returns?|yield|airdrop|reward)\b/i;
   assert.doesNotMatch(boostShareText("X", raw), banned);
 });
