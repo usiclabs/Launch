@@ -2,7 +2,7 @@
 export const BRAND = "LAUNCH";
 export const BRAND_TLD = "";
 export const BRAND_DOMAIN = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://openlaunch-production.up.railway.app").host;
-export const BRAND_X = "mobilelaunchxyz"; // the official account (never link the look-alike handles)
+export const BRAND_X = "launchxyz"; // the official account (never link the look-alike handles)
 export const BRAND_GITHUB = "https://github.com/usiclabs/Launch"; // MIT, contracts + site
 export const TAGLINE = "launch a token. Free. Open source. On Base, Robinhood Chain or Arc.";
 /**
