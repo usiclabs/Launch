@@ -91,7 +91,7 @@ export default function OnboardingTour() {
               <span className={styles.stepNumber}>{index < step ? <Check size={13} aria-hidden="true" /> : String(index + 1).padStart(2, "0")}</span>
               <span className={styles.stepLabel}>{item.label}</span>
             </button>)}
-            <p className={styles.sidebarNote}>Open source.<br />Open participation.</p>
+            <p className={styles.sidebarNote}>Your idea.<br />Your launch.</p>
           </nav>
 
           <div className={styles.content}>

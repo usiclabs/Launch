@@ -1,7 +1,7 @@
 import { PLATFORM_TOKEN } from "@/lib/launchpad/platformToken";
 import { SITE_URL } from "@/lib/chainPublic";
 import { launchpad } from "@/lib/launchpad/config";
-import { BRAND, BRAND_GITHUB } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 import { boostEnabled } from "@/lib/launchpad/boostServer";
 import { BOOST_FLOOR_TWIG, BOOST_TOKEN, BOOST_WINDOW_H } from "@/lib/launchpad/boost";
 import { applicationsOpen } from "@/lib/launchpad/pairApplyServer";
@@ -10,7 +10,7 @@ import { applicationsOpen } from "@/lib/launchpad/pairApplyServer";
 function pairApplySection(): string {
   if (!applicationsOpen()) return "";
   return `Listing is applied for at /pairs/apply (a free check, then a fee in legacy wrapper sent to 0x…dEaD naming the application: amount = whole legacy wrapper × 10^18
-+ 3 × 10^11 + application id; it pays for a review, not a listing, and is not refunded). Rules: https://github.com/usiclabs/Launch/blob/main/docs/pairs.md
++ 3 × 10^11 + application id; it pays for a review, not a listing, and is not refunded). Rules: ${SITE_URL}/rules
 `;
 }
 
@@ -48,7 +48,7 @@ export function GET() {
   const a = launchpad("arc");
   const body = `# ${BRAND}
 
-> LAUNCH is an open-source (MIT: ${BRAND_GITHUB}), zero-fee token launchpad on Base (8453), Robinhood Chain (4663) and Arc (5042). One transaction deploys a token and locks 100% of its supply as
+> LAUNCH is a zero-fee token launchpad on Base (8453), Robinhood Chain (4663) and Arc (5042). One transaction deploys a token and locks 100% of its supply as
 > Uniswap v4 liquidity, forever. No platform fee: the factory and locker have no fee address at all. About page: ${SITE_URL}/about
 
 ## Source verification

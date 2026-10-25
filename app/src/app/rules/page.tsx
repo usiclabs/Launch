@@ -8,7 +8,7 @@ import shell from "@/components/sections/SectionShell.module.css";
 import styles from "@/components/sections/RulesGuide.module.css";
 import { launchpad } from "@/lib/launchpad/config";
 import { CHAINS, CHAIN_KEYS, CHAIN_LABELS, explorerAddress } from "@/lib/chainPublic";
-import { BRAND_GITHUB } from "@/lib/brand";
+import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
 import LaunchMachine from "@/components/launchpad/LaunchMachine";
 import { ChainLogo } from "@/components/launchpad/ChainLogo";
 import BoostRulesEntry from "@/components/launchpad/BoostRulesEntry";
@@ -71,7 +71,7 @@ export default function RulesPage() {
               {CONTENTS.map(([id, title, Icon]) => <li key={id}><a href={`#${id}`}><span aria-hidden="true"><Icon size={13} /></span>{title}</a></li>)}
             </ol>
           </nav>
-          <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className={styles.sourceLink}><FileCode2 size={16} aria-hidden="true" /> Read the source <ArrowUpRight size={13} aria-hidden="true" /></a>
+          {PUBLIC_SOURCE_VISIBLE && (<a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className={styles.sourceLink}><FileCode2 size={16} aria-hidden="true" /> Read the source <ArrowUpRight size={13} aria-hidden="true" /></a>)}
         </aside>
 
         <div className={styles.article}>
@@ -158,7 +158,7 @@ export default function RulesPage() {
                 </section>;
               })}
             </div>
-            <p className={styles.contractNote}>Uniswap v4&apos;s PoolManager, PositionManager, Permit2 and Universal Router are Uniswap&apos;s canonical deployments. MIT-licensed source on <a href={BRAND_GITHUB} target="_blank" rel="noreferrer">GitHub ↗</a>; the verification records for each chain are linked above.</p>
+            <p className={styles.contractNote}>Uniswap v4&apos;s PoolManager, PositionManager, Permit2 and Universal Router are Uniswap&apos;s canonical deployments. {PUBLIC_SOURCE_VISIBLE && (<a href={BRAND_GITHUB} target="_blank" rel="noreferrer">GitHub ↗</a>)} The verification records for each chain are linked above.</p>
           </section>
 
           <div className={styles.closing}><div><p className={styles.eyebrow}>Your next move</p><h2>Make something of your own.</h2></div><Link href="/launch" className={shell.action}>Launch a token <ArrowRight size={15} aria-hidden="true" /></Link></div>

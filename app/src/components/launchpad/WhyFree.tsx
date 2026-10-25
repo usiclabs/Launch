@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import { ChainLogoStack } from "./ChainLogo";
 import { VISIBLE_CHAINS } from "@/lib/launchpad/config";
 import { MagicCard } from "@/components/vendor/magic-card";
-import { BRAND_GITHUB } from "@/lib/brand";
+import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
 
 const CONTRACTS = `${BRAND_GITHUB}/tree/main/contracts/src`;
 
@@ -47,8 +47,8 @@ export default function WhyFree() {
           ))}
         </ul>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-line pt-3">
-          <a href={CONTRACTS} target="_blank" rel="noopener noreferrer" className={`${action} text-body hover:text-ink`}>Read the contracts<ArrowUpRight size={12} aria-hidden="true" /></a>
+        <div className={`mt-4 grid ${PUBLIC_SOURCE_VISIBLE ? "grid-cols-2" : "grid-cols-1"} gap-2 border-t border-line pt-3`}>
+          {PUBLIC_SOURCE_VISIBLE && (<a href={CONTRACTS} target="_blank" rel="noopener noreferrer" className={`${action} text-body hover:text-ink`}>Read the contracts<ArrowUpRight size={12} aria-hidden="true" /></a>)}
           <Link href="/agents" className={`${action} text-brand hover:border-brand/40`}>Agents launch too<ArrowRight size={12} aria-hidden="true" /></Link>
         </div>
       </section>

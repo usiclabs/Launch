@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUp, ArrowUpRight, FileCode2 } from "lucide-react";
-import { BRAND, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
+import { BRAND, BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE, BRAND_X } from "@/lib/brand";
 import { CHAIN_KEYS, CHAIN_LABELS, CHAINS, explorerAddress } from "@/lib/chainPublic";
 import { hasChainPage, launchpad } from "@/lib/launchpad/config";
 import { chainLandingPath } from "@/lib/chainLanding";
@@ -17,7 +17,7 @@ const EXPLORE = [
 ];
 const BUILD = [
   { href: "/agents", label: "Developers & agents" },
-  { href: BRAND_GITHUB, label: "Source code", external: true },
+  ...(PUBLIC_SOURCE_VISIBLE ? [{ href: BRAND_GITHUB, label: "Source code", external: true }] : []),
   { href: "/llms.txt", label: "LLM reference" },
   { href: `https://x.com/${BRAND_X}`, label: "Updates on X", external: true },
 ];
@@ -74,10 +74,10 @@ export default function Footer() {
 
         <div className={styles.bottom}>
           {/* the chart library's licence credit, on every page that can show a chart */}
-          <p>Open source. Open participation. Charts by <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer" className={styles.credit}>TradingView</a>.</p>
+          <p>Open participation. Charts by <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer" className={styles.credit}>TradingView</a>.</p>
           <div className={styles.utilities}>
             <TourButton />
-            <a href={`${BRAND_GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={styles.license}>MIT licensed <ArrowUpRight size={12} aria-hidden="true" /></a>
+            {PUBLIC_SOURCE_VISIBLE && (<a href={`${BRAND_GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={styles.license}>MIT licensed <ArrowUpRight size={12} aria-hidden="true" /></a>)}
             <a href="#site-top" className={styles.backTop}>Back to top <ArrowUp size={14} aria-hidden="true" /></a>
           </div>
         </div>

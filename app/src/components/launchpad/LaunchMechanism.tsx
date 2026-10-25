@@ -5,7 +5,7 @@ import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { useLive } from "./LiveProvider";
 import LiveNumber, { COMPACT_USD } from "../LiveNumber";
 import { fmtUsd } from "@/lib/launchpad/math";
-import { BRAND_GITHUB } from "@/lib/brand";
+import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
 import { CHAIN_KEYS, CHAIN_LABELS, chainList } from "@/lib/chainPublic";
 import styles from "./LaunchMechanism.module.css";
 
@@ -58,7 +58,7 @@ export default function LaunchMechanism() {
       {/* the "≈" explained in the open: a title alone cannot be reached by touch or keyboard */}
       {usdNote ? <p className="mb-2 max-w-2xl text-pretty text-[11px] leading-relaxed text-body">≈ {usdNote}</p> : null}
       <p className="max-w-2xl text-pretty text-[11px] leading-relaxed text-muted">Creators choose a 0%, 1% or 3% trading fee. It goes to their named recipients or is burned. The platform takes none: no fee address in the factory, no platform cut in the locker.</p>
-      <a href={`${BRAND_GITHUB}/tree/main/contracts/src`} target="_blank" rel="noreferrer" className="mt-1 mb-2 inline-flex min-h-9 items-center gap-1 text-xs font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">Read the contracts<ArrowUpRight size={12} aria-hidden="true" /></a>
+      {PUBLIC_SOURCE_VISIBLE && (<a href={`${BRAND_GITHUB}/tree/main/contracts/src`} target="_blank" rel="noreferrer" className="mt-1 mb-2 inline-flex min-h-9 items-center gap-1 text-xs font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">Read the contracts<ArrowUpRight size={12} aria-hidden="true" /></a>)}
     </details>
   </section>;
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Info } from "lucide-react";
 import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
-import { BRAND, BRAND_GITHUB, BRAND_X } from "@/lib/brand";
+import { BRAND, BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE, BRAND_X } from "@/lib/brand";
 import { CHAIN_KEYS, CHAIN_LABELS, CHAINS } from "@/lib/chainPublic";
 import { chainLandingPath } from "@/lib/chainLanding";
 import { hasChainPage } from "@/lib/launchpad/config";
@@ -17,14 +17,14 @@ import { hasChainPage } from "@/lib/launchpad/config";
 export const metadata: Metadata = pageMetadata({
   path: "/about",
   title: `About ${BRAND}`,
-  description: `${BRAND} is a free, open-source token launchpad on Base and Robinhood Chain, with Arc coming soon. What it does, who builds it, and which channels are official.`,
+  description: `${BRAND} is a free token launchpad on Base and Robinhood Chain, with Arc coming soon. What it does, who builds it, and which channels are official.`,
 });
 
 const DIFFERENCES = [
   ["No platform fee", "The factory and the locker have no fee address, fee variable or treasury. There is nothing to switch on later."],
   ["Liquidity locked forever", "100% of the supply goes into one Uniswap v4 position at launch. Its NFT is held by an ownerless locker with no withdraw path: not the creator, not LAUNCH, nobody."],
   ["No pre-mine, no admin", "Every token starts inside the pool. The contracts have no owner, no pause, no upgrade and no allowlist. They are the same for everyone."],
-  ["Open source", "Contracts and site are MIT-licensed on GitHub, and every deployed contract is source-verified on the chain's explorers."],
+  ["Clear launch rules", "Fixed supply, permanent liquidity locks and creator-set fees. Review each launch before you sign."],
   ["Creator-set trading fee", "0%, 1% or 3%, chosen at launch, paid in full to the beneficiaries the creator names or burned. Fixed forever."],
   ["Open to agents", "A launch is one contract call from any wallet. The list, trades and metadata are also plain JSON, with no API key."],
 ] as const;
@@ -36,7 +36,7 @@ export default function AboutPage() {
         eyebrow="About"
         icon={<Info />}
         title={`What ${BRAND} is`}
-        description={<>{BRAND} is a free, open-source token launchpad. One transaction deploys a fixed-supply ERC-20, opens a Uniswap v4 pool at the market cap you pick and locks 100% of the supply as liquidity, forever. Live on Base and Robinhood Chain. Arc is coming soon.</>}
+        description={<>{BRAND} is a free token launchpad. One transaction deploys a fixed-supply ERC-20, opens a Uniswap v4 pool at the market cap you pick and locks 100% of the supply as liquidity, forever. Live on Base and Robinhood Chain. Arc is coming soon.</>}
       >
         <Link href="/launch" className={shell.action}>Launch a token <ArrowRight size={15} aria-hidden="true" /></Link>
         <Link href="/rules" className={shell.textLink}>How it works <ArrowRight size={14} aria-hidden="true" /></Link>
@@ -69,7 +69,7 @@ export default function AboutPage() {
 
       <section className={`${shell.anchorSection} mt-14`} id="who" aria-labelledby="who-heading">
         <h2 id="who-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">Who builds it</h2>
-        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">{BRAND} is maintained by USIC Labs and built on an MIT-licensed open-source codebase. The contracts, the indexer and this site live in one MIT-licensed repository; contributions go through pull requests there.</p>
+        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">{BRAND} is maintained by USIC Labs. The platform brings token creation, trading and community discovery together in one place.</p>
         <p className="mt-3 max-w-[40rem] text-base leading-relaxed text-body text-pretty">Tokens launched here are created by their launchers, not by {BRAND}. A locked pool does not make a token valuable; read <Link href="/rules#know" className="text-brand underline decoration-line-strong underline-offset-4 hover:text-ink">before you begin</Link>.</p>
       </section>
 
@@ -87,11 +87,11 @@ export default function AboutPage() {
             <a href={`https://x.com/${BRAND_X}`} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">@{BRAND_X} <ArrowUpRight size={13} aria-hidden="true" /></a>
             <p className="mt-2 text-xs leading-relaxed text-muted">Launch notes and updates.</p>
           </li>
-          <li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
+          {PUBLIC_SOURCE_VISIBLE && (<li className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
             <p className="text-xs uppercase tracking-wide text-muted">Source code</p>
-            <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">usiclabs/Launch <ArrowUpRight size={13} aria-hidden="true" /></a>
+            {PUBLIC_SOURCE_VISIBLE && (<a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 font-mono text-sm text-ink hover:text-brand">usiclabs/Launch <ArrowUpRight size={13} aria-hidden="true" /></a>)}
             <p className="mt-2 text-xs leading-relaxed text-muted">LAUNCH source code, available under the MIT license.</p>
-          </li>
+          </li>)}
         </ul>
       </section>
 

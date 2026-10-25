@@ -9,7 +9,7 @@ import { getLaunchFeed, getLaunchTotalsForRequest } from "@/lib/launchpad/querie
 import { ethUsd } from "@/lib/launchpad/ethPrice";
 import { boostEnabled } from "@/lib/launchpad/boostSwitch";
 import { SITE_URL } from "@/lib/chainPublic";
-import { BRAND, BRAND_DOMAIN, BRAND_GITHUB, BRAND_X, SITE_DESCRIPTION, SITE_TITLE, SOCIAL_DESCRIPTION } from "@/lib/brand";
+import { BRAND, BRAND_DOMAIN, BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE, BRAND_X, SITE_DESCRIPTION, SITE_TITLE, SOCIAL_DESCRIPTION } from "@/lib/brand";
 import { siteJsonLdHtml, siteVerification } from "@/lib/seo";
 import Footer from "@/components/Footer";
 import RouteProgress from "@/components/RouteProgress";
@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const usd = await ethUsd();
   const [feed, totals] = await Promise.all([getLaunchFeed(24, usd).catch(() => []), getLaunchTotalsForRequest(usd)]);
   // Organization + WebSite + WebApplication: the entity record search engines reconcile the brand word against.
-  const siteJsonLd = siteJsonLdHtml({ siteUrl: SITE_URL, brand: BRAND, domain: BRAND_DOMAIN, description: SITE_DESCRIPTION, sameAs: [`https://x.com/${BRAND_X}`, BRAND_GITHUB] });
+  const siteJsonLd = siteJsonLdHtml({ siteUrl: SITE_URL, brand: BRAND, domain: BRAND_DOMAIN, description: SITE_DESCRIPTION, sameAs: [`https://x.com/${BRAND_X}`, ...(PUBLIC_SOURCE_VISIBLE ? [BRAND_GITHUB] : [])] });
   return (
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body id="site-top" tabIndex={-1} className="min-h-screen flex flex-col">

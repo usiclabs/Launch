@@ -21,7 +21,7 @@ export const PALETTE_PAGES: ReadonlyArray<{ id: string; label: string; href: str
   { id: "page:rules", label: "How it works", href: "/rules", keywords: "rules learn fees locker liquidity contracts risks faq" },
   { id: "page:agents", label: "Agents and API", href: "/agents", keywords: "api developers llms json bots code" },
   { id: "page:me", label: "Your dashboard", href: "/me", keywords: "me wallet portfolio fees collect launches holdings" },
-  { id: "page:about", label: "About LAUNCH", href: "/about", keywords: "about open source mit" },
+  { id: "page:about", label: "About LAUNCH", href: "/about", keywords: "about platform team" },
   { id: "page:base", label: "Launches on Base", href: "/base", keywords: "base chain network" },
   { id: "page:robinhood", label: "Launches on Robinhood Chain", href: "/robinhood", keywords: "robinhood chain network stocks" },
   { id: "page:arc", label: "Launches on Arc", href: "/arc", keywords: "arc chain network usdc" },

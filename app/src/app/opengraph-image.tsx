@@ -50,7 +50,7 @@ export default async function OgImage() {
             </span>
           </div>
           <div style={{ marginTop: 22, fontSize: 30, color: BODY, display: "flex", alignItems: "center", gap: 14, fontWeight: 500 }}>
-            <span>Open source</span>
+            <span>Zero platform fees</span>
             <span style={{ color: LINE }}>·</span>
             <span>Base</span>
             <span style={{ color: LINE }}>·</span>

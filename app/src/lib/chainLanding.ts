@@ -22,14 +22,14 @@ export type ChainLandingCopy = {
 export const CHAIN_LANDING: Record<ChainKey, ChainLandingCopy> = {
   base: {
     title: "Free token launchpad on Base",
-    description: "Launch a token on Base in one transaction. Zero platform fee, open source, 100% of supply locked as Uniswap v4 liquidity forever. You only pay gas.",
+    description: "Launch a token on Base in one transaction. Zero platform fee, 100% of supply locked as Uniswap v4 liquidity forever. You only pay gas.",
     heading: "Launch a token on Base",
     intro: "Base is Coinbase's Ethereum layer 2. A launch here deploys a fixed-supply ERC-20, opens a Uniswap v4 pool on Base and locks all of the supply in it, in one transaction.",
     gas: "ETH",
   },
   robinhood: {
     title: "Free token launchpad on Robinhood Chain",
-    description: "Launch a token on Robinhood Chain in one transaction. Zero platform fee, open source, 100% of supply locked as Uniswap v4 liquidity forever.",
+    description: "Launch a token on Robinhood Chain in one transaction. Zero platform fee, 100% of supply locked as Uniswap v4 liquidity forever.",
     heading: "Launch a token on Robinhood Chain",
     intro: "Robinhood Chain is Robinhood's Ethereum layer 2. A launch here deploys a fixed-supply ERC-20, opens a Uniswap v4 pool on Robinhood Chain and locks all of the supply in it, in one transaction.",
     gas: "ETH",

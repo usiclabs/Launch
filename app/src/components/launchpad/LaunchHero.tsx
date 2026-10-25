@@ -5,7 +5,7 @@ import HeroLocker from "./HeroLocker";
 import HeroCtaLink from "./HeroCtaLink";
 import LiveTicker from "./LiveTicker";
 import { ChainLogoStack } from "./ChainLogo";
-import { BRAND_GITHUB } from "@/lib/brand";
+import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
 import { VISIBLE_CHAINS } from "@/lib/launchpad/config";
 import { coinPicturesEnabled, imagePublicBase } from "@/lib/launchpad/imageStore";
 import { HERO } from "./hero-layout";
@@ -35,7 +35,7 @@ export default function LaunchHero({ configured }: { configured: boolean }) {
         <div className={styles.copyArea}>
           <Link href="/rules#launchpad" className={HERO.chip}>
             <ChainLogoStack chains={VISIBLE_CHAINS} size={18} />
-            <span className="truncate text-body">Zero platform fees · Open-source contracts</span>
+            <span className="truncate text-body">Zero platform fees · Liquidity locked</span>
             <ArrowRight size={12} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
           </Link>
           <h1 className={HERO.headline}>
@@ -44,7 +44,7 @@ export default function LaunchHero({ configured }: { configured: boolean }) {
             <span className="text-brand">Ready for the market.</span>
           </h1>
           <p className={HERO.copy}>
-            Launch your token and Uniswap v4 pool in one transaction. Zero platform fees. Open-source contracts. 100% of the token supply enters the pool, with liquidity locked forever.
+            Launch your token and Uniswap v4 pool in one transaction. Zero platform fees. 100% of the token supply enters the pool, with liquidity locked forever.
           </p>
           <p className="mt-3 text-sm font-medium text-ink">You only pay network gas.</p>
           <div className={HERO.actions}>
@@ -63,8 +63,8 @@ export default function LaunchHero({ configured }: { configured: boolean }) {
           <p className="mt-4 text-xs leading-relaxed text-muted">Live on Base and Robinhood Chain · Arc coming soon</p>
           {/* the proofs: three small chips, each one a place to check the claim */}
           <ul className={HERO.proofs}>
-            <li><a href={`${BRAND_GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={proof}><Scale size={14} aria-hidden="true" className="text-muted" />MIT licensed</a></li>
-            <li><a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className={proof}><GithubMark /><span className="sm:hidden">Source</span><span className="hidden sm:inline">Source on GitHub</span><ArrowUpRight size={12} aria-hidden="true" className="text-muted" /></a></li>
+            {PUBLIC_SOURCE_VISIBLE && (<li><a href={`${BRAND_GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={proof}><Scale size={14} aria-hidden="true" className="text-muted" />MIT licensed</a></li>)}
+            {PUBLIC_SOURCE_VISIBLE && (<li><a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className={proof}><GithubMark /><span className="sm:hidden">Source</span><span className="hidden sm:inline">Source on GitHub</span><ArrowUpRight size={12} aria-hidden="true" className="text-muted" /></a></li>)}
             <li><Link href="/rules#contracts" className={proof}><ShieldCheck size={14} aria-hidden="true" className="text-up" />Verified contracts</Link></li>
           </ul>
           {!configured ? (

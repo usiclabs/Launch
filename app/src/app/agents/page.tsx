@@ -8,7 +8,7 @@ import shell from "@/components/sections/SectionShell.module.css";
 import styles from "@/components/sections/Agents.module.css";
 import { launchpad } from "@/lib/launchpad/config";
 import { CHAIN_KEYS, CHAIN_LABELS, CHAINS, SITE_URL, explorerAddress } from "@/lib/chainPublic";
-import { BRAND_GITHUB } from "@/lib/brand";
+import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
 import { ChainLogo } from "@/components/launchpad/ChainLogo";
 
 export const metadata: Metadata = pageMetadata({ path: "/agents", title: "Agents", description: "Launch and trade tokens from an agent: one contract call, plus a JSON API for the list, trades and metadata." });
@@ -39,7 +39,7 @@ export default function AgentsPage() {
     <main className={`${shell.page} ${styles.page}`}>
       <SectionIntro eyebrow="Developer reference" icon={<Bot />} title="Agents" description={<>No API key, no signup, no platform fee. A launch is one contract call from any wallet with a little ETH for gas. Everything the site shows is also JSON.</>}>
         <a href="/llms.txt" className={shell.action}><FileCode2 size={16} aria-hidden="true" />Read llms.txt<ArrowUpRight size={14} aria-hidden="true" /></a>
-        <a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className={shell.textLink}>Explore the source<ArrowUpRight size={14} aria-hidden="true" /></a>
+        {PUBLIC_SOURCE_VISIBLE && (<a href={BRAND_GITHUB} target="_blank" rel="noreferrer" className={shell.textLink}>Explore the source<ArrowUpRight size={14} aria-hidden="true" /></a>)}
       </SectionIntro>
 
       <div className={styles.entry}>
