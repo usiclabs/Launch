@@ -256,7 +256,8 @@ const DEV_RPC: Record<ChainKey, string | undefined> = {
 
 /** Browser RPC: dev override per chain, else our same-origin proxy (→ Alchemy/public, key stays server-side). */
 export function browserRpc(key: ChainKey): string {
-  return DEV_RPC[key]?.trim() || `${SITE_URL}/api/rpc?chain=${key}`;
+  const origin = typeof window === "undefined" ? SITE_URL : window.location.origin;
+  return DEV_RPC[key]?.trim() || `${origin}/api/rpc?chain=${key}`;
 }
 
 /** Where a token trades outside this site, per chain. A chain without an entry shows no outside link. */
