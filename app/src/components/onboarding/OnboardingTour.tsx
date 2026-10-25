@@ -11,11 +11,11 @@ import styles from "./OnboardingTour.module.css";
 const STORAGE_KEY = "launch:welcome:v1";
 const REPLAY_EVENT = "launch:replay-welcome";
 const STEPS = [
-  { label: "Welcome", eyebrow: "Your idea starts here", title: "Meet your next launch.", description: "Discover new tokens, follow the market, or bring an idea of your own. Here’s a quick look around LAUNCH.", href: "/rules#launchpad", link: "See how LAUNCH works" },
-  { label: "Discover", eyebrow: "Find your next move", title: "A market with a pulse.", description: "Explore Trending, follow trades in the live activity feed, and browse Launches by chain or activity. Star a token to keep it in your watchlist on this browser.", href: "/#launches", link: "Explore launches", icon: ChartNoAxesCombined },
-  { label: "Launch", eyebrow: "From an idea to onchain", title: "Make something yours.", description: "Choose a network and pair, add your token’s name and images, then review your launch. One transaction creates the token and pool, with liquidity locked forever. You pay gas; LAUNCH takes no platform fee.", href: "/launch", link: "Open the launch form", icon: Rocket },
-  { label: "Your space", eyebrow: "Keep everything in view", title: "One wallet. Your workspace.", description: "Connect your wallet to see your launches, claimable trading fees, holdings, and trades in Your dashboard. You can browse the platform before connecting.", href: "/me", link: "Visit your dashboard", icon: Wallet },
-  { label: "Connect", eyebrow: "More than a launch", title: "Keep the conversation open.", description: "Read community Posts, learn the mechanics in How it works, or explore Agents for programmatic access. You’re ready to find your way around.", href: "/feed", link: "Explore community posts", icon: MessagesSquare },
+  { label: "Welcome", eyebrow: "Your idea starts here", title: "Your idea. Your next move.", description: "A place to discover tokens, follow the market and launch something of your own. Get oriented in five short steps.", href: "/rules#launchpad", link: "See how LAUNCH works" },
+  { label: "Discover", eyebrow: "Find your next move", title: "A market with a pulse.", description: "See what’s trending, follow live trades and filter launches by network. Save tokens to a watchlist that stays on this browser.", href: "/#launches", link: "Explore launches", icon: ChartNoAxesCombined },
+  { label: "Launch", eyebrow: "From an idea to onchain", title: "Make something yours.", description: "Choose your network and pair, add an identity, then review. One transaction creates your token and pool with liquidity locked forever. Zero platform fees; you pay network gas.", href: "/launch", link: "Open the launch form", icon: Rocket },
+  { label: "Your space", eyebrow: "Keep everything in view", title: "One wallet. Your workspace.", description: "Your dashboard brings launches, holdings, trades and claimable fees together. Browse freely first. Connect your wallet when you’re ready to take action.", href: "/me", link: "Visit your dashboard", icon: Wallet },
+  { label: "Connect", eyebrow: "More than a launch", title: "Keep the conversation open.", description: "Follow the conversation in Posts, understand the launch mechanics, or build with Agents. Choose where you want to begin.", href: "/feed", link: "Explore community posts", icon: MessagesSquare },
 ] as const;
 
 /** Replay is available on every page, including when browser storage is unavailable. */
@@ -42,7 +42,7 @@ export default function OnboardingTour() {
   }
 
   function goTo(next: number) {
-    setStep(next);
+    setStep(Math.max(0, Math.min(STEPS.length - 1, next)));
     // Announce the new title and keep keyboard navigation predictable after a step change.
     requestAnimationFrame(() => {
       title.current?.focus({ preventScroll: true });
@@ -81,12 +81,16 @@ export default function OnboardingTour() {
       <Dialog.Backdrop className={styles.backdrop} />
       <Dialog.Popup ref={panel} initialFocus={title} className={styles.panel}>
         <header className={styles.header}>
-          <span className={styles.wordmark}><Mark size={25} /> LAUNCH <span className={styles.guide}>A quick introduction</span></span>
+          <span className={styles.wordmark}><Mark size={25} /> LAUNCH <span className={styles.guide}>Your starting point</span></span>
           <Dialog.Close className={styles.close} aria-label="Close introduction"><X size={18} aria-hidden="true" /></Dialog.Close>
         </header>
 
+        <div className={styles.progress} role="progressbar" aria-label="Introduction progress" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-valuetext={`Step ${step + 1} of ${STEPS.length}: ${current.label}`}><span style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
         <div className={styles.layout}>
-          <nav className={styles.steps} aria-label="Introduction steps">
+          <nav className={styles.steps} aria-label="Introduction steps" onKeyDown={(event) => {
+            const next = event.key === "ArrowRight" ? step + 1 : event.key === "ArrowLeft" ? step - 1 : event.key === "Home" ? 0 : event.key === "End" ? STEPS.length - 1 : null;
+            if (next !== null) { event.preventDefault(); goTo(next); }
+          }}>
             {STEPS.map((item, index) => <button key={item.label} type="button" onClick={() => goTo(index)} className={styles.step} aria-current={index === step ? "step" : undefined} aria-label={`${index + 1}. ${item.label}`}>
               <span className={styles.stepNumber}>{index < step ? <Check size={13} aria-hidden="true" /> : String(index + 1).padStart(2, "0")}</span>
               <span className={styles.stepLabel}>{item.label}</span>
@@ -106,6 +110,7 @@ export default function OnboardingTour() {
               <p className={styles.eyebrow}>{current.eyebrow}</p>
               <Dialog.Title ref={title} tabIndex={-1} className={styles.title}>{current.title}</Dialog.Title>
               <Dialog.Description className={styles.description}>{current.description}</Dialog.Description>
+              <div className={styles.highlights} aria-label="At a glance">{[ ["Explore first", "No wallet needed"], ["Live activity", "Personal watchlist"], ["One transaction", "Zero platform fees"], ["Your wallet", "Your activity"], ["Community", "Developer tools"] ][step].map(label => <span key={label}><Check size={11} aria-hidden="true" />{label}</span>)}</div>
               <Link href={current.href} onClick={close} className={styles.sectionLink}>{current.link}<ArrowRight size={14} aria-hidden="true" /></Link>
             </div>
 
@@ -114,9 +119,9 @@ export default function OnboardingTour() {
                 {step === 0 ? <button type="button" onClick={close} className={styles.quiet}>Skip tour</button> : <button type="button" onClick={() => goTo(step - 1)} className={styles.quiet}><ArrowLeft size={15} aria-hidden="true" /> Back</button>}
                 <span className={styles.count} aria-label={`Step ${step + 1} of ${STEPS.length}`}>{String(step + 1).padStart(2, "0")}<span> / {String(STEPS.length).padStart(2, "0")}</span></span>
               </div>
-              {step === STEPS.length - 1 ? <Link href="/launch" onClick={close} className={styles.primary}>Launch a token <ArrowRight size={16} aria-hidden="true" /></Link> : <button type="button" onClick={() => goTo(step + 1)} className={styles.primary}>{step === 0 ? "Show me around" : "Continue"}<ArrowRight size={16} aria-hidden="true" /></button>}
+              {step === STEPS.length - 1 ? <Link href="/launch" onClick={close} className={styles.primary}>Launch a token <ArrowRight size={16} aria-hidden="true" /></Link> : <button type="button" onClick={() => goTo(step + 1)} className={styles.primary}>{step === 0 ? "Show me around" : `Next: ${STEPS[step + 1].label}`}<ArrowRight size={16} aria-hidden="true" /></button>}
             </div>
-            {step === STEPS.length - 1 ? <button type="button" onClick={close} className={styles.finish}>Keep exploring LAUNCH</button> : <p className={styles.reassurance}>Take it at your pace. Replay anytime from the footer.</p>}
+            {step === STEPS.length - 1 ? <button type="button" onClick={close} className={styles.finish}>Explore the market instead</button> : <p className={styles.reassurance}>No rush. You can replay this tour anytime.</p>}
           </div>
         </div>
       </Dialog.Popup>

@@ -102,3 +102,34 @@
 @media (max-width: 359px) { .guide { display: none; } .content { padding-inline: 16px; } .title { font-size: 26px; } .count { display: none; } .nodeIcon { width: 58px; height: 58px; } }
 @media (max-height: 740px) and (max-width: 639px) { .scene { height: 150px; } .sceneCaption { top: 8px; font-size: 8px; } .orbit { scale: .7; } .sceneFootnote { font-size: 8px; bottom: 7px; } .marketPreview { scale: .82; padding-top: 5px; } .workspace { scale: .8; } .mechanism { scale: .85; padding-bottom: 0; } .mechanismNote { bottom: -15px; } .community { scale: .9; } .copy { padding-top: 14px; } .reassurance { font-size: 9px; } }
 @media (prefers-reduced-motion: reduce) { .panel, .backdrop, .panel *, .panel *::before, .panel *::after { animation: none !important; transition: none !important; } .primary:hover { transform: none; } }
+
+/* A quiet frame, clear hierarchy and controls that remain reachable on small screens. */
+.progress { height: 2px; background: var(--color-line); overflow: hidden; }
+.progress > span { display: block; height: 100%; background: var(--color-brand); transition: width 360ms cubic-bezier(.22,1,.36,1); }
+.header { position: sticky; top: 0; z-index: 3; background: var(--color-paper); }
+.panel { scrollbar-width: thin; scrollbar-color: var(--color-line-strong) transparent; }
+.content { display: flex; flex-direction: column; }
+.scene { flex-shrink: 0; background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--color-brand) 9%, transparent), transparent 72%), var(--color-card); }
+.copy { flex: 1; min-height: 234px; }
+.highlights { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.highlights > span { display: inline-flex; align-items: center; gap: 5px; min-height: 25px; border: 1px solid var(--color-line); border-radius: 999px; padding: 3px 9px; color: var(--color-body); background: var(--color-card); font-size: 10px; }
+.highlights svg { color: var(--color-brand); }
+.primary { box-shadow: inset 0 1px 0 rgb(255 255 255 / .15), 0 7px 24px -14px var(--color-brand); }
+.primary svg, .sectionLink svg { transition: transform 180ms; }
+.primary:hover svg, .sectionLink:hover svg { transform: translateX(3px); }
+.marketRow, .workspaceRow, .communityCard, .mechanismNode { animation: appear 400ms ease both; }
+.marketRow:nth-child(3), .workspaceRow:nth-child(3), .communityCard:nth-child(2), .mechanismNode:nth-child(3) { animation-delay: 70ms; }
+.marketRow:nth-child(4), .workspaceRow:nth-child(4), .communityCard:nth-child(3), .mechanismNode:nth-child(5) { animation-delay: 140ms; }
+@media (max-width: 639px) {
+ .panel { width: calc(100% - 12px); left: 6px; bottom: max(6px, env(safe-area-inset-bottom)); border-radius: 25px; max-height: calc(100dvh - max(24px, env(safe-area-inset-top)) - env(safe-area-inset-bottom)); padding-bottom: 0; }
+ .steps { gap: 3px; padding-inline: 12px; }
+ .step { flex-direction: column; gap: 4px; border-radius: 12px; padding-block: 7px; }
+ .stepLabel { display: block; font-size: 9px; }
+ .copy { min-height: 0; }
+ .content { padding-bottom: 14px; }
+ .controls { position: sticky; bottom: 0; z-index: 2; background: var(--color-paper); padding-bottom: 8px; }
+ .highlights { margin-top: 10px; }
+ .sectionLink { margin-top: 5px; }
+ .description { font-size: 14px; line-height: 1.65; }
+}
+@media (prefers-reduced-motion: reduce) { .progress > span { transition: none; } .primary:hover svg, .sectionLink:hover svg { transform: none; } }
