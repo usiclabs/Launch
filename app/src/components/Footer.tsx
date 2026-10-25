@@ -34,7 +34,7 @@ export default function Footer() {
               Open to your next idea
             </div>
             <h2 className={styles.heading}>Make it yours.<br /><span>Keep it open.</span></h2>
-            <p className={styles.description}>Launch on Base, Robinhood Chain or Arc.<br />No platform cut. You only pay gas.</p>
+            <p className={styles.description}>Live on Base and Robinhood Chain. Arc coming soon.<br />No platform cut. You only pay gas.</p>
             <Link href="/launch" className={styles.launch}>
               Launch a token <ArrowRight size={17} aria-hidden="true" />
             </Link>
@@ -60,8 +60,8 @@ export default function Footer() {
               <div className={styles.chain} key={chain}>
                 <div className={styles.chainName}>{hasChainPage(chain) ? <Link href={chainLandingPath(chain)} className="hover:underline underline-offset-4">{CHAIN_LABELS[chain]}</Link> : CHAIN_LABELS[chain]}<span className={styles.chainId}>{CHAINS[chain].id}</span></div>
                 <div className={styles.contracts}>
-                  {factory ? <a href={explorerAddress(chain, factory)} target="_blank" rel="noreferrer" aria-label={`${CHAIN_LABELS[chain]} factory on explorer`} title={factory}>Factory <ArrowUpRight size={12} aria-hidden="true" /></a> : <span className={styles.unconfigured}>Factory not configured</span>}
-                  {locker ? <a href={explorerAddress(chain, locker)} target="_blank" rel="noreferrer" aria-label={`${CHAIN_LABELS[chain]} locker on explorer`} title={locker}>Locker <ArrowUpRight size={12} aria-hidden="true" /></a> : <span className={styles.unconfigured}>Locker not configured</span>}
+                  {factory ? <a href={explorerAddress(chain, factory)} target="_blank" rel="noreferrer" aria-label={`${CHAIN_LABELS[chain]} factory on explorer`} title={factory}>Factory <ArrowUpRight size={12} aria-hidden="true" /></a> : <span className={styles.unconfigured}>Coming soon</span>}
+                  {locker ? <a href={explorerAddress(chain, locker)} target="_blank" rel="noreferrer" aria-label={`${CHAIN_LABELS[chain]} locker on explorer`} title={locker}>Locker <ArrowUpRight size={12} aria-hidden="true" /></a> : <span className={styles.unconfigured}>Not live yet</span>}
                 </div>
               </div>
             );

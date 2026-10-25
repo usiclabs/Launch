@@ -35,7 +35,7 @@ export function publicClient(key: ChainKey): PublicClient {
   const hit = cached.get(key);
   if (hit) return hit;
   const primary = http(rpcUrl(key), { batch: true, retryCount: 3 });
-  const transport = key === "base" ? fallback([primary, http(b20RpcUrl(), { batch: true, retryCount: 2 })], { rank: false }) : primary;
+  const transport = key === "base" ? fallback([primary, http(b20RpcUrl(), { batch: true, retryCount: 1, timeout: 5_000 }), http(CHAINS.base.rpcUrls.default.http[0], { batch: true, retryCount: 1, timeout: 5_000 })], { rank: false }) : primary;
   const c = createPublicClient({ chain: CHAINS[key], transport });
   cached.set(key, c);
   return c;

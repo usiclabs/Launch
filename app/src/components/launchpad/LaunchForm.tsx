@@ -1056,7 +1056,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
                   <ReviewLine k="Trading fee" v={feePips === 0 ? "0% · no recipients" : `${FEE_PRESETS.find((f) => f.pips === feePips)?.label ?? "Selected fee"} · ${recipients.length ? describeShares(recipients, shortAddr) : "complete recipient routing"}`} />
                   <ReviewLine k="Platform fee" v="0%" />
                   <ReviewLine k="Network gas" v="Exact estimate appears in your wallet before you sign" />
-                  {initialBuyRaw ? <ReviewLine k="Optional first buy" v={`${initialBuyLabel} ${quote.symbol} · separate transaction`} /> : null}
+                  {initialBuyRaw ? <ReviewLine k="Optional first buy" v={`${initialBuyLabel} · separate transaction`} /> : null}
                 </dl>
               </div>
               <p className="text-xs text-muted leading-relaxed">
