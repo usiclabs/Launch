@@ -11,7 +11,7 @@ function ThemeColorSync() {
   useEffect(() => {
     const sync = () => {
       const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-      const color = resolvedTheme === "dark" ? THEME_COLOR.dark : THEME_COLOR.light;
+      const color = resolvedTheme === "light" ? THEME_COLOR.light : THEME_COLOR.dark;
       if (meta && meta.content !== color) meta.content = color;
     };
     sync();
@@ -25,7 +25,7 @@ function ThemeColorSync() {
 }
 
 /**
- * Light by default (the shipped design) with an explicit dark option behind the
+ * Dark by default for first visits, with a light option behind the
  * header toggle. Two persisted states, "light" | "dark", independent of OS preference.
  *
  * Class-based: Tailwind's dark variant resolves against `.dark` on <html>
@@ -41,7 +41,7 @@ function ThemeColorSync() {
  */
 export default function ThemeProvider({ children, nonce }: { children: React.ReactNode; nonce?: string }) {
   return (
-    <NextThemes attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange nonce={nonce}>
+    <NextThemes attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange nonce={nonce}>
       <ThemeColorSync />
       {children}
     </NextThemes>
