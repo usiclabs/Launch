@@ -20,7 +20,7 @@ function handler(file: string, name: string, bindings: Record<string, unknown>):
   visit(ast);
   assert.ok(declaration, `Missing ${name} handler in ${file}`);
   const { outputText } = ts.transpileModule(`(${declaration})`, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } });
-  return runInNewContext(outputText, bindings);
+  return runInNewContext(outputText, { journal: { ready: true }, unresolvedSwap: false, readTransactions: () => [], saveTransaction: () => true, settleTransaction: () => {}, ...bindings });
 }
 
 test("trade locks synchronously during preflight and a rejection allows retry", async () => {
@@ -133,4 +133,30 @@ test("preparing a trade disables the same controls as signing and confirming", (
   assert.match(source, /Preparing trade…/);
   assert.match(source, /<input[^>]*disabled=\{busy\}/);
   assert.match(source, /if \(!v\[0\] \|\| busy\) return/);
+});
+
+
+test("saved unresolved swaps prevent another wallet request after reload", async () => {
+  let requests = 0;
+  const trade = handler("./TradePanel.tsx", "trade", {
+    journal: { ready: true }, unresolvedSwap: true,
+    getWalletClient: () => { requests++; throw new Error("must not sign"); },
+  });
+  await trade();
+  assert.equal(requests, 0);
+});
+
+test("recovery checks the original receipt and never requests a wallet", async () => {
+  const settlements: unknown[][] = [];
+  const reads: string[] = [];
+  const check = handler("./TransactionRecovery.tsx", "check", {
+    lock: { current: false }, setBusy: () => {}, setMessage: () => {}, config: {},
+    CHAINS: { base: { id: 8453 } },
+    getPublicClient: () => ({ getTransactionReceipt: async ({ hash }: { hash: string }) => { reads.push(hash); return { status: "success" }; } }),
+    settleTransaction: (...args: unknown[]) => settlements.push(args),
+    fetch: async () => ({}), AbortSignal,
+  });
+  await check({ kind: "swap", chain: "base", hash: "original-hash" });
+  assert.deepEqual(reads, ["original-hash"]);
+  assert.equal(settlements[0][2], "confirmed");
 });

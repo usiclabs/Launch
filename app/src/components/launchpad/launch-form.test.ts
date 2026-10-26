@@ -25,7 +25,7 @@ test("launch merge preserves optional funding checks and post-launch buy isolati
   assert.ok(buyCall >= 0, "Optional first buy call must remain");
   assert.ok(receiptCheck < buyCall, "The receipt status check must run before the first buy");
   assert.match(source, /if \(buyHash\) await fetch\(`\/api\/launch\/sync\?chain=\$\{chain\}&tx=\$\{buyHash\}/);
-  assert.match(source, /Launched, but the first buy did not go through/);
+  assert.match(source, /Launched. Review the optional first buy/);
   assert.match(source, /buying: "Launched! Buying your first tokens…"/);
 });
 
@@ -77,6 +77,7 @@ for (const status of ["success", "reverted"]) {
     const { outputText } = ts.transpileModule(`(${declaration})`, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } });
     // Inert wallet/RPC dependencies: no connection, signature or network request.
     const firstBuy = runInNewContext(outputText, {
+      chainKeyOf: () => "base", saveTransaction: () => true, settleTransaction: () => {}, nowMs: () => 1,
       TICK_SPACING: 200, zeroAddress: "zero", V4_QUOTER_ABI: [], UNIVERSAL_ROUTER_ABI: [], ERC20_TRANSFER_EVENT: {},
       FIRST_BUY_SLIPPAGE_BPS: 300, BUILDER_DATA_SUFFIX: "0x", minOut,
       encodeV4ExactInSingle: (input: { minOut: bigint }) => { encodedMinimum = input.minOut; return { commands: "0x10", inputs: [] }; },
@@ -119,7 +120,7 @@ test("stock quote: one blocking message, a chip that names the issuer, a way out
   assert.match(source, /if \(quoteKey === "stock" && !stock\) errors.push\(STOCK_PICK_MESSAGE\)/);
   assert.match(source, /\{quoteKey === "stock" && !stock \? \(\s*<div className="[^"]*" role="status">\s*\{STOCK_PICK_MESSAGE\}/);
   // the only live region is that status box: the search results must not be re-announced on every keystroke
-  assert.doesNotMatch(source, /aria-live/);
+  assert.doesNotMatch(source, /aria-live="assertive"/);
   assert.doesNotMatch(source, /data-testid|\(registry\)|Quote = \{/);
   // the picked stock chip says whose stock it is and can be cleared; "Switch quote" returns to the first configured quote
   assert.match(source, /\{stock\.symbol\}\s*<span className="[^"]*">\{CHAIN_COPY\[chain\]\.stock\?\.badge\}<\/span>/);

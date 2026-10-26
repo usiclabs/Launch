@@ -34,14 +34,14 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const dynamic = "force-dynamic";
 
-const PAPER = "#FAFAF8";
-const INK = "#0F172A";
-const BODY = "#475569";
-const MUTED = "#64748B";
-const LINE = "#E7E5E4";
+const PAPER = "#080809";
+const INK = "#FAFAFA";
+const BODY = "#CBCBD0";
+const MUTED = "#9A9AA3";
+const LINE = "#29292F";
 const BLUE = "#FA003E";
-const UP = "#15803D";
-const DOWN = "#DC2626";
+const UP = "#7EE2A8";
+const DOWN = "#FF7D8D";
 
 /**
  * Per-token share card. Never fetches an arbitrary user-supplied image URL server-side
@@ -83,7 +83,7 @@ export default async function TokenOg({ params }: { params: Promise<{ chain: str
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", background: PAPER, display: "flex", flexDirection: "column", fontFamily: "Geist, sans-serif", position: "relative", overflow: "hidden", color: INK }}>
-        <div style={{ position: "absolute", top: -320, left: -120, width: 900, height: 640, borderRadius: "50%", background: "radial-gradient(closest-side, #EAF0FF 0%, rgba(234,240,255,0) 100%)" }} />
+        <div style={{ position: "absolute", top: -320, left: -120, width: 900, height: 640, borderRadius: "50%", background: "radial-gradient(closest-side, #3B0014 0%, rgba(59,0,20,0) 100%)" }} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "40px 64px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <img src={await brandImage()} width={40} height={40} alt="" style={{ borderRadius: "50%" }} />
@@ -93,7 +93,7 @@ export default async function TokenOg({ params }: { params: Promise<{ chain: str
             </span>
           </div>
           {card ? (
-            <span style={{ display: "flex", alignItems: "center", height: 40, padding: "0 16px", borderRadius: 999, border: `1px solid ${LINE}`, background: "#fff", color: BODY, fontSize: 20, fontWeight: 600 }}>
+            <span style={{ display: "flex", alignItems: "center", height: 40, padding: "0 16px", borderRadius: 999, border: `1px solid ${LINE}`, background: "#141417", color: BODY, fontSize: 20, fontWeight: 600 }}>
               {card.chainLabel}
             </span>
           ) : null}
@@ -120,7 +120,7 @@ export default async function TokenOg({ params }: { params: Promise<{ chain: str
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 26 }}>
                 {card.quote ? (
-                  <span style={{ display: "flex", alignItems: "center", gap: 10, height: 40, padding: "0 16px 0 7px", borderRadius: 999, border: `1px solid ${LINE}`, background: "#fff", color: BODY, fontSize: 19, fontWeight: 600, whiteSpace: "nowrap" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 10, height: 40, padding: "0 16px 0 7px", borderRadius: 999, border: `1px solid ${LINE}`, background: "#141417", color: BODY, fontSize: 19, fontWeight: 600, whiteSpace: "nowrap" }}>
                     {card.quote.kind === "pair" ? (
                       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, background: LINE, color: BODY, fontSize: 14, fontWeight: 800, overflow: "hidden" }}>
                         {pLogo ? <img src={pLogo} width={30} height={30} alt="" /> : card.quote.ticker.slice(0, 1)}
@@ -134,7 +134,7 @@ export default async function TokenOg({ params }: { params: Promise<{ chain: str
                   </span>
                 ) : null}
                 {[card.fee, "liquidity locked forever", card.age].map((t, i) => (
-                  <span key={t} style={{ display: "flex", alignItems: "center", height: 40, padding: "0 16px", borderRadius: 999, border: `1px solid ${i === 0 ? "#bbf7d0" : LINE}`, background: i === 0 ? "#ECFDF3" : "#fff", color: i === 0 ? UP : BODY, fontSize: 19, fontWeight: 600, whiteSpace: "nowrap" }}>
+                  <span key={t} style={{ display: "flex", alignItems: "center", height: 40, padding: "0 16px", borderRadius: 999, border: `1px solid ${i === 0 ? "#245338" : LINE}`, background: i === 0 ? "#11251A" : "#141417", color: i === 0 ? UP : BODY, fontSize: 19, fontWeight: 600, whiteSpace: "nowrap" }}>
                     {t}
                   </span>
                 ))}

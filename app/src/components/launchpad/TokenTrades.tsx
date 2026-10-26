@@ -1,3 +1,4 @@
+import DataFreshness from "./DataFreshness";
 import { ArrowDownLeft, ArrowUpRight, Activity } from "lucide-react";
 import type { SwapRow } from "@/lib/launchpad/queries";
 import { explorerAddress, explorerTx, shortAddr, type ChainKey } from "@/lib/chainPublic";
@@ -9,6 +10,7 @@ import { WhoName } from "@/components/profile/Who";
 /** Recent swaps straight from the pool: a side pill, the wallet, both amounts, the price and a link to each transaction. */
 export default function TokenTrades({ chain, symbol, quote, swaps, now }: { chain: ChainKey; symbol: string; quote: Quote; swaps: SwapRow[]; now: number }) {
   return <section aria-label="Indexed trades">
+    <div className="px-5 pt-2"><DataFreshness at={now} label="Trade history" /></div>
     <div className="flex min-h-11 items-center justify-between gap-3 px-5 text-[11px] text-muted"><span>Direct from the pool</span><span className="font-mono tnum">{swaps.length} recent swaps</span></div>
     {swaps.length === 0 ? <div className="flex min-h-48 flex-col items-center justify-center gap-2 border-t border-line px-5 text-center"><Activity size={22} strokeWidth={1.4} className="mb-1 text-muted" /><h3 className="text-sm font-medium text-ink">The tape is quiet.</h3><p className="max-w-xs text-xs leading-relaxed text-muted text-pretty">No swaps have been indexed for this token yet. Confirmed trades appear here with an explorer link.</p></div> :
       <div className="relative max-h-[480px] overflow-auto bb-scroll" tabIndex={0} aria-label="Trade history">

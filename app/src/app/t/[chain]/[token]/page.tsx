@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isAddress, type Address } from "viem";
 import { ArrowLeft, ArrowUpRight, Globe } from "lucide-react";
+import CompareTokenLink from "@/components/launchpad/CompareTokenLink";
 import TokenShare from "@/components/launchpad/TokenShare";
 import { RecordTokenVisit } from "@/components/launchpad/RecentTokens";
 import TokenAvatar from "@/components/launchpad/TokenAvatar";
@@ -127,7 +128,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
   const factory = launchpad(chain).factory;
   const sync = syncCursors.find((c) => c.chain === chain);
   const lagBlocks = sync?.head_block === null || sync?.head_block === undefined ? null : Math.max(0, sync.head_block - sync.cursor_block);
-  const indexDelayed = !sync || Boolean(sync.last_error) || (lagBlocks !== null && lagBlocks > syncLagAlertBlocks(chain));
+  const indexDelayed = !sync || !sync.last_run_at || nowMs() - new Date(sync.last_run_at).getTime() > 600_000 || Boolean(sync.last_error) || (lagBlocks !== null && lagBlocks > syncLagAlertBlocks(chain));
   const freshness = sync?.last_run_at
     ? { label: indexDelayed ? `Indexing delayed · updated ${ago(sync.last_run_at, nowMs())} ago` : `Indexed ${ago(sync.last_run_at, nowMs())} ago`, delayed: indexDelayed }
     : { label: "Index status unavailable · verify the onchain record below", delayed: true };
@@ -232,7 +233,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
               <WatchButton token={{ chain, token: l.token, name: l.name, symbol: l.symbol }} labelled />
               {/* the token's links as one bar, the Watch button's height: share, copy the address, the explorer */}
               <div className="inline-flex h-10 max-w-full items-stretch overflow-hidden rounded-xl border border-line bg-card text-xs font-medium text-body sm:h-9">
-                <TokenShare chain={chain} token={l.token} name={l.name} symbol={l.symbol} className={`inline-flex ${segment}`} />
+                <CompareTokenLink chain={chain} token={token} /><TokenShare chain={chain} token={l.token} name={l.name} symbol={l.symbol} className={`inline-flex ${segment}`} />
                 <RecordTokenVisit chain={chain} token={l.token} name={l.name} symbol={l.symbol} image={l.image_url} />
                 <CopyChip value={l.token} className={`inline-flex ${segment} border-l border-line font-code`} />
                 {/* phones keep one row of actions; the explorer link is also in About & contracts */}

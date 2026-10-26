@@ -32,7 +32,7 @@ import { encodeV4ExactInSingle, type PoolKey } from "@/lib/launchpad/swap";
 import { PLATFORM_TOKEN, TOKEN_PREVIEW } from "@/lib/launchpad/platformToken";
 import { gitlawbLinkedUsd } from "@/lib/launchpad/twig";
 import { parseXHandle } from "@/lib/launchpad/xHandle";
-import { CHAINS, CHAIN_LABELS, CHAIN_KEYS, DEFAULT_CHAIN, BUILDER_DATA_SUFFIX, explorerTx, shortAddr, type ChainKey } from "@/lib/chainPublic";
+import { CHAINS, CHAIN_LABELS, CHAIN_KEYS, DEFAULT_CHAIN, chainKeyOf, BUILDER_DATA_SUFFIX, explorerTx, shortAddr, type ChainKey } from "@/lib/chainPublic";
 import { friendlyError } from "@/lib/errors";
 import { Spinner } from "@/components/Skeleton";
 import { useLaunchDraft } from "./useLaunchDraft";
@@ -41,6 +41,11 @@ import LaunchSectionNav from "./LaunchSectionNav";
 import LaunchSuccess from "./LaunchSuccess";
 import FieldHelp from "./FieldHelp";
 import WalletPicker from "@/components/WalletPicker";
+import { nowMs } from "@/lib/launchpad/time";
+import LaunchGuide from "./LaunchGuide";
+import TransactionRecovery from "./TransactionRecovery";
+import { useTransactionJournal } from "./useTransactionJournal";
+import { readTransactions, saveTransaction, settleTransaction } from "@/lib/launchpad/transaction-journal";
 import { randomHex } from "@/lib/nonce";
 
 /**
@@ -165,8 +170,11 @@ async function firstBuy(ctx: FirstBuyCtx, tokenAddr: Address, launchHash: Hex, a
   });
   setPhase({ k: "buying", hash: launchHash, step: "sign" });
   const h = await wallet.writeContract(request);
+  const buyChain = chainKeyOf(CHAIN.id)!;
+  saveTransaction({ hash: h, wallet: address, chain: buyChain, kind: "swap", label: "Optional first buy", token: tokenAddr, state: "pending", createdAt: nowMs() });
   setPhase({ k: "buying", hash: launchHash, step: "sent", buyHash: h });
   const rc = await pub.waitForTransactionReceipt({ hash: h });
+  settleTransaction(buyChain, h, rc.status === "success" ? "confirmed" : "reverted");
   if (rc.status !== "success") throw new Error("The buy reverted on-chain.");
   // the executed amount can be below the quote (down to the slippage floor): read it off the receipt
   const received = parseEventLogs({ abi: [ERC20_TRANSFER_EVENT], eventName: "Transfer", logs: rc.logs })
@@ -270,6 +278,10 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   const [bannerBusy, setBannerBusy] = useState(false);
   const [resultNote, setResultNote] = useState<string | null>(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const journal = useTransactionJournal(address);
+  const unresolvedLaunch = journal.rows.some(tx => tx.chain === chain && tx.kind === "launch" && tx.state === "pending");
+  const [gasEstimate, setGasEstimate] = useState<string | null>(null);
+  const [journalWarning, setJournalWarning] = useState(false);
   const submitting = useRef(false);
   const submittedHash = useRef<Hex | null>(null);
   const inFlight = phase.k !== "idle" && phase.k !== "error";
@@ -378,8 +390,9 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   const hasRow = (payout: string) => rows.some((r) => r.payout.trim().toLowerCase() === payout.toLowerCase());
 
   async function launch() {
-    if (submitting.current || inFlight || draft.pending || !draft.ready || TOKEN_PREVIEW || !valid || !address || !cfg.factory || startTick === null) return;
+    if (!journal.ready || readTransactions().some(tx => tx.wallet.toLowerCase() === address?.toLowerCase() && tx.chain === chain && tx.kind === "launch" && tx.state === "pending") || submitting.current || inFlight || draft.pending || !draft.ready || TOKEN_PREVIEW || !valid || !address || !cfg.factory || startTick === null) return;
     submitting.current = true;
+    setGasEstimate(null);
     setPhase({ k: "saving" });
     const FACTORY_ADDRESS = cfg.factory;
     let salt = saltRef.current ?? (saltRef.current = randomSalt());
@@ -447,15 +460,23 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
         dataSuffix: BUILDER_DATA_SUFFIX,
       });
 
+      const [gas, gasPrice, available] = await Promise.all([
+        pub.estimateContractGas({ ...request, account: address }), pub.getGasPrice(), pub.getBalance({ address }),
+      ]);
+      const estimatedCost = gas * gasPrice;
+      setGasEstimate(`${fmtUnitsExact(estimatedCost, CHAIN.nativeCurrency.decimals)} ${NATIVE_SYMBOL}`);
+      if (available < estimatedCost * 120n / 100n) throw new Error(`Not enough ${NATIVE_SYMBOL} for the estimated launch gas plus a 20% buffer. Add gas funds and try again.`);
       setPhase({ k: "signing" });
       const wallet = await getWalletClient(config, { chainId: CHAIN.id });
       const hash = await wallet.writeContract(request);
       submittedHash.current = hash;
+      setJournalWarning(!saveTransaction({ hash, wallet: address, chain, kind: "launch", label: `Launch ${symbolClean}`, state: "pending", createdAt: nowMs() }));
       setPhase({ k: "sent", hash });
       const receipt = await pub.waitForTransactionReceipt({ hash });
-      if (receipt.status !== "success") { submittedHash.current = null; throw new Error("Transaction reverted on-chain. No token was created by this transaction."); }
+      if (receipt.status !== "success") { settleTransaction(chain, hash, "reverted"); submittedHash.current = null; throw new Error("Transaction reverted on-chain. No token was created by this transaction."); }
       const [ev] = parseEventLogs({ abi: LAUNCH_FACTORY_ABI, eventName: "Launched", logs: receipt.logs });
       const token = (ev?.args.token ?? meta.token ?? "").toLowerCase();
+      settleTransaction(chain, hash, "confirmed", token);
       draft.clear();
 
       // Optional first buy. The launch is already on-chain: whatever happens here must not read as a launch failure.
@@ -476,10 +497,10 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
       await fetch(`/api/launch/sync?chain=${chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
       if (buyHash) await fetch(`/api/launch/sync?chain=${chain}&tx=${buyHash}`, { method: "POST" }).catch(() => {});
       setPhase({ k: "done", hash, token });
-      setResultNote(buyProblem ? `Your launch succeeded. The optional first buy did not go through: ${buyProblem} You can try a buy on the token page.` : bought ? `Your first buy is confirmed: ${bought.exact ? "" : "about "}${fmtCompact(Number(bought.out) / 1e18)} ${symbolClean}.` : null);
+      setResultNote(buyProblem ? `Your launch succeeded. The optional first buy needs attention: ${buyProblem} Check your recent transactions on the dashboard before trying another buy.` : bought ? `Your first buy is confirmed: ${bought.exact ? "" : "about "}${fmtCompact(Number(bought.out) / 1e18)} ${symbolClean}.` : null);
       toast({ kind: "launch", title: `${name.trim()} is live on ${CHAIN_LABEL}`, sub: "Liquidity locked forever. Your token is ready to share.", chain, token, symbol: symbolClean, celebrate: true });
       if (bought !== null) toast({ kind: "buy", title: `You bought ${bought.exact ? "" : "about "}${fmtCompact(Number(bought.out) / 1e18)} ${symbolClean}`, sub: "Buy confirmed on " + CHAIN_LABEL, chain, token, symbol: symbolClean });
-      if (buyProblem) toast({ kind: "info", title: "Launched, but the first buy did not go through", sub: `${buyProblem} You can buy on the token page.`, chain, token, symbol: symbolClean });
+      if (buyProblem) toast({ kind: "info", title: "Launched. Review the optional first buy", sub: `${buyProblem} Check your recent transactions before buying again.`, chain, token, symbol: symbolClean });
     } catch (err) {
       setPhase(submittedHash.current ? { k: "pending", hash: submittedHash.current, message: "Your transaction was submitted, but confirmation is unavailable. Check its status before taking another action." } : { k: "error", message: friendlyError(err) });
     } finally {
@@ -495,10 +516,11 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
     try {
       const pub = getPublicClient(config, { chainId: CHAIN.id })!;
       const receipt = await pub.waitForTransactionReceipt({ hash });
-      if (receipt.status !== "success") { submittedHash.current = null; setPhase({ k: "error", message: "The launch transaction reverted. No token was created by this transaction. Review your settings before trying again." }); return; }
+      if (receipt.status !== "success") { settleTransaction(chain, hash, "reverted"); submittedHash.current = null; setPhase({ k: "error", message: "The launch transaction reverted. No token was created by this transaction. Review your settings before trying again." }); return; }
       const [event] = parseEventLogs({ abi: LAUNCH_FACTORY_ABI, eventName: "Launched", logs: receipt.logs });
       if (!event?.args.token) throw new Error("Launch event not available yet");
       const token = event.args.token.toLowerCase();
+      settleTransaction(chain, hash, "confirmed", token);
       draft.clear();
       setPhase({ k: "indexing", hash });
       await fetch(`/api/launch/sync?chain=${chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
@@ -517,7 +539,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
       <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
         <p className="mb-2 text-[11px] font-semibold uppercase tracking-[.08em] text-muted">Before you launch</p>
         <ul className="space-y-2 text-xs">
-          {[{ ok: done.token && done.price && done.fees && done.buy, label: "Token details & launch settings" }, { ok: isConnected && onChain, label: isConnected ? onChain ? `Wallet on ${CHAIN_LABEL}` : `Switch wallet to ${CHAIN_LABEL}` : "Connect your wallet" }, { ok: nativeBalance !== undefined && nativeBalance > 0n, label: !address ? `${NATIVE_SYMBOL} needed for network gas` : nativeBalance === undefined ? ethBal.isError ? "Gas balance unavailable" : "Checking gas balance…" : nativeBalance === 0n ? `Add ${NATIVE_SYMBOL} for gas` : `${NATIVE_SYMBOL} available · exact gas checked before signing` }, { ok: !logoBusy && !bannerBusy, label: logoBusy || bannerBusy ? "Preparing artwork…" : "Artwork ready · optional" }].map(item => <li key={item.label} className="flex items-start gap-2"><span className={item.ok ? "mt-px text-up" : "mt-px text-muted"}>{item.ok ? <Check size={13} aria-hidden="true" /> : <Circle size={12} aria-hidden="true" />}</span><span className={item.ok ? "text-body" : "text-muted"}>{item.label}</span></li>)}
+          {[{ ok: done.token && done.price && done.fees && done.buy, label: "Token details & launch settings" }, { ok: done.chain && done.price, label: `Pairing: ${quote.symbol} · ${cap(fdvPreview ?? 0).compact} starting market cap` }, { ok: true, label: `Fixed supply: ${fmtCompact(Number(DEFAULT_SUPPLY) / 1e18)} · 100% enters the pool` }, { ok: done.fees, label: `Trading fee: ${feePips / 10000}% · ${feeRouteSub}` }, { ok: isConnected && onChain, label: isConnected ? onChain ? `Wallet on ${CHAIN_LABEL}` : `Switch wallet to ${CHAIN_LABEL}` : "Connect your wallet" }, { ok: nativeBalance !== undefined && nativeBalance > 0n, label: !address ? `${NATIVE_SYMBOL} needed for network gas` : nativeBalance === undefined ? ethBal.isError ? "Gas balance unavailable" : "Checking gas balance…" : nativeBalance === 0n ? `Add ${NATIVE_SYMBOL} for gas` : `${NATIVE_SYMBOL} available · exact gas checked before signing` }, { ok: !logoBusy && !bannerBusy, label: logoBusy || bannerBusy ? "Preparing artwork…" : "Artwork ready · optional" }].map(item => <li key={item.label} className="flex items-start gap-2"><span className={item.ok ? "mt-px text-up" : "mt-px text-muted"}>{item.ok ? <Check size={13} aria-hidden="true" /> : <Circle size={12} aria-hidden="true" />}</span><span className={item.ok ? "text-body" : "text-muted"}>{item.label}</span></li>)}
         </ul>
         {ethBal.isError && address ? <button type="button" onClick={() => void ethBal.refetch()} className="mt-2 min-h-10 text-xs font-medium text-brand underline underline-offset-2">Retry gas balance</button> : null}
       </div>
@@ -542,13 +564,16 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
         connected={isConnected}
         onChain={onChain}
         connecting={switching}
-        valid={valid && draft.ready && !draft.pending}
+        valid={valid && draft.ready && !draft.pending && journal.ready && !unresolvedLaunch}
         phase={phase}
         onConnect={() => setPickerOpen(true)}
         onSwitch={() => void switchChainAsync({ chainId: CHAIN.id })}
         label={initialBuyRaw ? "Launch + first buy" : "Launch for free, gas only"}
       />
       <PhaseNote phase={phase} chain={chain} />
+      {gasEstimate && phase.k !== "error" && phase.k !== "idle" ? <p role="status" className="text-xs leading-relaxed text-muted">Simulation passed. Estimated launch gas: {gasEstimate}. Your wallet shows the final network cost. Optional first-buy gas is separate.</p> : null}
+      {journalWarning ? <p role="status" className="text-xs text-warm-ink">This browser could not save your transaction reference. Keep this page open and save the explorer link.</p> : null}
+      {unresolvedLaunch ? <p role="status" className="text-xs text-warm-ink">Check your saved launch transaction above before starting another launch on this network.</p> : null}
       {phase.k === "pending" ? <button type="button" onClick={() => void checkConfirmation()} className={`${btn.secondary} w-full`}>Check launch confirmation</button> : null}
     </div>
   );
@@ -559,6 +584,8 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
 
   return (
     <>
+    <TransactionRecovery wallet={address} chain={chain} pendingOnly />
+    <LaunchGuide />
     <div className="mb-5 rounded-2xl border border-line bg-card px-4 py-3 sm:px-5">
       {draft.pending ? <div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><p className="flex items-center gap-2 text-sm font-semibold text-ink"><Save size={15} aria-hidden="true" />Pick up where you left off.</p><p className="mt-1 break-words text-xs leading-relaxed text-muted">{draft.pending.name || "Your token"} · details and artwork saved in this browser. Review pairing, price and fees again.</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={() => { if(draft.pending) applyDraft(draft.pending); draft.restored(); }} className={btn.primarySm}>Restore draft</button><button type="button" onClick={() => { applyDraft({name:"",symbol:"",description:"",image:"",banner:"",website:"",x:"",chain:initialChain}); draft.clear(); }} className={btn.secondarySm}>Start fresh</button></div></div> : <p role="status" className="flex items-start gap-2 text-xs leading-relaxed text-muted"><Save size={14} className="mt-0.5 shrink-0" aria-hidden="true" />{draft.storageError ? "This browser is blocking saved drafts. Keep this page open until you’re done." : draft.saved ? "Details and artwork saved in this browser. Pairing, price, fees and first-buy amounts are reviewed each visit." : "Your token details and artwork save automatically on this browser as you work."}</p>}
     </div>

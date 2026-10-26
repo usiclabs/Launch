@@ -126,6 +126,11 @@ export default function TokenShare({
                 <span className="p-4 text-center text-xs text-slate-700">{message || "Preparing QR code…"}</span>
               )}
             </div>
+            <details className="mb-4 rounded-xl border border-line p-3">
+              <summary className="min-h-8 cursor-pointer text-xs font-medium text-ink">Preview your share card</summary>
+              {open ? <Image unoptimized src={`/t/${chain}/${token}/opengraph-image`} alt={`${name} branded launch card`} width={1200} height={630} className="mt-3 h-auto w-full rounded-lg border border-line" /> : null}
+              <p className="mt-2 text-[11px] leading-relaxed text-muted">Includes the token identity and network. Share the trading link alongside the image so people can open the correct token.</p>
+            </details>
             <label className="block text-xs text-muted" htmlFor={`share-${token}`}>
               Token link
             </label>

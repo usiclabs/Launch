@@ -13,6 +13,7 @@ const EXPLORE = [
   { href: "/rules", label: "How it works" },
   { href: "/about", label: "About LAUNCH" },
   { href: "/status", label: "Platform status" },
+  { href: "/compare", label: "Compare tokens" },
   { href: "/feed", label: "Community posts" },
   { href: "/me", label: "Your dashboard" },
 ];

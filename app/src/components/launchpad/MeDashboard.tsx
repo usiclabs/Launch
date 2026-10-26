@@ -32,6 +32,10 @@ import SeasonCard from "@/components/points/SeasonCard";
 import EarnCard from "@/components/earn/EarnCard";
 import { useBoostOn } from "./useBoostOn";
 import { BOOST_CHAIN } from "@/lib/launchpad/boost";
+import TransactionRecovery from "./TransactionRecovery";
+import DataFreshness from "./DataFreshness";
+import TokenShare from "./TokenShare";
+import CreatorWorkspace from "./CreatorWorkspace";
 import styles from "./MeDashboard.module.css";
 
 type Me = { wallet: string; ethUsd: number | null; launches: LaunchRow[]; tokens: (LaunchRow & { my_buys: number; my_sells: number; my_last_trade: string })[]; trades: WalletTrade[] };
@@ -69,7 +73,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
     if (!address) return;
     setRefreshing(true);
     try {
-      const res = await fetch(`/api/me?wallet=${address}`, { cache: "no-store" });
+      const res = await fetch(`/api/me?wallet=${address}`, { cache: "no-store", signal: AbortSignal.timeout(12000) });
       if (!res.ok) throw new Error(`me ${res.status}`);
       const m = (await res.json()) as Me;
       setMe(m);
@@ -182,7 +186,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
               <li><span className={styles.capIcon} aria-hidden="true"><Coins size={17} /></span><div><h3>See where fees go</h3><p>View your beneficiary share and uncollected fees. Collect to the recipients set at launch.</p></div></li>
               <li><span className={styles.capIcon} aria-hidden="true"><ArrowDownLeft size={17} /></span><div><h3>Follow your activity</h3><p>Check token balances and past trades across every chain, with links to the transactions.</p></div></li>
             </ol>
-            <Link href="/#launches" className={styles.browseLink}>Just exploring? Browse launches<ArrowUpRight size={15} aria-hidden="true" /></Link>
+            <Link href="/#token-market" className={styles.browseLink}>Just exploring? Browse launches<ArrowUpRight size={15} aria-hidden="true" /></Link>
           </div>
         </section>
         <div className={styles.disclosure}><span>One wallet. Every chain.</span><p>This dashboard reads public on-chain activity. There is no separate LAUNCH account.</p></div>
@@ -208,6 +212,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
     return (
       <div className={styles.dashboard}>
         {walletBar}
+      <TransactionRecovery wallet={address} />
         <SeasonCard address={address} />
         <EarnCard address={address} />
         {err ? <div className={styles.error} role="alert"><h2>We couldn’t load your dashboard.</h2><p>{err}. Your wallet and tokens are unchanged.</p><button type="button" className={styles.outlineButton} onClick={() => void load()} disabled={refreshing}>Try again<RefreshCw size={14} aria-hidden="true" /></button></div> : <div className={styles.loading} aria-busy="true" aria-label="Loading your dashboard"><dl className={styles.loadingStats}>{Array.from({ length: 4 }, (_, k) => <SkStat key={k} />)}</dl><ul className={styles.loadingRows}>{Array.from({ length: 3 }, (_, k) => <SkRow key={k} i={k} />)}</ul></div>}
@@ -217,6 +222,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
   return (
     <div className={styles.dashboard}>
       {walletBar}
+      <TransactionRecovery wallet={address} />
       <SeasonCard address={address} />
       <EarnCard address={address} />
       {err ? <p className={styles.error} role="alert">Refresh failed: {err}. Showing the last loaded data. Try Refresh again.</p> : null}
@@ -227,6 +233,8 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
         <Stat k="Holdings value" icon={<Wallet size={14} />} v={holdings.reading ? "Reading…" : holdings.unknown ? "—" : fmtUsd(holdings.usd, { compact: true })} hint={holdings.unknown ? "A balance or price is unavailable" : holdings.unpriced ? `Excludes ${holdings.unpriced} with no USD price` : "Current estimated USD value"} />
       </dl>
 
+      <DataFreshness at={now || null} failed={Boolean(err)} label="Dashboard" />
+      <CreatorWorkspace launches={me.launches} />
       <Tabs defaultValue="launches" className={styles.ledger}>
         <TabsList aria-label="Your wallet activity" className={styles.tabsList}>
           <TabsTab value="launches">Launches<span className={styles.tabCount}>{me.launches.length}</span></TabsTab>
@@ -284,6 +292,8 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
                     <div className="text-[11px] text-muted">uncollected</div>
                   </div>
                   <div className={styles.rowActions}>
+                    <TokenShare chain={l.chain} token={l.token} name={l.name} symbol={l.symbol} className={styles.quietButton} />
+                    <Link href={`/compare?tokens=${l.chain}:${l.token}`} className={styles.quietButton}>Compare</Link>
                     <button type="button" onClick={() => void collect(l)} disabled={busy !== null || !hasFees(p)} className={styles.collectButton} aria-label={`Collect fees for ${l.symbol}`}>
                       <Coins size={14} aria-hidden="true" />{busy === k ? "Collecting…" : "Collect"}
                     </button>
@@ -307,7 +317,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
       {/* holdings */}
       <TabsPanel value="holdings">
         <div className={styles.panelHeading}><div><h2>Your holdings</h2><p>Current balances for tokens this wallet has traded here.</p></div></div>
-        {me.tokens.length === 0 ? <EmptyState icon="holdings" title="Your next discovery belongs here." description="After you trade a token, its balance and estimated value will appear in this view." href="/#launches" action="Explore launches" /> : null}
+        {me.tokens.length === 0 ? <EmptyState icon="holdings" title="Your next discovery belongs here." description="After you trade a token, its balance and estimated value will appear in this view." href="/#token-market" action="Explore launches" /> : null}
         <ul className={styles.tokenList}>
           {me?.tokens.map((t) => {
             const bal = balances[key(t)];
@@ -342,7 +352,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
       {/* trades */}
       <TabsPanel value="trades">
         <div className={styles.panelHeading}><div><h2>Your trades</h2><p>The latest indexed buys and sells from this wallet.</p></div></div>
-        {me.trades.length === 0 ? <EmptyState icon="trades" title="A clean trading history." description="Your buys and sells will be listed here, with a transaction link for every trade." href="/#launches" action="Explore launches" /> : null}
+        {me.trades.length === 0 ? <EmptyState icon="trades" title="A clean trading history." description="Your buys and sells will be listed here, with a transaction link for every trade." href="/#token-market" action="Explore launches" /> : null}
         {me && me.trades.length > 0 ? (
           <div className={`${styles.tradeScroll} bb-scroll`} role="region" aria-label="Your trades table" tabIndex={0}>
             <table className={styles.trades}>

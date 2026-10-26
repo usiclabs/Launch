@@ -8,6 +8,7 @@ import { mergeChartPayload, type ChartPayload } from "@/lib/launchpad/chart-payl
 import type { ChainKey } from "@/lib/chainPublic";
 import { nowMs } from "@/lib/launchpad/time";
 import { useLive } from "./LiveProvider";
+import DataFreshness from "./DataFreshness";
 import TradingChart from "./TradingChart";
 
 /** One bounded history request, then shared-clock refreshes. No extra poller. */
@@ -15,7 +16,7 @@ export default function PriceChart({ chain, token, symbol, launchedAt }: { chain
   const launchT = Math.floor(new Date(launchedAt).getTime() / 1000);
   const [interval, setInterval] = useState<Interval>(() => defaultInterval(nowMs() / 1000 - launchT));
   const [range, setRange] = useState<ChartRange>("auto");
-  const [result, setResult] = useState<{ key: string; data: ChartPayload } | null>(null);
+  const [result, setResult] = useState<{ key: string; data: ChartPayload; loadedAt: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [failure, setFailure] = useState<{ key: string; message: string } | null>(null);
   const { address } = useHydratedAccount();
@@ -52,7 +53,7 @@ export default function PriceChart({ chain, token, symbol, launchedAt }: { chain
       ready.current = requestKey;
       if (!tailOnly) lastFull.current = nowMs();
       setFailure(null);
-      setResult((current) => ({ key: requestKey,
+      setResult((current) => ({ key: requestKey, loadedAt: Date.now(),
         data: mergeChartPayload(current?.key === requestKey ? current.data : null, payload, tailOnly) }));
     } catch (error) {
       if (id !== generation.current || (controller.signal.aborted && !timedOut)) return;
@@ -82,9 +83,9 @@ export default function PriceChart({ chain, token, symbol, launchedAt }: { chain
     void load(true);
   }), [subscribe, requestKey, chain, token, load]);
 
-  return <TradingChart chain={chain} token={token} symbol={symbol} interval={interval} range={range}
+  return <div className="space-y-2"><DataFreshness at={result?.key === requestKey ? result.loadedAt : null} failed={failure?.key === requestKey} label="Chart" /><TradingChart chain={chain} token={token} symbol={symbol} interval={interval} range={range}
     data={result?.key === requestKey ? result.data : null} loading={loading || (result?.key !== requestKey && failure?.key !== requestKey)}
     error={failure?.key === requestKey ? failure.message : null} hasWallet={Boolean(address)}
     onIntervalChange={(next) => { setInterval(next); setRange("auto"); }}
-    onRefresh={() => void load()} />;
+    onRefresh={() => void load()} /></div>;
 }

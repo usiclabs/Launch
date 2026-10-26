@@ -1,4 +1,7 @@
 "use client";
+import TransactionRecovery from "./TransactionRecovery";
+import { useTransactionJournal } from "./useTransactionJournal";
+import { readTransactions, saveTransaction, settleTransaction } from "@/lib/launchpad/transaction-journal";
 import TradeFeeSummary from "./TradeFeeSummary";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -69,6 +72,9 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   const router = useRouter();
   const config = useConfig();
   const { address, isConnected, chainId } = useHydratedAccount();
+  const journal = useTransactionJournal(address);
+  const [journalWarning, setJournalWarning] = useState(false);
+  const unresolvedSwap = journal.rows.some(tx => tx.chain === chain && tx.kind === "swap" && tx.token?.toLowerCase() === token.toLowerCase() && tx.state === "pending");
   const { switchChainAsync, isPending: switching } = useSwitchChain();
   const [side, setSide] = useState<Side>("buy");
   const viaEth = side === "buy" && ethRoute !== null && payWith === "eth";
@@ -173,7 +179,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   }, [address, tradable, tokenBalance, poolKey, poolId, config, V4.quoter, V4.stateView, CHAIN.id]);
 
   async function trade() {
-    if (!tradable || !address || amountIn === null || !quote_ || quote_.forKey !== quoteKey || busy || insufficient || transactionLock.current) return;
+    if (!journal.ready || unresolvedSwap || readTransactions().some(tx => tx.wallet.toLowerCase() === address?.toLowerCase() && tx.chain === chain && tx.kind === "swap" && tx.token?.toLowerCase() === token.toLowerCase() && tx.state === "pending") || !tradable || !address || amountIn === null || !quote_ || quote_.forKey !== quoteKey || busy || insufficient || transactionLock.current) return;
     // Lock before the first await, including wallet lookup and RPC preflight.
     transactionLock.current = true;
     setPhase({ k: "preparing" });
@@ -232,8 +238,10 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
       });
       setPhase({ k: "signing" });
       const hash = await wallet.writeContract(request);
+      setJournalWarning(!saveTransaction({ hash, wallet: address, chain, kind: "swap", label: `${side === "buy" ? "Buy" : "Sell"} ${symbol}`, token, state: "pending", createdAt: Date.now() }));
       setPhase({ k: "sent", hash });
       const rc = await pub.waitForTransactionReceipt({ hash });
+      settleTransaction(chain, hash, rc.status === "success" ? "confirmed" : "reverted");
       if (rc.status !== "success") throw new Error("Transaction reverted on-chain.");
       await fetch(`/api/launch/sync?chain=${chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
       setPhase({ k: "done", hash, side });
@@ -272,6 +280,9 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
     <section className="overflow-hidden rounded-2xl border border-line bg-card scroll-mt-24" id="trade" tabIndex={-1} aria-label={`Trade ${symbol}`}>
       <div className="flex min-h-12 items-center justify-between gap-3 border-b border-line px-5"><h2 className="min-w-0 truncate text-sm font-semibold text-ink">Trade {symbol}</h2><span className="inline-flex shrink-0 items-center gap-1.5 text-[11px] text-muted"><ChainLogo chain={chain} size={12} />{CHAIN_LABEL}</span></div>
       <div className="space-y-4 p-4 sm:p-5">
+      <TransactionRecovery wallet={address} chain={chain} pendingOnly />
+      {journalWarning ? <p role="status" className="text-xs text-warm-ink">Browser storage is unavailable. Keep this page open and save your explorer link; recovery will not survive a reload.</p> : null}
+      {unresolvedSwap ? <p role="status" className="text-xs text-warm-ink">Check your saved swap before submitting another trade for this token.</p> : null}
       <ToggleGroup aria-label="Trade side" value={[side]} onValueChange={(v) => { if (!v[0] || busy) return; setSide(v[0] as Side); setAmount(""); setQuote(null); setQuoting(false); setPhase({ k: "idle" }); }} className="grid w-full grid-cols-2">
         {(["buy", "sell"] as Side[]).map((s) => <ToggleGroupItem key={s} value={s} disabled={busy} thumbClassName={s === "buy" ? "bg-up-soft" : "bg-down-soft"} className={`min-h-10 text-sm font-semibold ${s === "buy" ? "data-pressed:text-up" : "data-pressed:text-down-ink"}`}>{s === "buy" ? "Buy" : "Sell"}</ToggleGroupItem>)}
       </ToggleGroup>
@@ -386,7 +397,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
         <button
           type="button"
           onClick={onTrade}
-          disabled={busy || amountIn === null || !quote_ || quote_.forKey !== quoteKey || insufficient}
+          disabled={!journal.ready || unresolvedSwap || busy || amountIn === null || !quote_ || quote_.forKey !== quoteKey || insufficient}
           className={`${confirming ? btn.warm : side === "buy" ? btn.up : `${btn.primary} !bg-down hover:brightness-110`} w-full min-h-12 text-[15px]`}
         >
           {phase.k === "preparing" ? (

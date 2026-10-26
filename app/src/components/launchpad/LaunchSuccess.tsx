@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, Copy, ExternalLink, LockKeyhole, Rocket, Share2, UserRound } from "lucide-react";
 import { CHAIN_LABELS, SITE_URL, explorerAddress, explorerTx, type ChainKey } from "@/lib/chainPublic";
 import { btn } from "@/components/ui";
+import TokenShare from "./TokenShare";
 import Mark from "./Mark";
 
 export default function LaunchSuccess({ chain, token, hash, name, symbol, buyNote }: { chain: ChainKey; token: string; hash: string; name: string; symbol: string; buyNote?: string | null }) {
@@ -46,7 +47,8 @@ export default function LaunchSuccess({ chain, token, hash, name, symbol, buyNot
       <div className="flex flex-wrap items-center gap-3"><a href={share} target="_blank" rel="noreferrer" className={`${btn.secondary} flex-1`}><Share2 size={15} aria-hidden="true" />Share on X</a><Link href="/me" className={`${btn.secondary} flex-1`}>Your dashboard<ArrowRight size={15} aria-hidden="true" /></Link></div>
       <section aria-labelledby="creator-next-steps" className="rounded-2xl border border-line bg-card p-4">
         <h3 id="creator-next-steps" className="text-xs font-semibold text-ink">Your launch, ready to share</h3>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <TokenShare chain={chain} token={token} name={name} symbol={symbol} className={`${btn.secondarySm} min-h-11 justify-center`} />
           <button type="button" onClick={() => void copyLink()} className={`${btn.secondarySm} min-h-11 justify-center`}><Copy size={13} aria-hidden="true" />{linkCopied ? "Page link copied" : "Copy page link"}</button>
           <Link href={`${path}#contracts`} className={`${btn.secondarySm} min-h-11 justify-center`}><ExternalLink size={13} aria-hidden="true" />Pool & onchain record</Link>
           <Link href="/me" className={`${btn.secondarySm} min-h-11 justify-center`}><UserRound size={13} aria-hidden="true" />Complete your profile</Link>
