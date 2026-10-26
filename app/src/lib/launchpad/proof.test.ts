@@ -67,5 +67,5 @@ test("fee routing says where every fee goes and that it cannot change", () => {
   assert.equal(fees({ lpFee: 30_000, mode: "burn" as never }).title, "3% trading fee, burned");
   assert.match(fees({ lpFee: 30_000, mode: "burn" as never }).detail, /0x…dEaD/);
   assert.equal(fees({ mode: "split" as never, recipients: 3 }).title, "1% trading fee, to the recipients set at launch");
-  assert.match(fees({ mode: "split" as never, recipients: 3 }).detail, /^3 wallets share it\. openlaunch takes 0%\. .*can never change\.$/);
+  assert.match(fees({ mode: "split" as never, recipients: 3 }).detail, /^3 wallets share it\. LAUNCH takes 0%\. .*can never change\.$/);
 });

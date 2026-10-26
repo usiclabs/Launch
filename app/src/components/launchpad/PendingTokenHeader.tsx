@@ -51,6 +51,7 @@ export default function PendingTokenHeader() {
         </div>
         <div className="flex flex-wrap gap-2">{[88, 76, 120, 96].map((w) => <Sk key={w} className="h-9 rounded-lg" style={{ width: w }} />)}</div>
       </div>
+      <div aria-hidden="true" className="flex flex-wrap gap-x-5 gap-y-2 border-t border-line px-4 py-3 sm:px-6"><Sk className="h-4 w-52" /><Sk className="h-4 w-44" /><Sk className="h-4 w-28" /></div>
     </header>
   );
 }

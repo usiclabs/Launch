@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isAddress, type Address } from "viem";
-import { ArrowLeft, ArrowUpRight, Globe } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Globe, LockKeyhole, Layers3, BadgeDollarSign } from "lucide-react";
 import CompareTokenLink from "@/components/launchpad/CompareTokenLink";
 import TokenShare from "@/components/launchpad/TokenShare";
 import { RecordTokenVisit } from "@/components/launchpad/RecentTokens";
@@ -152,7 +152,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
   // a chip on the cover: dark glass, so it reads over any banner in either theme (display is set where it is used)
   const glass = "h-7 shrink-0 items-center gap-1.5 rounded-full bg-black/45 px-2.5 text-[11px] font-medium text-white ring-1 ring-white/15 backdrop-blur-md";
   // one segment of the action bar; display is set per segment, so a phone-hidden one never carries two display classes
-  const segment = "items-center gap-1.5 px-3 transition-colors hover:bg-ink/5 hover:text-ink focus-visible:-outline-offset-2 motion-reduce:transition-none";
+  const segment = "min-h-11 items-center gap-1.5 px-3 transition-colors hover:bg-ink/5 hover:text-ink focus-visible:-outline-offset-2 motion-reduce:transition-none";
 
   // Facts-only structured data (on-chain fields + creator metadata, no scores).
   // Escaped for the script sink: creator-supplied name/description must not
@@ -189,7 +189,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
             {/* the cover melts into the card, so the mark and the name read on one surface */}
             <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-b from-transparent via-card/50 to-card" />
             <nav aria-label="Breadcrumb" className="absolute inset-x-3 top-3 flex items-center justify-between gap-2 sm:inset-x-4 sm:top-4">
-              <Link href="/#launches" className={`inline-flex ${glass} transition-colors hover:bg-black/60 motion-reduce:transition-none`}><ArrowLeft size={13} aria-hidden="true" /> All launches</Link>
+              <Link href="/#token-market" className={`inline-flex ${glass} transition-colors hover:bg-black/60 motion-reduce:transition-none`}><ArrowLeft size={13} aria-hidden="true" /> All launches</Link>
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className={`inline-flex ${glass}`}><ChainLogo chain={chain} size={14} />{chainLabel}</span>
                 <span className={`hidden sm:inline-flex ${glass}`}>Uniswap v4</span>
@@ -220,7 +220,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
               </div>
             </div>
             <div className="bb-token-summary md:row-span-2 md:text-right">
-              <p className="text-xs text-muted">Market cap</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted">Market cap <span className="font-normal normal-case tracking-normal">· estimate</span></p>
               <p className="mt-1 font-mono text-3xl font-bold tracking-[-0.03em] text-ink tnum sm:text-4xl" title={cap.usd !== null ? fmtUsd(cap.usd) : cap.main}>{cap.main}</p>
               <p className="mt-1 font-mono text-[11px] text-muted tnum">{cap.detail}</p>
               <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted md:justify-end">
@@ -231,15 +231,20 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
             </div>
             <div className={`${styles.actions} flex max-w-full flex-wrap items-center gap-2`}>
               <WatchButton token={{ chain, token: l.token, name: l.name, symbol: l.symbol }} labelled />
-              {/* the token's links as one bar, the Watch button's height: share, copy the address, the explorer */}
-              <div className="inline-flex h-10 max-w-full items-stretch overflow-hidden rounded-xl border border-line bg-card text-xs font-medium text-body sm:h-9">
-                <CompareTokenLink chain={chain} token={token} /><TokenShare chain={chain} token={l.token} name={l.name} symbol={l.symbol} className={`inline-flex ${segment}`} />
+              {/* Independent controls wrap naturally on narrow screens and keep full touch targets. */}
+              <div className="flex max-w-full flex-wrap items-stretch gap-2 text-xs font-medium text-body">
+                <CompareTokenLink chain={chain} token={token} /><TokenShare chain={chain} token={l.token} name={l.name} symbol={l.symbol} className={`inline-flex ${segment} rounded-xl border border-line bg-card`} />
                 <RecordTokenVisit chain={chain} token={l.token} name={l.name} symbol={l.symbol} image={l.image_url} />
-                <CopyChip value={l.token} className={`inline-flex ${segment} border-l border-line font-code`} />
-                {/* phones keep one row of actions; the explorer link is also in About & contracts */}
-                <a href={explorerAddress(chain, l.token)} target="_blank" rel="noreferrer" className={`hidden sm:inline-flex ${segment} border-l border-line`}>{explorerName(chain)}<ArrowUpRight size={13} aria-hidden="true" /></a>
+                <CopyChip value={l.token} className={`inline-flex ${segment} rounded-xl border border-line bg-card font-code`} />
+                {/* The explorer link is also available in About & contracts on phones. */}
+                <a href={explorerAddress(chain, l.token)} target="_blank" rel="noreferrer" className={`hidden sm:inline-flex ${segment} rounded-xl border border-line bg-card`}>{explorerName(chain)}<ArrowUpRight size={13} aria-hidden="true" /></a>
               </div>
             </div>
+          </div>
+          <div className={`${styles.launchFacts} flex flex-wrap gap-x-5 gap-y-1 border-t border-line px-4 py-2.5 sm:px-6`} aria-label="Launch facts">
+            <span><Layers3 size={13} aria-hidden="true" />100% supply into the pool at launch</span>
+            <a href={locker ? explorerAddress(chain, locker) : "#contracts"} {...(locker ? { target: "_blank", rel: "noreferrer" } : {})}><LockKeyhole size={13} aria-hidden="true" />Liquidity position locked forever<ArrowUpRight size={11} aria-hidden="true" /></a>
+            <span><BadgeDollarSign size={13} aria-hidden="true" />0% platform fee</span>
           </div>
         </header>
 
@@ -247,7 +252,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
           <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1">
             <TokenChart key={`${chain}:${l.token}`} chain={chain} token={l.token} symbol={l.symbol} poolId={l.pool_id} quote={l.quote} launchedAt={l.block_time} hasTrades={l.buys + l.sells > 0} />
             {/* hairlines between the cells come from the gap over a line-coloured grid, so they hold in both layouts */}
-            <dl className={`${styles.stats} grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4`}>
+            <dl aria-label="Market statistics" className={`${styles.stats} grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4`}>
               <Stat k="Price" v={priceUsd !== null ? fmtUsd(priceUsd) : `${fmtPrice(l.price_quote)} ${quote.symbol}`} sub={`${fmtPrice(l.price_quote)} ${quote.symbol}`} />
               <Stat k="24h volume" v={l.volume_24h_usd !== null ? marketUsd(l.volume_24h_usd) : fmtQuote(l.volume_24h, quote.decimals, quote.symbol)} sub={fmtQuote(l.volume_24h, quote.decimals, quote.symbol)} />
               <Stat k="Total volume" v={l.volume_usd !== null ? marketUsd(l.volume_usd) : fmtQuote(l.volume_quote, quote.decimals, quote.symbol)} sub={fmtQuote(l.volume_quote, quote.decimals, quote.symbol)} />
@@ -258,7 +263,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
             <TokenProof facts={proof.facts} holdersReady={proof.holdersReady} links={proofLinks} freshness={freshness} bar={proof.holdersReady && holders ? { top10Bps: holders.top10Bps, poolBps: holders.poolBps } : null} />
           </div>
 
-          <aside className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <aside aria-label="Trading and token information" className={`${styles.sidebar} min-w-0 space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1`}>
             {/* a beam in the token's colour travels the trade box border; the box itself keeps the action colours */}
             <div className="relative rounded-2xl">
               <TradePanel chain={chain} token={l.token as Address} symbol={l.symbol} poolKey={poolKey} poolId={l.pool_id as `0x${string}`} feeRoute={tradeFee} recipients={l.recipients} quote={quote} ethUsd={usd} />
@@ -314,7 +319,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
 }
 
 function Stat({ k, v, sub, children }: { k: string; v: React.ReactNode; sub: string; children?: React.ReactNode }) {
-  return <div className="min-w-0 bg-card px-4 py-3.5"><dt className="text-[11px] text-muted">{k}</dt><dd className="mt-1.5 truncate font-mono text-[15px] font-bold tracking-tight text-ink tnum">{v}</dd><dd className="mt-1 truncate font-mono text-[10px] text-muted tnum" title={sub}>{sub}</dd>{children}</div>;
+  return <div className="min-w-0 bg-card px-4 py-3.5"><dt className="text-[11px] text-muted">{k}</dt><dd className="mt-1.5 overflow-x-auto whitespace-nowrap font-mono text-[15px] font-bold tracking-tight text-ink tnum">{v}</dd><dd className="mt-1 truncate font-mono text-[10px] text-muted tnum" title={sub}>{sub}</dd>{children}</div>;
 }
 /** Buys against sells as one thin bar; no trades draws an empty track, never an even split. */
 function BuySellBar({ buys, sells }: { buys: number; sells: number }) {
