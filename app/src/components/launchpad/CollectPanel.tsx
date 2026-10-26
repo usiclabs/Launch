@@ -1,4 +1,5 @@
 "use client";
+import {saveTransaction,settleTransaction} from "@/lib/launchpad/transaction-journal";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -100,8 +101,10 @@ export default function CollectPanel({
         const { request } = await pub.simulateContract({ address: LOCKER_ADDRESS, abi: LAUNCH_LOCKER_ABI, functionName: "claim", args: [currency ?? quote.address], account: address, dataSuffix: BUILDER_DATA_SUFFIX });
         hash = await wallet.writeContract(request);
       }
+      saveTransaction({hash,wallet:address,chain,kind:"collect",label:what === "collect" ? `Collect ${symbol} fees` : "Claim credited fees",token,state:"pending",createdAt:Date.now()});
       setPhase({ k: "sent", hash, what, currency });
       const receipt = await pub.waitForTransactionReceipt({ hash });
+      settleTransaction(chain,hash,receipt.status === "success" ? "confirmed" : "reverted");
       if (receipt.status !== "success") throw new Error("Transaction reverted on-chain.");
       await fetch(`/api/launch/sync?chain=${chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
       void mine.refetch();

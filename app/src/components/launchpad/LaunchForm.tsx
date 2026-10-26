@@ -1,4 +1,5 @@
 "use client";
+import LaunchTemplates from "./LaunchTemplates";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ChartCandlestick, Check, ChevronDown, CircleDollarSign, Circle, Globe, Rocket, Save } from "lucide-react";
@@ -147,14 +148,20 @@ async function firstBuy(ctx: FirstBuyCtx, tokenAddr: Address, launchHash: Hex, a
     if (erc20Allowance < amountIn) {
       setPhase({ k: "buying", hash: launchHash, step: "approve" });
       const h = await wallet.writeContract({ address: payToken, abi: ERC20_MIN_ABI, functionName: "approve", args: [V4.permit2, maxUint256], dataSuffix: BUILDER_DATA_SUFFIX, chain: CHAIN, account: address });
-      await pub.waitForTransactionReceipt({ hash: h });
+      saveTransaction({hash:h,wallet:address,chain:chainKeyOf(CHAIN.id)!,kind:"approval",label:"Approve optional first buy",token:tokenAddr,state:"pending",createdAt:nowMs()});
+      const approvalReceipt=await pub.waitForTransactionReceipt({ hash: h });
+      settleTransaction(chainKeyOf(CHAIN.id)!,h,approvalReceipt.status === "success" ? "confirmed" : "reverted");
+      if(approvalReceipt.status !== "success")throw new Error("First-buy approval reverted on-chain.");
     }
     const [pAmount, pExp] = await pub.readContract({ address: V4.permit2, abi: PERMIT2_ABI, functionName: "allowance", args: [address, payToken, V4.universalRouter] });
     const now = Math.floor(Date.now() / 1000);
     if (pAmount < amountIn || pExp <= now + 60) {
       setPhase({ k: "buying", hash: launchHash, step: "approve" });
       const h = await wallet.writeContract({ address: V4.permit2, abi: PERMIT2_ABI, functionName: "approve", args: [payToken, V4.universalRouter, maxUint160, now + PERMIT_EXPIRY_S], dataSuffix: BUILDER_DATA_SUFFIX, chain: CHAIN, account: address });
-      await pub.waitForTransactionReceipt({ hash: h });
+      saveTransaction({hash:h,wallet:address,chain:chainKeyOf(CHAIN.id)!,kind:"approval",label:"Approve optional first buy",token:tokenAddr,state:"pending",createdAt:nowMs()});
+      const approvalReceipt=await pub.waitForTransactionReceipt({ hash: h });
+      settleTransaction(chainKeyOf(CHAIN.id)!,h,approvalReceipt.status === "success" ? "confirmed" : "reverted");
+      if(approvalReceipt.status !== "success")throw new Error("First-buy approval reverted on-chain.");
     }
   }
   const { commands, inputs } = encodeV4ExactInSingle({ key, zeroForOne: true, amountIn, minOut: minOut(out, FIRST_BUY_SLIPPAGE_BPS), layout: V4.swapLayout });
@@ -586,6 +593,12 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
     <>
     <TransactionRecovery wallet={address} chain={chain} pendingOnly />
     <LaunchGuide />
+    <LaunchTemplates disabled={inFlight || Boolean(draft.pending) || !draft.ready} current={{version:1,label:name,details:draftDetails,settings:{quoteKey,mcapPick,customMcap,feePips,beneficiary,rows}}} onApply={t=>{
+      applyDraft(t.details);
+      const selected=launchpad(t.details.chain).quotes.find(q=>q.key===t.settings.quoteKey);
+      if(selected)setQuoteKey(selected.key);
+      setMcapPick(t.settings.mcapPick);setCustomMcap(t.settings.customMcap);setFeePips(t.settings.feePips);setBeneficiary(t.settings.beneficiary);setRows(t.settings.rows.length?t.settings.rows:[emptyRow()]);
+    }} />
     <div className="mb-5 rounded-2xl border border-line bg-card px-4 py-3 sm:px-5">
       {draft.pending ? <div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><p className="flex items-center gap-2 text-sm font-semibold text-ink"><Save size={15} aria-hidden="true" />Pick up where you left off.</p><p className="mt-1 break-words text-xs leading-relaxed text-muted">{draft.pending.name || "Your token"} · details and artwork saved in this browser. Review pairing, price and fees again.</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={() => { if(draft.pending) applyDraft(draft.pending); draft.restored(); }} className={btn.primarySm}>Restore draft</button><button type="button" onClick={() => { applyDraft({name:"",symbol:"",description:"",image:"",banner:"",website:"",x:"",chain:initialChain}); draft.clear(); }} className={btn.secondarySm}>Start fresh</button></div></div> : <p role="status" className="flex items-start gap-2 text-xs leading-relaxed text-muted"><Save size={14} className="mt-0.5 shrink-0" aria-hidden="true" />{draft.storageError ? "This browser is blocking saved drafts. Keep this page open until you’re done." : draft.saved ? "Details and artwork saved in this browser. Pairing, price, fees and first-buy amounts are reviewed each visit." : "Your token details and artwork save automatically on this browser as you work."}</p>}
     </div>

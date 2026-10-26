@@ -2,6 +2,7 @@
 import TransactionRecovery from "./TransactionRecovery";
 import { useTransactionJournal } from "./useTransactionJournal";
 import { readTransactions, saveTransaction, settleTransaction } from "@/lib/launchpad/transaction-journal";
+import TradeReview from "./TradeReview";
 import TradeFeeSummary from "./TradeFeeSummary";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -74,7 +75,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   const { address, isConnected, chainId } = useHydratedAccount();
   const journal = useTransactionJournal(address);
   const [journalWarning, setJournalWarning] = useState(false);
-  const unresolvedSwap = journal.rows.some(tx => tx.chain === chain && tx.kind === "swap" && tx.token?.toLowerCase() === token.toLowerCase() && tx.state === "pending");
+  const unresolvedSwap = journal.rows.some(tx => tx.chain === chain && (tx.kind === "swap" || tx.kind === "approval") && tx.token?.toLowerCase() === token.toLowerCase() && tx.state === "pending");
   const { switchChainAsync, isPending: switching } = useSwitchChain();
   const [side, setSide] = useState<Side>("buy");
   const viaEth = side === "buy" && ethRoute !== null && payWith === "eth";
@@ -99,6 +100,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   const [quoteAttempt,setQuoteAttempt]=useState(0);
   const [phase, setPhase] = useState<Phase>({ k: "idle" });
   // a trade that moves the price past IMPACT_CONFIRM takes a second tap; this holds the quote the first tap armed
+  const [reviewedKey,setReviewedKey]=useState<string|null>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const [sellAll, setSellAll] = useState<{ forBalance: string; out: bigint; impact: number | null } | null>(null);
   const seq = useRef(0);
@@ -179,7 +181,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   }, [address, tradable, tokenBalance, poolKey, poolId, config, V4.quoter, V4.stateView, CHAIN.id]);
 
   async function trade() {
-    if (!journal.ready || unresolvedSwap || readTransactions().some(tx => tx.wallet.toLowerCase() === address?.toLowerCase() && tx.chain === chain && tx.kind === "swap" && tx.token?.toLowerCase() === token.toLowerCase() && tx.state === "pending") || !tradable || !address || amountIn === null || !quote_ || quote_.forKey !== quoteKey || busy || insufficient || transactionLock.current) return;
+    if (!journal.ready || unresolvedSwap || readTransactions().some(tx => tx.wallet.toLowerCase() === address?.toLowerCase() && tx.chain === chain && (tx.kind === "swap" || tx.kind === "approval") && tx.token?.toLowerCase() === token.toLowerCase() && tx.state === "pending") || !tradable || !address || amountIn === null || !quote_ || quote_.forKey !== quoteKey || busy || insufficient || transactionLock.current) return;
     // Lock before the first await, including wallet lookup and RPC preflight.
     transactionLock.current = true;
     setPhase({ k: "preparing" });
@@ -206,7 +208,10 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
         if (erc20Allowance < amountIn) {
           setPhase({ k: "approving", step: "erc20" });
           const h = await wallet.writeContract({ address: payToken, abi: ERC20_MIN_ABI, functionName: "approve", args: [V4.permit2, maxUint256], dataSuffix: BUILDER_DATA_SUFFIX });
-          await pub.waitForTransactionReceipt({ hash: h });
+          saveTransaction({hash:h,wallet:address,chain,kind:"approval",label:`Approve ${side === "sell" ? symbol : pay.symbol}`,token,state:"pending",createdAt:Date.now()});
+          const approvalReceipt=await pub.waitForTransactionReceipt({ hash: h });
+          settleTransaction(chain,h,approvalReceipt.status === "success" ? "confirmed" : "reverted");
+          if(approvalReceipt.status !== "success") throw new Error("Token approval reverted on-chain.");
         }
         const [pAmount, pExp] = await pub.readContract({ address: V4.permit2, abi: PERMIT2_ABI, functionName: "allowance", args: [address, payToken, V4.universalRouter] });
         const now = Math.floor(Date.now() / 1000);
@@ -219,7 +224,10 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
             args: [payToken, V4.universalRouter, maxUint160, now + PERMIT_EXPIRY_S],
             dataSuffix: BUILDER_DATA_SUFFIX,
           });
-          await pub.waitForTransactionReceipt({ hash: h });
+          saveTransaction({hash:h,wallet:address,chain,kind:"approval",label:`Approve ${side === "sell" ? symbol : pay.symbol}`,token,state:"pending",createdAt:Date.now()});
+          const approvalReceipt=await pub.waitForTransactionReceipt({ hash: h });
+          settleTransaction(chain,h,approvalReceipt.status === "success" ? "confirmed" : "reverted");
+          if(approvalReceipt.status !== "success") throw new Error("Token approval reverted on-chain.");
         }
       }
 
@@ -266,10 +274,12 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
   const inUsd = amountIn !== null && side === "buy" && payUsd ? fmtUsd(units(amountIn, pay.decimals) * payUsd) : null;
   const fresh = quote_ && quote_.forKey === quoteKey ? quote_ : null;
   const impact = fresh && fresh.sqrtPriceX96 !== null && amountIn !== null ? priceImpact({ sqrtPriceX96: fresh.sqrtPriceX96, amountIn, amountOut: fresh.out, zeroForOne: side === "buy", feePips: poolKey.fee }) : null;
+  const reviewId=`${quoteKey}:${fresh?.out.toString()??""}:${slippageBps}:${address??""}`;
   const level = impact === null ? null : impactLevel(impact);
   const confirming = level === "confirm" && armed === quoteKey;
   // the second tap is outside trade() on purpose: trade() keeps its synchronous lock as the first thing it does
   function onTrade() {
+    if(reviewedKey !== reviewId){setArmed(null);setReviewedKey(reviewId);return;}
     if (level === "confirm" && armed !== quoteKey) { setArmed(quoteKey); return; }
     setArmed(null);
     void trade();
@@ -419,13 +429,14 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
           ) : confirming && impact !== null ? (
             `Tap again to ${side} at ${fmtImpact(impact)} impact`
           ) : side === "buy" ? (
-            `Buy ${symbol}`
+            reviewedKey === reviewId ? `Confirm buy ${symbol}` : `Review buy ${symbol}`
           ) : (
-            `Sell ${symbol}`
+            reviewedKey === reviewId ? `Confirm sell ${symbol}` : `Review sell ${symbol}`
           )}
         </button>
       )}
 
+      <TradeReview open={reviewedKey === reviewId && Boolean(fresh) && amountIn !== null && !busy} onClose={()=>{setReviewedKey(null);setArmed(null);}} onConfirm={onTrade} chain={chain} router={V4.universalRouter??""} wallet={address??""} approval={side === "sell" || (!isNative && !viaEth)} fields={[["Network",CHAIN_LABEL],["You pay",`${amount} ${side === "buy" ? pay.symbol : symbol}`],["Minimum received",fresh ? `${formatUnits(minOut(fresh.out,slippageBps),side === "buy" ? 18 : quote.decimals)} ${side === "buy" ? symbol : quote.symbol}` : "—"],["Trading fee",feeRoute],["Platform fee","$0"],["Slippage limit",`${slippageBps/100}%`]]} impactWarning={level === "confirm" && impact !== null ? `${confirming ? "Confirm" : "Review"} ${fmtImpact(impact)} price impact. This trade materially moves the pool price.${confirming ? " Continue only if you accept this impact." : " Continuing requires a second confirmation."}` : null}/>
       {phase.k === "error" ? (
         <p className="rounded-xl bg-down-soft border border-down/20 text-down-ink text-sm px-3 py-2" role="alert">
           {phase.message}

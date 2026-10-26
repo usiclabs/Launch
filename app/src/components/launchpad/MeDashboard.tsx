@@ -1,4 +1,5 @@
 "use client";
+import {saveTransaction,settleTransaction} from "@/lib/launchpad/transaction-journal";
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -35,6 +36,7 @@ import { BOOST_CHAIN } from "@/lib/launchpad/boost";
 import TransactionRecovery from "./TransactionRecovery";
 import DataFreshness from "./DataFreshness";
 import TokenShare from "./TokenShare";
+import CreatorInsights from "./CreatorInsights";
 import CreatorWorkspace from "./CreatorWorkspace";
 import styles from "./MeDashboard.module.css";
 
@@ -145,7 +147,9 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
       const wallet = await getWalletClient(config, { chainId: CHAINS[l.chain].id });
       const { request } = await pub.simulateContract({ address: cfg.locker, abi: LAUNCH_LOCKER_ABI, functionName: "collect", args: [BigInt(l.token_id)], account: address, dataSuffix: BUILDER_DATA_SUFFIX });
       const hash = await wallet.writeContract(request);
+      saveTransaction({hash,wallet:address,chain:l.chain,kind:"collect",label:`Collect ${l.symbol} fees`,token:l.token,state:"pending",createdAt:Date.now()});
       const receipt = await pub.waitForTransactionReceipt({ hash });
+      settleTransaction(l.chain,hash,receipt.status === "success" ? "confirmed" : "reverted");
       if (receipt.status !== "success") throw new Error("Transaction reverted on-chain.");
       await fetch(`/api/launch/sync?chain=${l.chain}&tx=${hash}`, { method: "POST" }).catch(() => {});
       toast({ kind: "collect", title: `Fees collected for ${l.symbol}`, sub: isBurnOnly(l.recipients) ? "Burned on the spot" : "Paid to the beneficiaries", chain: l.chain, token: l.token, symbol: l.symbol });
@@ -235,6 +239,7 @@ function WalletDashboard({ address, isConnected }: { address: Address | undefine
 
       <DataFreshness at={now || null} failed={Boolean(err)} label="Dashboard" />
       <CreatorWorkspace launches={me.launches} />
+      <CreatorInsights key={address} wallet={address!} launches={me.launches} trades={me.trades} />
       <Tabs defaultValue="launches" className={styles.ledger}>
         <TabsList aria-label="Your wallet activity" className={styles.tabsList}>
           <TabsTab value="launches">Launches<span className={styles.tabCount}>{me.launches.length}</span></TabsTab>

@@ -20,7 +20,7 @@ function handler(file: string, name: string, bindings: Record<string, unknown>):
   visit(ast);
   assert.ok(declaration, `Missing ${name} handler in ${file}`);
   const { outputText } = ts.transpileModule(`(${declaration})`, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } });
-  return runInNewContext(outputText, { journal: { ready: true }, unresolvedSwap: false, readTransactions: () => [], saveTransaction: () => true, settleTransaction: () => {}, ...bindings });
+  return runInNewContext(outputText, { token: "token", journal: { ready: true }, unresolvedSwap: false, readTransactions: () => [], saveTransaction: () => true, settleTransaction: () => {}, ...bindings });
 }
 
 test("trade locks synchronously during preflight and a rejection allows retry", async () => {
@@ -139,7 +139,7 @@ test("preparing a trade disables the same controls as signing and confirming", (
 test("saved unresolved swaps prevent another wallet request after reload", async () => {
   let requests = 0;
   const trade = handler("./TradePanel.tsx", "trade", {
-    journal: { ready: true }, unresolvedSwap: true,
+    token: "token", journal: { ready: true }, unresolvedSwap: true,
     getWalletClient: () => { requests++; throw new Error("must not sign"); },
   });
   await trade();
@@ -192,4 +192,23 @@ test("repriced recovery syncs the confirmed replacement hash, not the dropped or
   assert.equal(settlements[0][2], "confirmed");
   assert.equal(settlements[0][4], "replacement");
   assert.deepEqual(synced, ["/api/launch/sync?chain=base&tx=replacement"]);
+});
+
+test("trade review opens before any signing and must match the reviewed quote",()=>{
+ let reviews=0;let trades=0;
+ const review=handler("./TradePanel.tsx","onTrade",{reviewedKey:null,reviewId:"current",setReviewedKey:()=>reviews++,level:null,armed:null,quoteKey:"quote",setArmed:()=>{},trade:()=>trades++});
+ review();assert.equal(reviews,1);assert.equal(trades,0);
+ const changed=handler("./TradePanel.tsx","onTrade",{reviewedKey:"previous",reviewId:"current",setReviewedKey:()=>reviews++,level:null,armed:null,quoteKey:"quote",setArmed:()=>{},trade:()=>trades++});
+ changed();assert.equal(trades,0);
+ const confirmed=handler("./TradePanel.tsx","onTrade",{reviewedKey:"current",reviewId:"current",setReviewedKey:()=>{},level:null,armed:null,quoteKey:"quote",setArmed:()=>{},trade:()=>trades++});
+ confirmed();assert.equal(trades,1);
+});
+
+test("a reverted token approval is journaled and cannot reach a swap request",async()=>{
+ const sent:string[]=[];const settlements:unknown[][]=[];
+ const trade=handler("./TradePanel.tsx","trade",{
+  tradable:true,address:"wallet",amountIn:1n,quote_:{out:2n,forKey:"quote"},quoteKey:"quote",busy:false,insufficient:false,transactionLock:{current:false},onChain:true,CHAIN:{id:8453},config:{},slippageBps:100,minOut:()=>1n,viaEth:false,ethRoute:null,side:"buy",isNative:false,quote:{address:"quote-token"},V4:{permit2:"permit2"},pay:{symbol:"USDG"},symbol:"TEST",chain:"base",maxUint256:2n,ERC20_MIN_ABI:[],BUILDER_DATA_SUFFIX:"0x",setPhase:()=>{},friendlyError:(e:Error)=>e.message,
+  getPublicClient:()=>({readContract:async()=>0n,waitForTransactionReceipt:async()=>({status:"reverted"})}),getWalletClient:async()=>({writeContract:async(r:{functionName:string})=>{sent.push(r.functionName);return "approval-hash";}}),settleTransaction:(...args:unknown[])=>settlements.push(args),
+ });
+ await trade();assert.deepEqual(sent,["approve"]);assert.equal(settlements[0][2],"reverted");
 });

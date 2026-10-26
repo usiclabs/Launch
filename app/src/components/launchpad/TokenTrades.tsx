@@ -1,3 +1,6 @@
+"use client";
+import { useState } from "react";
+import { filterTrades } from "@/lib/launchpad/workspace-tools";
 import DataFreshness from "./DataFreshness";
 import { ArrowDownLeft, ArrowUpRight, Activity } from "lucide-react";
 import type { SwapRow } from "@/lib/launchpad/queries";
@@ -9,9 +12,15 @@ import { WhoName } from "@/components/profile/Who";
 
 /** Recent swaps straight from the pool: a side pill, the wallet, both amounts, the price and a link to each transaction. */
 export default function TokenTrades({ chain, symbol, quote, swaps, now }: { chain: ChainKey; symbol: string; quote: Quote; swaps: SwapRow[]; now: number }) {
+  const [side,setSide]=useState("all"); const [wallet,setWallet]=useState("");const [minimum,setMinimum]=useState("");
+  const visible=filterTrades(swaps,side,wallet,minimum,quote.decimals);
+  const input="mt-1 min-h-11 w-full rounded-xl border border-line bg-paper px-3 text-xs text-ink";
   return <section aria-label="Indexed trades">
+    <div className="grid gap-3 px-5 pt-4 sm:grid-cols-3"><label className="text-xs text-muted">Side<select value={side} onChange={e=>setSide(e.target.value)} className={input}><option value="all">All trades</option><option value="buy">Buys</option><option value="sell">Sells</option></select></label><label className="text-xs text-muted">Wallet<input value={wallet} onChange={e=>setWallet(e.target.value)} placeholder="Address or fragment" maxLength={42} className={input}/></label><label className="text-xs text-muted">Minimum size · {quote.symbol}<input value={minimum} onChange={e=>setMinimum(e.target.value)} type="number" min="0" step="any" className={input} placeholder="0"/></label></div>
+    <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-2"><p role="status" className="text-xs text-muted">{visible.length} of {swaps.length} loaded swaps · filters apply to this recent window</p><button type="button" className="min-h-11 text-xs text-brand" onClick={()=>{setSide("all");setWallet("");setMinimum("");}}>Reset filters</button></div>
     <div className="px-5 pt-2"><DataFreshness at={now} label="Trade history" /></div>
     <div className="flex min-h-11 items-center justify-between gap-3 px-5 text-[11px] text-muted"><span>Direct from the pool</span><span className="font-mono tnum">{swaps.length} recent swaps</span></div>
+    {swaps.length > 0 && !visible.length ? <p className="px-5 py-8 text-center text-sm text-muted">No trades match these filters.</p> : null}
     {swaps.length === 0 ? <div className="flex min-h-48 flex-col items-center justify-center gap-2 border-t border-line px-5 text-center"><Activity size={22} strokeWidth={1.4} className="mb-1 text-muted" /><h3 className="text-sm font-medium text-ink">The tape is quiet.</h3><p className="max-w-xs text-xs leading-relaxed text-muted text-pretty">No swaps have been indexed for this token yet. Confirmed trades appear here with an explorer link.</p></div> :
       <div className="relative max-h-[480px] overflow-auto bb-scroll" tabIndex={0} aria-label="Trade history">
         <table className="w-full text-xs">
@@ -25,7 +34,7 @@ export default function TokenTrades({ chain, symbol, quote, swaps, now }: { chai
               <th className="py-2.5 pl-3 pr-5 text-right font-medium">Time</th>
             </tr>
           </thead>
-          <tbody>{swaps.map((s) => { const q = BigInt(s.amount0); const t = BigInt(s.amount1); const Icon = s.is_buy ? ArrowDownLeft : ArrowUpRight; const wallet = s.trader ? <WhoName address={s.trader} className="text-[12px]" explorer={explorerAddress(chain, s.trader)} fallback={<a href={explorerAddress(chain, s.trader)} target="_blank" rel="noreferrer" className="font-code text-[11px] text-muted transition-colors hover:text-ink motion-reduce:transition-none" title={s.trader}>{shortAddr(s.trader)}</a>} /> : null; return <tr key={`${s.tx_hash}:${s.log_index}`} className="border-b border-line last:border-0 transition-colors hover:bg-ink/[0.03] motion-reduce:transition-none">
+          <tbody>{visible.map((s) => { const q = BigInt(s.amount0); const t = BigInt(s.amount1); const Icon = s.is_buy ? ArrowDownLeft : ArrowUpRight; const wallet = s.trader ? <WhoName address={s.trader} className="text-[12px]" explorer={explorerAddress(chain, s.trader)} fallback={<a href={explorerAddress(chain, s.trader)} target="_blank" rel="noreferrer" className="font-code text-[11px] text-muted transition-colors hover:text-ink motion-reduce:transition-none" title={s.trader}>{shortAddr(s.trader)}</a>} /> : null; return <tr key={`${s.tx_hash}:${s.log_index}`} className="border-b border-line last:border-0 transition-colors hover:bg-ink/[0.03] motion-reduce:transition-none">
             <td className="py-2.5 pl-5 pr-3">
               <span className={`inline-flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-semibold ${s.is_buy ? "bg-up-soft text-up" : "bg-down-soft text-down-ink"}`}><Icon size={12} aria-hidden="true" />{s.is_buy ? "Buy" : "Sell"}</span>
               {/* phones have no wallet column: the wallet sits under the side */}

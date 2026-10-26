@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import "./globals.css";
 import Web3Provider from "@/components/Web3Provider";
 import Header from "@/components/Header";
+import {PriceAlertRunner} from "@/components/launchpad/PriceAlerts";
 import TxToasts from "@/components/launchpad/TxToasts";
 import LiveProvider from "@/components/launchpad/LiveProvider";
 import { getLaunchFeed, getLaunchTotalsForRequest } from "@/lib/launchpad/queries";
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </Suspense>
           <Header />
           <TxToasts />
+          <PriceAlertRunner />
           <div className="flex-1 min-w-0">{children}</div>
           <Footer />
           <OnboardingTour />

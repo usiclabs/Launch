@@ -26,7 +26,7 @@ function render(enabled: boolean, block = false, saved = true) {
     React: { createElement: (type: string, props: Element["props"], ...children: unknown[]) => ({ type, props: props ?? {}, children }), Fragment: "Fragment" },
     Popover: Object.fromEntries(["Root", "Trigger", "Portal", "Backdrop", "Positioner", "Popup", "Title", "Description", "Close"].map((key) => [key, key])),
     styles: new Proxy({}, { get: (_target, key) => key }),
-    Bell: "Bell", Check: "Check", ShieldCheck: "ShieldCheck", X: "X",
+    Link: "a", Bell: "Bell", Check: "Check", ShieldCheck: "ShieldCheck", X: "X",
     useActivityNotifications: () => enabled,
     setActivityNotifications: (value: boolean) => { chosen = value; },
     activityPreferenceSaved: () => saved,

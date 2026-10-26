@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useId, useRef, useState } from "react";
 import { Popover } from "@base-ui/react/popover";
@@ -63,6 +64,7 @@ export default function NotificationSettings({ block = false }: { block?: boolea
               <ShieldCheck size={18} strokeWidth={1.7} aria-hidden />
               <div><div className={styles.personalHeading}><span className={styles.label}>Your transactions</span><span className={styles.always}>Always on</span></div><p className={styles.help}>Confirmations and important notices still appear.</p></div>
             </div>
+            <Link href="/alerts" className="inline-flex min-h-11 items-center text-xs text-brand underline">Manage watchlist price alerts ↗</Link>
             <p className={styles.footer}>{activityPreferenceSaved() ? "Saved in this browser." : "This browser is blocking saved settings, so this choice lasts until you leave the page."} The activity feed stays live.</p>
           </Popover.Popup>
         </Popover.Positioner>
