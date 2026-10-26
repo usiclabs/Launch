@@ -1,6 +1,7 @@
 "use client";
 import TransactionHelp from "./TransactionHelp";
 import LaunchTemplates from "./LaunchTemplates";
+import {DraftProjects} from "./WorkspaceUpgrades";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ChartCandlestick, Check, ChevronDown, CircleDollarSign, Circle, Globe, Rocket, Save } from "lucide-react";
@@ -594,6 +595,12 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
     <>
     <TransactionRecovery wallet={address} chain={chain} pendingOnly />
     <LaunchGuide />
+    <DraftProjects disabled={logoBusy || bannerBusy || inFlight || Boolean(draft.pending) || !draft.ready} current={{version:1,label:name,details:draftDetails,settings:{quoteKey,mcapPick,customMcap,feePips,beneficiary,rows}}} onApply={t=>{
+      applyDraft(t.details);
+      const selected=launchpad(t.details.chain).quotes.find(q=>q.key===t.settings.quoteKey);
+      if(selected)setQuoteKey(selected.key);
+      setMcapPick(t.settings.mcapPick);setCustomMcap(t.settings.customMcap);setFeePips(t.settings.feePips);setBeneficiary(t.settings.beneficiary);setRows(t.settings.rows.length?t.settings.rows:[emptyRow()]);
+    }} />
     <LaunchTemplates disabled={inFlight || Boolean(draft.pending) || !draft.ready} current={{version:1,label:name,details:draftDetails,settings:{quoteKey,mcapPick,customMcap,feePips,beneficiary,rows}}} onApply={t=>{
       applyDraft(t.details);
       const selected=launchpad(t.details.chain).quotes.find(q=>q.key===t.settings.quoteKey);

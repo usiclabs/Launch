@@ -1,3 +1,4 @@
+import {ReleaseHighlights} from "@/components/launchpad/WorkspaceUpgrades";
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
@@ -58,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           <TxToasts />
           <PriceAlertRunner />
-          <div className="flex-1 min-w-0">{children}</div>
+          <div className="flex-1 min-w-0"><ReleaseHighlights />{children}</div>
           <Footer />
           <OnboardingTour />
           </LiveProvider>

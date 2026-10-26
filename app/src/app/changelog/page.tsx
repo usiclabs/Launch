@@ -11,6 +11,7 @@ export const metadata = pageMetadata({
 });
 
 const releases = [
+  {id: "workspace-portability",date:"2026-10-26",label:"October 26, 2026",category:"Workspace upgrades",title:"More room for your next idea.",summary:"Keep separate launches in progress and carry your saved workspace between devices.",updates:[["Named draft projects","Save up to 10 unfinished launches with token details and settings. Review before replacing your current form and undo project removals. First-buy amounts are cleared and custom pairs need reselecting."],["Workspace backup and restore","Export watchlists, templates, named projects, alerts, discovery views and preferences in one validated file. Review before replacing browser data. Wallet credentials, transaction history and the automatic recovery draft are excluded."],["Release highlights","A dismissible homepage panel links to the changelog. Dismissal is remembered for this release in your browser."]],links:[{href:"/launch",label:"Open draft projects"},{href:"/preferences#workspace-backup",label:"Back up your workspace"}]},
   {
     id: "workspace-and-verification",
     date: "2026-10-26",
@@ -131,7 +132,7 @@ export default function ChangelogPage() {
           <span className={styles.latest}>
             Latest update <time dateTime="2026-10-26">October 26, 2026</time>
           </span>
-          <a href="#workspace-and-verification" className={styles.link}>
+          <a href="#workspace-portability" className={styles.link}>
             Read what’s new <ArrowRight size={15} aria-hidden="true" />
           </a>
         </div>
