@@ -1,6 +1,6 @@
 import { isChainKey, type ChainKey } from "../chainKeys.ts";
 export const JOURNAL_KEY = "launch:transactions:v1";
-export type SavedTransaction = { hash: `0x${string}`; wallet: string; chain: ChainKey; kind: "launch" | "swap" | "collect"; label: string; token?: string; state: "pending" | "confirmed" | "reverted"; createdAt: number };
+export type SavedTransaction = { hash: `0x${string}`; wallet: string; chain: ChainKey; kind: "launch" | "swap" | "collect"; label: string; token?: string; replacementHash?: `0x${string}`; state: "pending" | "confirmed" | "reverted" | "replaced"; createdAt: number };
 const address = /^0x[0-9a-f]{40}$/i;
 export function parseJournal(raw: string | null): SavedTransaction[] {
   try {
@@ -8,7 +8,7 @@ export function parseJournal(raw: string | null): SavedTransaction[] {
     if (!Array.isArray(data)) return [];
     const seen = new Set<string>();
     return data.filter((v): v is SavedTransaction => {
-      if (!v || typeof v !== "object" || !/^0x[0-9a-f]{64}$/i.test(v.hash) || !address.test(v.wallet) || !isChainKey(v.chain) || !["launch", "swap", "collect"].includes(v.kind) || !["pending", "confirmed", "reverted"].includes(v.state) || typeof v.label !== "string" || v.label.length > 100 || !Number.isFinite(v.createdAt) || (v.token !== undefined && !address.test(v.token))) return false;
+      if (!v || typeof v !== "object" || !/^0x[0-9a-f]{64}$/i.test(v.hash) || !address.test(v.wallet) || !isChainKey(v.chain) || !["launch", "swap", "collect"].includes(v.kind) || !["pending", "confirmed", "reverted", "replaced"].includes(v.state) || typeof v.label !== "string" || v.label.length > 100 || !Number.isFinite(v.createdAt) || (v.token !== undefined && !address.test(v.token)) || (v.replacementHash !== undefined && !/^0x[0-9a-f]{64}$/i.test(v.replacementHash))) return false;
       const key = `${v.chain}:${v.hash.toLowerCase()}`;
       if (seen.has(key)) return false;
       seen.add(key); return true;
@@ -35,7 +35,7 @@ export function saveTransaction(tx: SavedTransaction): boolean {
   window.dispatchEvent(new Event(JOURNAL_KEY));
   return persisted;
 }
-export function settleTransaction(chain: ChainKey, hash: string, state: "confirmed" | "reverted", token?: string): void {
+export function settleTransaction(chain: ChainKey, hash: string, state: "confirmed" | "reverted" | "replaced", token?: string, replacementHash?: `0x${string}`): void {
   const tx = readTransactions().find(r => r.chain === chain && r.hash.toLowerCase() === hash.toLowerCase());
-  if (tx) saveTransaction({ ...tx, state, ...(token ? { token } : {}) });
+  if (tx) saveTransaction({ ...tx, state, ...(token ? { token } : {}), ...(replacementHash ? { replacementHash } : {}) });
 }

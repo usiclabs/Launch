@@ -152,11 +152,25 @@ test("recovery checks the original receipt and never requests a wallet", async (
   const check = handler("./TransactionRecovery.tsx", "check", {
     lock: { current: false }, setBusy: () => {}, setMessage: () => {}, config: {},
     CHAINS: { base: { id: 8453 } },
-    getPublicClient: () => ({ getTransactionReceipt: async ({ hash }: { hash: string }) => { reads.push(hash); return { status: "success" }; } }),
+    getPublicClient: () => ({ waitForTransactionReceipt: async ({ hash }: { hash: string }) => { reads.push(hash); return { status: "success" }; } }),
     settleTransaction: (...args: unknown[]) => settlements.push(args),
     fetch: async () => ({}), AbortSignal,
   });
   await check({ kind: "swap", chain: "base", hash: "original-hash" });
   assert.deepEqual(reads, ["original-hash"]);
   assert.equal(settlements[0][2], "confirmed");
+});
+
+
+test("a cancelled recovery cannot be reported as a successful swap", async () => {
+  const settlements: unknown[][] = [];
+  const check = handler("./TransactionRecovery.tsx", "check", {
+    lock: { current: false }, setBusy: () => {}, setMessage: () => {}, config: {},
+    CHAINS: { base: { id: 8453 } },
+    getPublicClient: () => ({ waitForTransactionReceipt: async ({ onReplaced }: { onReplaced: (value: unknown) => void }) => { onReplaced({ reason: "cancelled" }); return { status: "success", transactionHash: "replacement" }; } }),
+    settleTransaction: (...args: unknown[]) => settlements.push(args),
+  });
+  await check({ kind: "swap", chain: "base", hash: "original" });
+  assert.equal(settlements[0][2], "replaced");
+  assert.equal(settlements[0][4], "replacement");
 });
