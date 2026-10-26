@@ -1,4 +1,5 @@
 "use client";
+import {SavedViews} from "./SuiteTools";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -271,6 +272,7 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
 
   return (
     <section ref={section} id="launches" aria-labelledby="launches-heading" className={`min-w-0 scroll-mt-24 ${bare ? "" : `overflow-hidden ${frame}`}`}>
+      <SavedViews selection={selection} view={view} />
       <div className={`space-y-4 ${pad} ${bare ? "pt-2" : "pt-5"}`}>
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
           <div>

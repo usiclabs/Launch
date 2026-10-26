@@ -15,6 +15,8 @@ const EXPLORE = [
   { href: "/status", label: "Platform status" },
   { href: "/compare", label: "Compare tokens" },
   { href: "/alerts", label: "Watchlist alerts" },
+  { href: "/help", label: "Help center" },
+  { href: "/preferences", label: "Display preferences" },
   { href: "/feed", label: "Community posts" },
   { href: "/me", label: "Your dashboard" },
 ];

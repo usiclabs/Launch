@@ -1,3 +1,4 @@
+import {VerificationDrawer} from "@/components/launchpad/SuiteTools";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -230,6 +231,7 @@ export default async function TokenPage({ params, searchParams }: { params: Prom
               </p>
             </div>
             <div className={`${styles.actions} flex max-w-full flex-wrap items-center gap-2`}>
+              <VerificationDrawer chain={chain} token={l.token} quote={l.quote} factory={factory} locker={locker} />
               <WatchButton token={{ chain, token: l.token, name: l.name, symbol: l.symbol }} labelled />
               {/* Independent controls wrap naturally on narrow screens and keep full touch targets. */}
               <div className="flex max-w-full flex-wrap items-stretch gap-2 text-xs font-medium text-body">

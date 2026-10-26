@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useAccount, useConfig } from "wagmi";
 import { getWalletClient } from "wagmi/actions";
@@ -50,7 +51,7 @@ export default function EditTokenSheet({ chain, token, symbol, initial, onClose,
   const busy = phase !== "idle" && phase !== "done";
   return (
     <Sheet title={`Edit ${symbol}`} onClose={onClose}>
-      <div className="space-y-4">
+      <fieldset disabled={busy} className="min-w-0 space-y-4 disabled:opacity-70">
         <p className="text-xs text-muted">Only off-chain details. Name, symbol, fee and beneficiaries live on-chain and cannot change. Saving asks your wallet for a free signature, no transaction.</p>
         <div>
           <label className={label} htmlFor="e-desc">Description</label>
@@ -75,12 +76,13 @@ export default function EditTokenSheet({ chain, token, symbol, initial, onClose,
             <input id="e-x" className={input} value={f.x_handle} onChange={(e) => setF({ ...f, x_handle: e.target.value })} onBlur={() => { if (v.ok && v.value.x_handle) setF((p) => ({ ...p, x_handle: `@${v.value.x_handle}` })); }} placeholder="@handle or x.com link" autoCapitalize="none" spellCheck={false} />
           </div>
         </div>
+        <details className="rounded-2xl border border-line bg-card p-4"><summary className="min-h-11 cursor-pointer text-sm font-semibold text-ink">Preview your metadata changes</summary><p className="mt-2 text-xs text-muted">Preview only. Changes publish after your signature is verified and the save succeeds.</p>{v.ok ? <div className="mt-4 overflow-hidden rounded-xl border border-line">{v.value.banner_url&&<Image unoptimized src={v.value.banner_url} alt="Proposed banner" width={600} height={200} className="aspect-[3/1] w-full object-cover"/>}<div className="space-y-3 p-4">{v.value.image_url&&<Image unoptimized src={v.value.image_url} alt="Proposed token logo" width={64} height={64} className="size-16 rounded-xl object-cover"/>}<p className="break-words text-lg font-semibold text-ink">{symbol}</p><p className="whitespace-pre-wrap break-words text-sm text-body">{v.value.description || "No description"}</p><p className="break-all text-xs text-muted">Website: {v.value.website || "None"}</p><p className="break-all text-xs text-muted">X: {v.value.x_handle ? `@${v.value.x_handle}` : "None"}</p></div></div>:<p className="mt-3 text-xs text-warm-ink">Resolve the validation message below to preview valid metadata.</p>}</details>
         {!v.ok ? <p className="text-xs text-warm-ink">{v.error}</p> : null}
         {err ? <p className="rounded-xl bg-down-soft border border-down/20 text-down-ink text-sm px-3 py-2">{err}</p> : null}
         <button type="button" onClick={() => void save()} disabled={busy || !v.ok || !address} className={`${btn.primary} w-full`}>
           {phase === "nonce" ? "Preparing…" : phase === "sign" ? "Sign in your wallet…" : phase === "save" ? "Saving…" : phase === "done" ? "Saved" : "Sign & save"}
         </button>
-      </div>
+      </fieldset>
     </Sheet>
   );
 }

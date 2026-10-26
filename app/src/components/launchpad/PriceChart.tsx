@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHydratedAccount } from "@/lib/useHydratedAccount";
-import { INTERVALS, bucketStart, defaultInterval, type Interval } from "@/lib/launchpad/candles";
+import { isInterval, INTERVALS, bucketStart, defaultInterval, type Interval } from "@/lib/launchpad/candles";
 import { chartRangeSelection, type ChartRange } from "@/lib/launchpad/chart-terminal";
 import { mergeChartPayload, type ChartPayload } from "@/lib/launchpad/chart-payload";
 import type { ChainKey } from "@/lib/chainPublic";
@@ -15,6 +15,7 @@ import TradingChart from "./TradingChart";
 export default function PriceChart({ chain, token, symbol, launchedAt }: { chain: ChainKey; token: string; symbol: string; launchedAt: string }) {
   const launchT = Math.floor(new Date(launchedAt).getTime() / 1000);
   const [interval, setInterval] = useState<Interval>(() => defaultInterval(nowMs() / 1000 - launchT));
+  useEffect(()=>{const timer=setTimeout(()=>{try{const d=JSON.parse(localStorage.getItem("launch:display:v1")??"{}");if(isInterval(d.interval))setInterval(d.interval);}catch{/* Defaults remain usable when storage is blocked. */}},0);return()=>clearTimeout(timer);},[]);
   const [range, setRange] = useState<ChartRange>("auto");
   const [result, setResult] = useState<{ key: string; data: ChartPayload; loadedAt: number } | null>(null);
   const [loading, setLoading] = useState(true);
