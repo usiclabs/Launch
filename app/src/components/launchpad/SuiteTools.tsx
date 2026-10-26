@@ -60,7 +60,7 @@ export function VerificationDrawer({
                         href={explorerAddress(chain, address)}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex min-h-11 items-center underline"
+                        className="inline-flex min-h-11 max-w-full items-center underline [overflow-wrap:anywhere]"
                       >
                         {address} ↗
                       </a>
@@ -94,6 +94,9 @@ export function SavedViews({
 }) {
   const [rows, setRows] = useState<{ name: string; url: string }[]>([]);
   const [name, setName] = useState("");
+  const [removed, setRemoved] = useState<{ name: string; url: string } | null>(
+    null,
+  );
   const [note, setNote] = useState("");
   useEffect(() => {
     const t = setTimeout(() => {
@@ -104,6 +107,8 @@ export function SavedViews({
             d
               .filter(
                 (x) =>
+                  x != null &&
+                  typeof x === "object" &&
                   typeof x.name === "string" &&
                   x.name.length <= 50 &&
                   typeof x.url === "string" &&
@@ -131,8 +136,12 @@ export function SavedViews({
     try {
       localStorage.setItem("launch:views:v1", JSON.stringify(next));
       setNote("Saved on this device.");
+      return true;
     } catch {
-      setNote("Storage is blocked. Copy the view link to keep it.");
+      setNote(
+        "Storage is blocked. Changes apply only for this visit. Copy the view link to keep it.",
+      );
+      return false;
     }
   }
   return (
@@ -147,7 +156,21 @@ export function SavedViews({
         market/watchlist view. Search text is not saved. Watchlist contents
         remain private to your device.
       </p>
-      <div className="flex flex-wrap gap-2">
+      <form
+        className="flex flex-wrap gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const label = name.trim() || "My discovery view";
+          save(
+            [
+              { name: label, url },
+              ...rows.filter((r) => r.name !== label),
+            ].slice(0, 10),
+          );
+          setName("");
+          setRemoved(null);
+        }}
+      >
         <input
           aria-label="Discovery view name"
           maxLength={50}
@@ -156,19 +179,7 @@ export function SavedViews({
           placeholder="Name this view"
           className={`${input} min-w-0 flex-1`}
         />
-        <button
-          type="button"
-          className={button}
-          onClick={() => {
-            const label = name.trim() || "My discovery view";
-            save(
-              [
-                { name: label, url },
-                ...rows.filter((r) => r.name !== label),
-              ].slice(0, 10),
-            );
-          }}
-        >
+        <button type="submit" className={button}>
           Save view
         </button>
         <button
@@ -189,7 +200,7 @@ export function SavedViews({
         >
           Copy view link
         </button>
-      </div>
+      </form>
       {!rows.length && (
         <p className="mt-3 text-xs text-muted">
           No saved views yet. Save this setup to return to it later.
@@ -201,21 +212,50 @@ export function SavedViews({
             key={r.name}
             className="flex flex-wrap justify-between gap-2 py-2"
           >
-            <a href={r.url} className={`${button} break-words`}>
+            <a
+              href={r.url}
+              className={`${button} max-w-full min-w-0 break-all text-left`}
+            >
               {r.name} ↗
             </a>
             <button
               type="button"
               aria-label={`Remove view ${r.name}`}
               className={button}
-              onClick={() => save(rows.filter((x) => x.name !== r.name))}
+              onClick={() => {
+                setRemoved(r);
+                if (save(rows.filter((x) => x.name !== r.name))) {
+                  setNote(`Removed “${r.name}”.`);
+                }
+              }}
             >
               Remove
             </button>
           </li>
         ))}
       </ul>
-      <p role="status" className="mt-2 break-words text-xs text-muted">
+      {removed && (
+        <button
+          type="button"
+          className={`${button} mt-2`}
+          onClick={() => {
+            const persisted = save(
+              [removed, ...rows.filter((r) => r.name !== removed.name)].slice(
+                0,
+                10,
+              ),
+            );
+            setRemoved(null);
+            if (persisted) setNote("View restored.");
+          }}
+        >
+          Undo removal
+        </button>
+      )}
+      <p
+        role="status"
+        className={`${styles.status} mt-2 break-all text-xs text-muted`}
+      >
         {note}
       </p>
     </details>
@@ -229,6 +269,7 @@ export function Preferences() {
     const t = setTimeout(() => {
       try {
         const d = JSON.parse(localStorage.getItem("launch:display:v1") ?? "{}");
+        if (!d || typeof d !== "object") return;
         if (["base", "robinhood"].includes(d.chain)) setChain(d.chain);
         if (["auto", "1m", "5m", "15m", "1h", "4h", "1d"].includes(d.interval))
           setInterval(d.interval);
@@ -257,6 +298,8 @@ export function Preferences() {
         <label className="text-xs text-muted">
           Preferred launch network
           <select
+            aria-label="Preferred launch network"
+            aria-describedby="preferred-network-hint"
             value={chain}
             onChange={(e) => setChain(e.target.value)}
             className={`${input} mt-1 block w-full`}
@@ -264,20 +307,41 @@ export function Preferences() {
             <option value="base">Base</option>
             <option value="robinhood">Robinhood Chain</option>
           </select>
+          <span
+            id="preferred-network-hint"
+            className="mt-2 block leading-relaxed"
+          >
+            Preselects the network on a new launch form.
+          </span>
         </label>
         <label className="text-xs text-muted">
           Default chart interval
           <select
+            aria-label="Default chart interval"
+            aria-describedby="chart-interval-hint"
             value={interval}
             onChange={(e) => setInterval(e.target.value)}
             className={`${input} mt-1 block w-full`}
           >
             {["auto", "1m", "5m", "15m", "1h", "4h", "1d"].map((i) => (
               <option key={i} value={i}>
-                {i === "auto" ? "Automatic by token age" : i}
+                {
+                  {
+                    auto: "Automatic by token age",
+                    "1m": "1 minute",
+                    "5m": "5 minutes",
+                    "15m": "15 minutes",
+                    "1h": "1 hour",
+                    "4h": "4 hours",
+                    "1d": "1 day",
+                  }[i]
+                }
               </option>
             ))}
           </select>
+          <span id="chart-interval-hint" className="mt-2 block leading-relaxed">
+            Sets the starting view when you open a token chart.
+          </span>
         </label>
       </div>
       <div className="mt-6 flex flex-wrap gap-3">

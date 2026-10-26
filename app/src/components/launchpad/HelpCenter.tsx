@@ -1,6 +1,6 @@
 "use client";
 import styles from "./WorkspacePolish.module.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 const topics = [
   [
@@ -46,6 +46,11 @@ const topics = [
 ];
 export default function HelpCenter() {
   const [query, setQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+  function clearSearch() {
+    setQuery("");
+    searchRef.current?.focus();
+  }
   const hits = topics.filter((t) =>
     t.join(" ").toLowerCase().includes(query.trim().toLowerCase()),
   );
@@ -65,13 +70,36 @@ export default function HelpCenter() {
       <label className="mt-6 block text-xs text-muted">
         Search help
         <input
+          ref={searchRef}
           type="search"
+          aria-controls="help-results"
+          autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Try approvals, fees or pending"
           className="mt-2 min-h-12 w-full rounded-xl border border-line bg-card px-4 text-sm text-ink"
         />
       </label>
+      {!query && (
+        <div
+          className="mt-3 flex flex-wrap gap-2"
+          aria-label="Popular help searches"
+        >
+          {["Launching", "Fees", "Approvals", "Pending"].map((term) => (
+            <button
+              key={term}
+              type="button"
+              className={styles.searchChip}
+              onClick={() => {
+                setQuery(term);
+                searchRef.current?.focus();
+              }}
+            >
+              {term}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="my-3 flex flex-wrap items-center justify-between gap-2">
         <p role="status" className="text-xs text-muted">
           {hits.length} {hits.length === 1 ? "topic" : "topics"}
@@ -79,14 +107,14 @@ export default function HelpCenter() {
         {query && (
           <button
             type="button"
-            onClick={() => setQuery("")}
+            onClick={clearSearch}
             className="min-h-11 text-xs font-medium text-brand"
           >
             Clear search
           </button>
         )}
       </div>
-      <div className="space-y-3">
+      <div id="help-results" className="space-y-3">
         {hits.map(([title, body]) => (
           <details
             key={title}
@@ -100,9 +128,21 @@ export default function HelpCenter() {
         ))}
       </div>
       {!hits.length && (
-        <p className="py-8 text-sm text-muted">
-          No matching topic. Try a shorter search.
-        </p>
+        <div className="rounded-2xl border border-dashed border-line px-5 py-8 text-center">
+          <p className="text-sm font-medium text-ink">
+            No matching topics yet.
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            Try a shorter phrase, or browse all ten topics.
+          </p>
+          <button
+            type="button"
+            onClick={clearSearch}
+            className={styles.searchChip}
+          >
+            Browse all topics
+          </button>
+        </div>
       )}
       <div className="mt-6 flex flex-wrap gap-4 text-sm text-body">
         <Link
