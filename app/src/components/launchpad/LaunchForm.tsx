@@ -1,4 +1,5 @@
 "use client";
+import TransactionHelp from "./TransactionHelp";
 import LaunchTemplates from "./LaunchTemplates";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -1275,9 +1276,7 @@ function PhaseNote({ phase, chain }: { phase: Phase; chain: ChainKey }) {
   if (phase.k === "pending") return <div role="status" className="rounded-xl border border-warm/30 bg-warm-soft px-3 py-3 text-xs leading-relaxed text-warm-ink"><p>{phase.message}</p><a href={explorerTx(chain,phase.hash)} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-11 items-center font-medium underline underline-offset-2">View submitted transaction</a></div>;
   if (phase.k === "error")
     return (
-      <p className="rounded-xl bg-down-soft border border-down/20 text-down-ink text-sm px-3 py-2" role="alert">
-        {phase.message}
-      </p>
+      <TransactionHelp message={phase.message} />
     );
   if (phase.k === "sent" || phase.k === "buying" || phase.k === "indexing" || phase.k === "done")
     return (

@@ -1,4 +1,5 @@
 "use client";
+import TransactionHelp from "./TransactionHelp";
 import TransactionRecovery from "./TransactionRecovery";
 import { useTransactionJournal } from "./useTransactionJournal";
 import { readTransactions, saveTransaction, settleTransaction } from "@/lib/launchpad/transaction-journal";
@@ -438,9 +439,7 @@ export default function TradePanel({ chain, token, symbol, poolKey, poolId, feeR
 
       <TradeReview open={reviewedKey === reviewId && Boolean(fresh) && amountIn !== null && !busy} onClose={()=>{setReviewedKey(null);setArmed(null);}} onConfirm={onTrade} chain={chain} router={V4.universalRouter??""} wallet={address??""} approval={side === "sell" || (!isNative && !viaEth)} fields={[["Network",CHAIN_LABEL],["You pay",`${amount} ${side === "buy" ? pay.symbol : symbol}`],["Minimum received",fresh ? `${formatUnits(minOut(fresh.out,slippageBps),side === "buy" ? 18 : quote.decimals)} ${side === "buy" ? symbol : quote.symbol}` : "—"],["Trading fee",feeRoute],["Platform fee","$0"],["Slippage limit",`${slippageBps/100}%`]]} impactWarning={level === "confirm" && impact !== null ? `${confirming ? "Confirm" : "Review"} ${fmtImpact(impact)} price impact. This trade materially moves the pool price.${confirming ? " Continue only if you accept this impact." : " Continuing requires a second confirmation."}` : null}/>
       {phase.k === "error" ? (
-        <p className="rounded-xl bg-down-soft border border-down/20 text-down-ink text-sm px-3 py-2" role="alert">
-          {phase.message}
-        </p>
+        <TransactionHelp message={phase.message} />
       ) : null}
       {phase.k === "done" ? (
         <p className="text-xs text-up">

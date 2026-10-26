@@ -1,0 +1,5 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {creatorKit,recoveryAdvice} from "./creator-kit.ts";
+test("launch kit identifies network and address without inventing financial figures",()=>{const token="0x"+"a".repeat(40);const kit=creatorKit("base",token,"Example","EX","https://example.com/token");assert.equal(kit?.facts.contract,token);assert.equal(kit?.facts.network,"Base");assert.match(kit!.announcement,/Example \(\$EX\)/);assert.ok(!("price" in kit!.facts));assert.equal(creatorKit("wrong",token,"x","x","x"),null);assert.equal(creatorKit("base","bad","x","x","x"),null);});
+test("timeout guidance never equates an unavailable receipt with failure",()=>{assert.match(recoveryAdvice("RPC timeout").steps.join(" "),/does not mean the transaction failed/);assert.match(recoveryAdvice("You cancelled in your wallet.").steps.join(" "),/does not revoke approvals/);assert.match(recoveryAdvice("Not enough gas").title,/funds/);assert.match(recoveryAdvice("Price moved more than 1%").steps.join(" "),/worse execution price/);assert.match(recoveryAdvice("Unknown error").steps.join(" "),/status is unknown/);});

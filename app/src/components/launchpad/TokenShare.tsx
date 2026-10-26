@@ -1,5 +1,6 @@
 "use client";
 
+import CreatorKit from "./CreatorKit";
 import { useEffect, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import { Copy, Download, Share2, X } from "lucide-react";
@@ -168,6 +169,7 @@ export default function TokenShare({
               <Download size={14} />
               {busy ? "Preparing share card…" : "Download share card"}
             </button>
+            {open && url ? <CreatorKit key={`${chain}:${token}`} chain={chain} token={token} name={name} symbol={symbol} url={url} qr={qr} /> : null}
             <p role="status" className="mt-2 min-h-8 text-xs leading-relaxed text-muted">
               {message || "Scan to open this token, or download its image card to share."}
             </p>
