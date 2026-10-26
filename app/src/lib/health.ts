@@ -20,6 +20,8 @@ export type HealthInput = {
   /** additional chains (first one goes in `sync` for backwards compatibility) */
   chains?: SyncHealthInput[];
   lagAlertBlocks?: LagAlertBlocks;
+  now?: number;
+  staleAfterMs?: number;
 };
 
 export type HealthBody = {
@@ -29,11 +31,12 @@ export type HealthBody = {
   launchpad: boolean;
   uploads: boolean;
   sync: { cursor_block: number | null; head_block: number | null; lag_blocks: number | null; last_run_at: string | null; last_error: string | null };
-  chains: { chain: string; cursor_block: number | null; head_block: number | null; lag_blocks: number | null; last_error: string | null }[];
+  chains: { chain: string; cursor_block: number | null; head_block: number | null; lag_blocks: number | null; last_run_at: string | null; delayed: boolean; last_error: string | null }[];
   alerts: string[];
 };
 
 export const DEFAULT_LAG_ALERT_BLOCKS = 200;
+export const DEFAULT_STALE_AFTER_MS = 10 * 60 * 1000;
 
 export function lagBlocks(head: number | null, cursor: number | null): number | null {
   if (head === null || cursor === null) return null;
@@ -54,8 +57,18 @@ export function healthBody(i: HealthInput): { status: number; body: HealthBody }
   if (i.dbConfigured && !i.dbOk) alerts.push("db_unreachable");
   if (i.uploads === false) alerts.push("image_uploads_off");
   const all = i.chains ?? (i.sync ? [i.sync] : []);
-  const chains = all.map((c) => ({ chain: c.chain ?? DEFAULT_CHAIN, cursor_block: c.cursor_block, head_block: c.head_block, lag_blocks: lagBlocks(c.head_block, c.cursor_block), last_error: c.last_error }));
+  const now = i.now ?? Date.now();
+  const stale = (c: SyncHealthInput) => {
+    const time = c.last_run_at ? Date.parse(c.last_run_at) : NaN;
+    return !Number.isFinite(time) || now - time > (i.staleAfterMs ?? DEFAULT_STALE_AFTER_MS);
+  };
+  const chains = all.map((c) => {
+    const chain = c.chain ?? DEFAULT_CHAIN;
+    const lag = lagBlocks(c.head_block, c.cursor_block);
+    return { chain, cursor_block: c.cursor_block, head_block: c.head_block, lag_blocks: lag, last_run_at: c.last_run_at, delayed: stale(c) || lag === null || lag > lagLimitFor(chain) || Boolean(c.last_error), last_error: c.last_error };
+  });
   if (i.dbConfigured && i.dbOk && i.launchpad) {
+    if (all.some(stale)) alerts.push("sync_stale");
     for (const c of chains) {
       if (c.lag_blocks !== null && c.lag_blocks > lagLimitFor(c.chain) && !alerts.includes("sync_lag")) alerts.push("sync_lag");
       if (c.last_error && !alerts.includes("sync_error")) alerts.push("sync_error");

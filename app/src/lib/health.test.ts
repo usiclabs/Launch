@@ -6,7 +6,7 @@ const base = { dbConfigured: true, dbOk: true, chain: true, launchpad: true, upl
 const sync = (o: Partial<{ cursor_block: number | null; head_block: number | null; last_run_at: string | null; last_error: string | null }> = {}) => ({
   cursor_block: 100,
   head_block: 110,
-  last_run_at: "2026-09-06T00:00:00.000Z",
+  last_run_at: new Date().toISOString(),
   last_error: null,
   ...o,
 });
@@ -51,4 +51,22 @@ test("lag beyond limit / last_error → ok:false but 200", () => {
 test("lagBlocks never negative / null-safe", () => {
   assert.equal(lagBlocks(5, 10), 0);
   assert.equal(lagBlocks(null, 10), null);
+});
+
+
+test("stalled indexer alerts even when its stored block gap is small", () => {
+  const now = Date.parse("2026-10-26T00:00:00Z");
+  const r = healthBody({ ...base, now, sync: sync({ last_run_at: "2026-10-25T23:40:00Z" }) });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.ok, false);
+  assert.equal(r.body.chains[0].delayed, true);
+  assert.deepEqual(r.body.alerts, ["sync_stale"]);
+});
+
+test("fresh chains use their own lag limits; missing timestamps cannot look current", () => {
+  const r = healthBody({ ...base, chains: [{ ...sync(), chain: "base" }, { ...sync({ last_run_at: null }), chain: "robinhood" }], lagAlertBlocks: chain => chain === "base" ? 5 : 20 });
+  assert.equal(r.body.chains[0].delayed, true);
+  assert.equal(r.body.chains[1].delayed, true);
+  assert.ok(r.body.alerts.includes("sync_stale"));
+  assert.ok(r.body.alerts.includes("sync_lag"));
 });
