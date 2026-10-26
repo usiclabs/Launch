@@ -6,7 +6,7 @@ import {
 } from "@/lib/launchpad/workspace-tools";
 const KEY = "launch:templates:v1";
 const button =
-  "min-h-11 rounded-xl border border-line px-3 text-xs text-ink transition-colors hover:bg-raised disabled:opacity-40";
+  "min-h-11 rounded-xl border border-line px-3 text-xs text-ink transition-colors hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand motion-reduce:transition-none disabled:opacity-40";
 export default function LaunchTemplates({
   current,
   onApply,
@@ -19,6 +19,7 @@ export default function LaunchTemplates({
   const [templates, setTemplates] = useState<LaunchTemplate[]>([]);
   const [label, setLabel] = useState("");
   const [note, setNote] = useState("");
+  const [deleted, setDeleted] = useState<LaunchTemplate | null>(null);
   const [ready, setReady] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -190,7 +191,7 @@ export default function LaunchTemplates({
                 <button
                   type="button"
                   aria-label={`Delete template ${t.label}`}
-                  onClick={() => persist(templates.filter((_, n) => n !== i))}
+                  onClick={() => { setDeleted(t); persist(templates.filter((_, n) => n !== i)); }}
                   className={button}
                 >
                   Delete
@@ -203,6 +204,7 @@ export default function LaunchTemplates({
           <p className="text-xs text-muted">No saved templates yet.</p>
         )}
       </fieldset>
+      {deleted && <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-raised px-3 py-2"><p className="break-words text-xs text-muted">Removed “{deleted.label}”.</p><button type="button" disabled={disabled || templates.length >= 10} className={button} onClick={() => { persist([deleted, ...templates.filter(t => t.label !== deleted.label)].slice(0,10)); setDeleted(null); }}>Undo delete</button></div>}
       <p role="status" className="mt-2 text-xs leading-relaxed text-muted">
         {note}
       </p>

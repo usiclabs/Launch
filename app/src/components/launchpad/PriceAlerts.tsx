@@ -172,6 +172,10 @@ export default function PriceAlerts() {
             );
             return;
           }
+          if (rules.some(a => a.chain === entry.chain && a.token.toLowerCase() === entry.token.toLowerCase() && a.metric === metric && a.direction === direction && a.target === n)) {
+            setNote("This alert already exists. Rearm it below if it has triggered.");
+            return;
+          }
           persist([
             ...rules,
             {
@@ -185,6 +189,7 @@ export default function PriceAlerts() {
               firedAt: null,
             },
           ]);
+          setTarget("");
         }}
       >
         <label className="text-xs text-muted">
@@ -274,7 +279,7 @@ export default function PriceAlerts() {
               <p className="mt-1 text-xs text-muted">
                 {CHAIN_LABELS[a.chain]} ·{" "}
                 {a.metric === "price" ? "Price" : "Market cap"} {a.direction} $
-                {a.target} · {a.firedAt ? "Triggered" : "Armed"}
+                {a.target} · {a.firedAt ? "Triggered" : "Monitoring"}
               </p>
             </div>
             <div className="flex gap-3">

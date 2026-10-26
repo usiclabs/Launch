@@ -31,7 +31,7 @@ type Fee = {
 };
 type Data = { activity: Activity[]; fees: Fee[]; asOf: number };
 const button =
-  "min-h-11 rounded-xl border border-line px-3 text-xs text-body hover:bg-raised disabled:opacity-40";
+  "min-h-11 rounded-xl border border-line px-3 text-xs text-body hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-40";
 function download(name: string, rows: unknown[][]) {
   const u = URL.createObjectURL(
     new Blob([csv(rows)], { type: "text/csv;charset=utf-8" }),
@@ -53,6 +53,7 @@ export default function CreatorInsights({
 }) {
   const journal = useTransactionJournal(wallet);
   const [data, setData] = useState<Data | null>(null);
+  const [loading,setLoading]=useState(true);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [filter, setFilter] = useState("all");
@@ -61,6 +62,7 @@ export default function CreatorInsights({
     let active = true;
     const c = new AbortController();
     const timer = setTimeout(() => {
+      setLoading(true);
       fetch(`/api/me/analytics?wallet=${wallet}`, {
         signal: AbortSignal.any([c.signal, AbortSignal.timeout(12000)]),
         cache: "no-store",
@@ -75,7 +77,7 @@ export default function CreatorInsights({
         })
         .catch(() => {
           if (active) setFailed(true);
-        });
+        }).finally(() => { if(active)setLoading(false); });
     }, 0);
     return () => {
       active = false;
@@ -177,10 +179,11 @@ export default function CreatorInsights({
           </h2>
           <button
             type="button"
+            disabled={loading}
             onClick={() => setAttempt((a) => a + 1)}
             className={button}
           >
-            Refresh analytics
+            {loading ? "Refreshing…" : "Refresh analytics"}
           </button>
         </div>
         <p className="mt-2 text-xs leading-relaxed text-muted">
@@ -194,6 +197,7 @@ export default function CreatorInsights({
           failed={failed}
           label="Analytics"
         />
+        {loading && <p role="status" className="mt-3 text-xs text-muted">{data ? "Updating your analytics… Previous snapshot remains visible." : "Loading indexed activity and fee collections…"}</p>}
         {failed && (
           <p role="alert" className="text-xs text-warm-ink">
             Analytics could not refresh. Retry above; any existing snapshot
@@ -413,7 +417,7 @@ export default function CreatorInsights({
               <div className="min-w-0">
                 <p className="break-words text-sm text-ink">{t.label}</p>
                 <p className="mt-1 text-[11px] text-muted">
-                  {CHAIN_LABELS[t.chain]} · {t.state} · {t.source} ·{" "}
+                  {CHAIN_LABELS[t.chain]} · {t.state === "pending" ? "Awaiting confirmation" : t.state === "replaced" ? "Replaced or cancelled" : t.state === "reverted" ? "Reverted" : "Confirmed"} · {t.source} ·{" "}
                   {new Date(t.at).toISOString().slice(0, 16).replace("T", " ")}{" "}
                   UTC
                 </p>
