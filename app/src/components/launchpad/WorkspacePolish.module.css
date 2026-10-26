@@ -1,0 +1,102 @@
+.surface {
+  background:
+    radial-gradient(
+      ellipse at 100% 0%,
+      color-mix(in srgb, var(--color-brand) 5%, transparent),
+      transparent 55%
+    ),
+    var(--color-card);
+  box-shadow: var(--surface-lift);
+}
+.surface h1 {
+  max-width: 25ch;
+  text-wrap: balance;
+  letter-spacing: -0.035em;
+}
+.surface > p {
+  max-width: 68ch;
+  line-height: 1.75;
+}
+.surface :is(input, select, textarea),
+.disclosure input {
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.surface :is(input, select, textarea):focus-visible,
+.disclosure input:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+.disclosure {
+  border-radius: 16px;
+  background: var(--color-card);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+.disclosure[open] {
+  border-color: var(--color-line-strong);
+}
+.disclosure summary {
+  align-content: center;
+  line-height: 1.6;
+  list-style-position: outside;
+  margin-left: 16px;
+  padding-block: 8px;
+  transition: color 160ms ease;
+}
+.disclosure summary::marker {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+.disclosure summary:hover {
+  color: var(--color-brand);
+}
+.disclosure summary:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.disclosure > p {
+  max-width: 68ch;
+  line-height: 1.75;
+}
+.status {
+  min-height: 20px;
+  line-height: 1.7;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .surface {
+    animation: settle 240ms ease-out backwards;
+  }
+  .disclosure[open] > p {
+    animation: reveal 180ms ease-out;
+  }
+}
+@keyframes settle {
+  from {
+    opacity: 0.65;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .surface *,
+  .disclosure,
+  .disclosure * {
+    transition: none;
+    animation: none;
+  }
+}
