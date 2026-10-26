@@ -11,7 +11,7 @@ const globals = readFileSync(new URL("../app/globals.css", import.meta.url), "ut
 test("the shared footer preserves navigation and existing public destinations", () => {
   assert.match(layout, /<Footer\s*\/>/);
   assert.doesNotMatch(layout, /<footer\b/);
-  for (const route of ["/", "/launch", "/rules", "/feed", "/me", "/agents", "/llms.txt", "/rules#contracts"]) {
+  for (const route of ["/", "/launch", "/rules", "/feed", "/me", "/agents", "/llms.txt", "/rules#contracts", "/status"]) {
     assert.ok(footer.includes(`"${route}"`), `missing footer route: ${route}`);
   }
   assert.match(footer, /BRAND_GITHUB/);
@@ -25,8 +25,8 @@ test("footer proofs use configured chain addresses without invented status claim
   assert.match(footer, /\{ factory, locker \} = launchpad\(chain\)/);
   assert.match(footer, /factory \? <a href=\{explorerAddress\(chain, factory\)\}/);
   assert.match(footer, /locker \? <a href=\{explorerAddress\(chain, locker\)\}/);
-  assert.match(footer, /Factory not configured/);
-  assert.match(footer, /Locker not configured/);
+  assert.match(footer, /Coming soon/);
+  assert.match(footer, /Not live yet/);
   assert.doesNotMatch(footer, /all systems operational|audited by|uptime|risk.free/i);
 });
 
