@@ -133,3 +133,60 @@
  .description { font-size: 14px; line-height: 1.65; }
 }
 @media (prefers-reduced-motion: reduce) { .progress > span { transition: none; } .primary:hover svg, .sectionLink:hover svg { transform: none; } }
+
+/* The scene is a small stage: depth and movement without blocking the message. */
+.backdrop { background: color-mix(in srgb, var(--color-scrim) 58%, transparent); backdrop-filter: blur(10px) saturate(.8); }
+.panel { border-color: color-mix(in srgb, var(--color-brand) 15%, var(--color-line-strong)); box-shadow: var(--shadow-dialog), 0 0 80px -58px var(--color-brand); }
+.scene { background: radial-gradient(ellipse at 50% 48%, color-mix(in srgb, var(--color-brand) 15%, transparent), transparent 68%), linear-gradient(155deg, var(--color-card), var(--color-paper)); }
+.scene::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; box-shadow: inset 0 1px rgb(255 255 255 / .06), inset 0 -28px 42px -40px var(--color-brand); }
+.sceneGlow { position: absolute; width: 250px; height: 250px; left: calc(50% - 125px); top: calc(50% - 125px); z-index: -1; border-radius: 50%; background: var(--color-brand); opacity: .11; filter: blur(64px); animation: breathe 7s ease-in-out infinite; }
+.sceneSweep { position: absolute; inset: -50% -30%; z-index: -1; pointer-events: none; background: linear-gradient(105deg, transparent 43%, color-mix(in srgb, var(--color-brand) 8%, transparent) 50%, transparent 57%); transform: translateX(-60%); animation: sweep 7s ease-in-out 1s infinite; }
+.sceneIndex { position: absolute; top: 13px; right: 17px; color: var(--color-muted); font-size: 9px; font-variant-numeric: tabular-nums; letter-spacing: .14em; }
+.sceneCaption { right: 70px; }
+.progress { height: 3px; }
+.progress > span { position: relative; box-shadow: 0 0 15px color-mix(in srgb, var(--color-brand) 65%, transparent); }
+.progress > span::after { content: ""; position: absolute; right: 0; top: -2px; width: 7px; height: 7px; border-radius: 50%; background: var(--color-brand); box-shadow: 0 0 12px var(--color-brand); }
+.step { position: relative; }
+.step[aria-current="step"]::before { content: ""; position: absolute; top: 25%; bottom: 25%; left: -14px; width: 2px; border-radius: 2px; background: var(--color-brand); box-shadow: 0 0 12px var(--color-brand); }
+.step:focus-visible, .quiet:focus-visible, .close:focus-visible, .primary:focus-visible, .sectionLink:focus-visible, .finish:focus-visible, .replay:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
+.orbitRing { animation: orbitTilt 16s ease-in-out infinite alternate; }
+.orbitRingInner { animation: orbitTiltReverse 19s ease-in-out infinite alternate; }
+.orbitDot, .orbitDotSecond { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-brand) 12%, transparent), 0 0 20px var(--color-brand); animation: beacon 3.5s ease-in-out infinite; }
+.orbitDotSecond { position: absolute; width: 4px; height: 4px; left: 24px; bottom: 40px; border-radius: 50%; background: var(--color-brand); animation-delay: 1.5s; }
+.coin { position: relative; background: radial-gradient(circle at 38% 25%, color-mix(in srgb, white 24%, var(--color-brand)), var(--color-brand) 55%, color-mix(in srgb, black 28%, var(--color-brand))); box-shadow: inset 0 2px 3px rgb(255 255 255 / .32), inset 0 -6px 9px rgb(0 0 0 / .2), 0 20px 40px -16px var(--color-brand), 0 0 0 8px color-mix(in srgb, var(--color-brand) 8%, transparent); animation: float 5s ease-in-out infinite; }
+.coin::after { content: ""; position: absolute; inset: -13px; border: 1px solid color-mix(in srgb, var(--color-brand) 30%, transparent); border-radius: 50%; animation: halo 5s ease-out infinite; }
+.floatingLabel { animation: appear 450ms 350ms ease both, hoverLabel 5s 1s ease-in-out infinite; }
+.marketPreview, .mechanism, .workspace, .community { filter: drop-shadow(0 16px 18px color-mix(in srgb, var(--color-brand) 8%, transparent)); }
+.marketRow { animation: riseIn 450ms ease both; }
+.marketRow:nth-child(3) { animation-delay: 130ms; }
+.marketRow:nth-child(4) { animation-delay: 260ms; }
+.sparkline path { stroke-dasharray: 120; animation: draw 1100ms 250ms ease-out both; }
+.marketRow:nth-child(3) .sparkline path { animation-delay: 400ms; }
+.marketRow:nth-child(4) .sparkline path { animation-delay: 550ms; }
+.mechanismNode { animation: riseIn 520ms ease both; }
+.mechanismNode:nth-of-type(2) { animation-delay: 330ms; }
+.mechanismNode:nth-of-type(3) { animation-delay: 660ms; }
+.connector { animation: connectorIn 420ms 280ms ease both; }
+.connector:nth-of-type(2) { animation-delay: 610ms; }
+.mechanismNote { animation: appear 400ms 950ms ease both; }
+.workspace { animation: riseIn 480ms ease both; }
+.workspaceRow { animation: riseIn 440ms ease both; }
+.communityCard { animation: riseIn 500ms ease both; }
+.primary { position: relative; overflow: hidden; isolation: isolate; }
+.primary::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 25%, rgb(255 255 255 / .2) 50%, transparent 75%); transform: translateX(-130%); transition: transform 600ms ease; }
+.primary:hover::after, .primary:focus-visible::after { transform: translateX(130%); }
+@keyframes breathe { 50% { opacity: .2; transform: scale(1.2); } }
+@keyframes sweep { 0%, 22% { transform: translateX(-60%); } 45%, 100% { transform: translateX(65%); } }
+@keyframes orbitTilt { to { transform: rotate(12deg) scale(1.04); } }
+@keyframes orbitTiltReverse { to { transform: rotate(-20deg) scale(.96); } }
+@keyframes beacon { 50% { opacity: .45; transform: scale(.72); } }
+@keyframes halo { 0%, 20% { opacity: .6; transform: scale(.88); } 75%, 100% { opacity: 0; transform: scale(1.2); } }
+@keyframes hoverLabel { 50% { translate: 0 -4px; } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(13px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes connectorIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@media (max-width: 639px) { .step[aria-current="step"]::before { left: 18%; right: 18%; top: auto; bottom: 0; width: auto; height: 2px; } .sceneIndex { top: 9px; right: 13px; } }
+@media (prefers-reduced-motion: reduce) {
+  .panel *, .panel *::before, .panel *::after { animation: none !important; transition: none !important; }
+  .sceneSweep { display: none; }
+  .sparkline path { stroke-dashoffset: 0; }
+}

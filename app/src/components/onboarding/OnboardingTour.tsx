@@ -101,7 +101,10 @@ export default function OnboardingTour() {
           <div className={styles.content}>
             <div className={styles.scene} key={`scene-${step}`} aria-hidden="true">
               <span className={styles.grid} />
+              <span className={styles.sceneGlow} />
+              <span className={styles.sceneSweep} />
               <span className={styles.sceneCaption}>LAUNCH / {current.label.toUpperCase()}</span>
+              <span className={styles.sceneIndex}>{String(step + 1).padStart(2, "0")} / 05</span>
               <Scene step={step} />
               <span className={styles.sceneFootnote}>{step === 1 ? "Explore · Follow · Discover" : step === 2 ? "Token → Pool → Locked liquidity" : step === 3 ? "Your launches · Your activity" : step === 4 ? "Build · Share · Connect" : "An open space for your next idea"}</span>
             </div>
@@ -132,7 +135,7 @@ export default function OnboardingTour() {
 function Scene({ step }: { step: number }) {
   if (step === 0) return <div className={styles.orbit}>
     <span className={styles.orbitRing} /><span className={styles.orbitRingInner} />
-    <span className={styles.orbitDot} /><div className={styles.coin}><Mark size={70} /></div>
+    <span className={styles.orbitDot} /><span className={styles.orbitDotSecond} /><div className={styles.coin}><Mark size={70} /></div>
     <span className={styles.floatingLabel}><Rocket size={13} /> Your next idea</span>
   </div>;
   if (step === 1) return <div className={styles.marketPreview}>
