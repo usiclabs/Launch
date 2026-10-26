@@ -174,3 +174,22 @@ test("a cancelled recovery cannot be reported as a successful swap", async () =>
   assert.equal(settlements[0][2], "replaced");
   assert.equal(settlements[0][4], "replacement");
 });
+
+test("repriced recovery syncs the confirmed replacement hash, not the dropped original", async () => {
+  const settlements: unknown[][] = [];
+  const synced: string[] = [];
+  const check = handler("./TransactionRecovery.tsx", "check", {
+    lock: { current: false }, setBusy: () => {}, setMessage: () => {}, config: {},
+    CHAINS: { base: { id: 8453 } },
+    getPublicClient: () => ({ waitForTransactionReceipt: async ({ onReplaced }: { onReplaced: (value: unknown) => void }) => {
+      onReplaced({ reason: "repriced" });
+      return { status: "success", transactionHash: "replacement" };
+    } }),
+    settleTransaction: (...args: unknown[]) => settlements.push(args),
+    fetch: async (url: string) => { synced.push(url); return {}; }, AbortSignal,
+  });
+  await check({ kind: "swap", chain: "base", hash: "original" });
+  assert.equal(settlements[0][2], "confirmed");
+  assert.equal(settlements[0][4], "replacement");
+  assert.deepEqual(synced, ["/api/launch/sync?chain=base&tx=replacement"]);
+});

@@ -39,7 +39,7 @@ export default function TransactionRecovery({ wallet, chain, pendingOnly = false
         if (!token) throw new Error("Launch record unavailable");
       }
       settleTransaction(tx.chain, tx.hash, rc.status === "success" ? "confirmed" : "reverted", token, rc.transactionHash !== tx.hash ? rc.transactionHash : undefined);
-      if (rc.status === "success") await fetch(`/api/launch/sync?chain=${tx.chain}&tx=${tx.hash}`, { method: "POST", signal: AbortSignal.timeout(10_000) }).catch(() => {});
+      if (rc.status === "success") await fetch(`/api/launch/sync?chain=${tx.chain}&tx=${rc.transactionHash}`, { method: "POST", signal: AbortSignal.timeout(10_000) }).catch(() => {});
       setMessage(rc.status === "success" ? "Confirmed on-chain. No new transaction was submitted. Indexed views may take a moment to update." : "This transaction reverted on-chain. Network gas may still have been charged.");
     } catch { setMessage("Confirmation is not available from this RPC yet. Check the original transaction on the explorer before retrying any action."); }
     finally { lock.current = false; setBusy(""); }
