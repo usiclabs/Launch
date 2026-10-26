@@ -15,6 +15,7 @@ export type PaletteItem =
 export type PaletteGroup = { value: string; items: PaletteItem[] };
 
 export const PALETTE_PAGES: ReadonlyArray<{ id: string; label: string; href: string; keywords: string }> = [
+  { id: "page:changelog", label: "Changelog", href: "/changelog", keywords: "updates releases new improvements history product" },
   { id: "page:home", label: "Launchpad", href: "/", keywords: "home market tokens list trending new top" },
   { id: "page:launch", label: "Launch a token", href: "/launch", keywords: "create deploy new token mint start" },
   { id: "page:feed", label: "Posts", href: "/feed", keywords: "community comments social feed conversation" },

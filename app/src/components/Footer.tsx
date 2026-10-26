@@ -12,6 +12,7 @@ const EXPLORE = [
   { href: "/", label: "Launchpad" },
   { href: "/rules", label: "How it works" },
   { href: "/about", label: "About LAUNCH" },
+  { href: "/changelog", label: "Changelog" },
   { href: "/status", label: "Platform status" },
   { href: "/compare", label: "Compare tokens" },
   { href: "/alerts", label: "Watchlist alerts" },

@@ -41,7 +41,7 @@ test("isCanonicalTokenPath rejects bad chains and addresses", () => {
 
 test("static sitemap covers every indexable route and skips /admin and /me", () => {
   const paths = STATIC_SITEMAP_ROUTES.map((r) => r.path);
-  for (const p of ["/", "/launch", "/base", "/robinhood", "/arc", "/feed", "/rules", "/about", "/agents"]) {
+  for (const p of ["/", "/launch", "/base", "/robinhood", "/arc", "/feed", "/rules", "/about", "/agents", "/changelog"]) {
     assert.ok(paths.includes(p), `missing ${p}`);
   }
   assert.ok(!paths.includes("/admin"), "/admin must stay out of the sitemap");
@@ -172,9 +172,9 @@ test("pageMetadata gives a page its own canonical and share card, never the home
   assert.deepEqual(m.alternates, { canonical: "/launch" });
   assert.equal(m.openGraph.url, "/launch");
   assert.equal(m.openGraph.title, "Launch a token for free");
-  assert.equal(m.openGraph.siteName, "openlaunch.lol");
+  assert.equal(m.openGraph.siteName, "LAUNCH");
   assert.equal(m.twitter.title, "Launch a token for free");
-  assert.equal(m.twitter.site, "@openlaunch_lol");
+  assert.equal(m.twitter.site, "@launchxyz");
   // a page's own openGraph drops the inherited file image: the card must name it or previews go blank
   assert.deepEqual(m.openGraph.images.map((i) => i.url), ["/opengraph-image"]);
   assert.deepEqual(m.twitter.images, m.openGraph.images);

@@ -52,6 +52,7 @@ export const STATIC_SITEMAP_ROUTES: StaticRoute[] = [
   { path: "/pairs", changeFrequency: "daily", priority: 0.6 },
   { path: "/rules", changeFrequency: "monthly", priority: 0.6 },
   { path: "/about", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/changelog", changeFrequency: "weekly", priority: 0.5 },
   { path: "/agents", changeFrequency: "monthly", priority: 0.6 },
 ];
 
