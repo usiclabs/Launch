@@ -60,7 +60,6 @@
 .mechanismNode { display: grid; justify-items: center; gap: 10px; color: var(--color-ink); font-size: 10px; }
 .nodeIcon { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 18px; border: 1px solid var(--color-line-strong); background: var(--color-paper); color: var(--color-brand); }
 .connector { margin-top: -22px; color: var(--color-muted); }
-.mechanismNote { position: absolute; bottom: 41px; display: flex; align-items: center; gap: 6px; color: var(--color-muted); font-size: 9px; }
 .workspace { width: min(100% - 40px, 280px); padding: 12px 15px; border: 1px solid var(--color-line-strong); border-radius: 13px; background: var(--color-paper); box-shadow: var(--shadow-card); }
 .workspaceTop { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .walletIcon { display: grid; place-items: center; width: 37px; height: 37px; border: 1px solid var(--color-line); border-radius: 11px; background: var(--color-brand-soft); color: var(--color-brand); }
@@ -95,12 +94,11 @@
   .primary { padding-inline: 14px; gap: 8px; }
   .sceneFootnote { bottom: 9px; }
   .orbit { scale: .9; }
-  .mechanismNote { bottom: 32px; }
   .workspace { padding-block: 9px; }
   .communityCard { padding-block: 13px; }
 }
 @media (max-width: 359px) { .guide { display: none; } .content { padding-inline: 16px; } .title { font-size: 26px; } .count { display: none; } .nodeIcon { width: 58px; height: 58px; } }
-@media (max-height: 740px) and (max-width: 639px) { .scene { height: 150px; } .sceneCaption { top: 8px; font-size: 8px; } .orbit { scale: .7; } .sceneFootnote { font-size: 8px; bottom: 7px; } .marketPreview { scale: .82; padding-top: 5px; } .workspace { scale: .8; } .mechanism { scale: .85; padding-bottom: 0; } .mechanismNote { bottom: -15px; } .community { scale: .9; } .copy { padding-top: 14px; } .reassurance { font-size: 9px; } }
+@media (max-height: 740px) and (max-width: 639px) { .scene { height: 150px; } .sceneCaption { top: 8px; font-size: 8px; } .orbit { scale: .7; } .sceneFootnote { font-size: 8px; bottom: 7px; } .marketPreview { scale: .82; padding-top: 5px; } .workspace { scale: .8; } .mechanism { scale: .85; padding-bottom: 0; } .community { scale: .9; } .copy { padding-top: 14px; } .reassurance { font-size: 9px; } }
 @media (prefers-reduced-motion: reduce) { .panel, .backdrop, .panel *, .panel *::before, .panel *::after { animation: none !important; transition: none !important; } .primary:hover { transform: none; } }
 
 /* A quiet frame, clear hierarchy and controls that remain reachable on small screens. */
@@ -168,7 +166,6 @@
 .mechanismNode:nth-of-type(3) { animation-delay: 660ms; }
 .connector { animation: connectorIn 420ms 280ms ease both; }
 .connector:nth-of-type(2) { animation-delay: 610ms; }
-.mechanismNote { animation: appear 400ms 950ms ease both; }
 .workspace { animation: riseIn 480ms ease both; }
 .workspaceRow { animation: riseIn 440ms ease both; }
 .communityCard { animation: riseIn 500ms ease both; }

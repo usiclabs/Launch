@@ -151,7 +151,6 @@ function Scene({ step }: { step: number }) {
     <div className={styles.mechanismNode}><div className={styles.nodeIcon}><ChartNoAxesCombined size={26} /></div><span>Pool</span></div>
     <span className={styles.connector}><ArrowRight size={16} /></span>
     <div className={styles.mechanismNode}><div className={styles.nodeIcon}><LockKeyhole size={25} /></div><span>Locked</span></div>
-    <div className={styles.mechanismNote}><Check size={13} /> One transaction. Zero platform fee.</div>
   </div>;
   if (step === 3) return <div className={styles.workspace}>
     <div className={styles.workspaceTop}><span className={styles.walletIcon}><Wallet size={22} /></span><div><strong>Your workspace</strong><span>Connected to your next move</span></div></div>
