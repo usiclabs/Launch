@@ -4,9 +4,11 @@ import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
 import { ChainLogo } from "@/components/launchpad/ChainLogo";
 import { checkPlatformToken } from "@/lib/launchpad/platformTokenCheck";
+import { BASE_PUBLIC_ENABLED } from "@/lib/chainPublic";
 export const dynamic = "force-dynamic";
 export default async function TokenCheckPage() {
-  const checks = await Promise.all([checkPlatformToken("base"), checkPlatformToken("robinhood")]);
+  const visibleChains = BASE_PUBLIC_ENABLED ? (["base", "robinhood"] as const) : (["robinhood"] as const);
+  const checks = await Promise.all(visibleChains.map(checkPlatformToken));
   return <main className={`${shell.page} bb-utility`}>
     <SectionIntro eyebrow="Pairing verification" icon={<ShieldCheck />} title="BNKR integration checks" description="Read-only checks of the exact pairing contracts. Liquidity results are discovery candidates, rather than approved trading routes.">
       <Link href="/launch" className={shell.action}><ArrowLeft size={14} aria-hidden="true" />Back to launch</Link>
