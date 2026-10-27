@@ -231,16 +231,10 @@ export default function ChangelogPage() {
             <p className={styles.category}>Core platform</p>
             <h2 id="foundation-title">The foundations remain simple.</h2>
             <p>
-              Launch on Base or Robinhood Chain in one transaction: your token,
-              a Uniswap v4 pool, and an original liquidity position locked
-              permanently. All supply enters the pool at launch. No platform
-              launch fee; network gas applies.
+              Launch on Robinhood Chain in one transaction: your token, a Uniswap v4 pool, and an original liquidity position locked permanently. All supply enters the pool at launch. No platform launch fee; network gas applies. Base is temporarily hidden while its RPC reliability is being resolved.
             </p>
             <p>
-              Token and banner uploads, charts, swaps, token comparison,
-              watchlists, creator fee collection and mobile onboarding support
-              the journey from first visit to managing a launch. Arc remains
-              coming soon.
+              Token and banner uploads, charts, swaps, token comparison, watchlists, creator fee collection and a polished mobile onboarding experience support the journey from first visit to managing a launch. Other networks remain hidden until they are ready.
             </p>
             <Link href="/rules" className={styles.link}>
               Understand the launch mechanics
