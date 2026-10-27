@@ -11,6 +11,30 @@ export const metadata = pageMetadata({
 });
 
 const releases = [
+  {
+    id: "robinhood-first",
+    date: "2026-10-27",
+    label: "October 27, 2026",
+    category: "Network focus",
+    title: "One network, clearly in focus.",
+    summary:
+      "LAUNCH is temporarily focused on Robinhood Chain while Base RPC reliability is being resolved.",
+    updates: [
+      [
+        "Robinhood Chain as the active network",
+        "Base launch options, chain references and homepage labels are hidden for now, so the active experience stays clear and consistent.",
+      ],
+      [
+        "Easy to restore",
+        "Base support remains in the product and can be re-enabled through the existing NEXT_PUBLIC_ENABLE_BASE feature flag when its RPC is ready.",
+      ],
+      [
+        "A more welcoming first visit",
+        "The onboarding flow has been refined with smoother pacing, subtle motion and clearer guidance through the platform.",
+      ],
+    ],
+    links: [{ href: "/", label: "Explore LAUNCH" }],
+  },
   {id: "workspace-portability",date:"2026-10-26",label:"October 26, 2026",category:"Workspace upgrades",title:"More room for your next idea.",summary:"Keep separate launches in progress and carry your saved workspace between devices.",updates:[["Named draft projects","Save up to 10 unfinished launches with token details and settings. Review before replacing your current form and undo project removals. First-buy amounts are cleared and custom pairs need reselecting."],["Workspace backup and restore","Export watchlists, templates, named projects, alerts, discovery views and preferences in one validated file. Review before replacing browser data. Wallet credentials, transaction history and the automatic recovery draft are excluded."],["Release highlights","A dismissible homepage panel links to the changelog. Dismissal is remembered for this release in your browser."]],links:[{href:"/launch",label:"Open draft projects"},{href:"/preferences#workspace-backup",label:"Back up your workspace"}]},
   {
     id: "workspace-and-verification",
@@ -130,9 +154,9 @@ export default function ChangelogPage() {
         </p>
         <div className={styles.heroBottom}>
           <span className={styles.latest}>
-            Latest update <time dateTime="2026-10-26">October 26, 2026</time>
+            Latest update <time dateTime="2026-10-27">October 27, 2026</time>
           </span>
-          <a href="#workspace-portability" className={styles.link}>
+          <a href="#robinhood-first" className={styles.link}>
             Read what’s new <ArrowRight size={15} aria-hidden="true" />
           </a>
         </div>
