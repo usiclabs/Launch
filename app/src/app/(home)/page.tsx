@@ -63,6 +63,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
     <>
       <main className="bb-market bb-mid bb-page relative space-y-6 pb-16 sm:space-y-8">
         <LaunchHero configured={LAUNCHPAD_CONFIGURED} />
+        <nav aria-label="Explore LAUNCH" className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 bb-scroll sm:gap-3">
+          <span className="shrink-0 pr-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Explore</span>
+          <a href="#trending" className="shrink-0 rounded-full border border-line bg-card/70 px-3 py-2 text-xs font-medium text-body transition-[border-color,color,transform] hover:-translate-y-0.5 hover:border-line-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-brand motion-reduce:transition-colors motion-reduce:hover:translate-y-0">Trending tokens <span aria-hidden="true">↗</span></a>
+          <a href="#activity" className="shrink-0 rounded-full border border-line bg-card/70 px-3 py-2 text-xs font-medium text-body transition-[border-color,color,transform] hover:-translate-y-0.5 hover:border-line-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-brand motion-reduce:transition-colors motion-reduce:hover:translate-y-0">Live activity <span aria-hidden="true">↗</span></a>
+          <a href="#token-market" className="shrink-0 rounded-full border border-line bg-card/70 px-3 py-2 text-xs font-medium text-body transition-[border-color,color,transform] hover:-translate-y-0.5 hover:border-line-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-brand motion-reduce:transition-colors motion-reduce:hover:translate-y-0">All launches <span aria-hidden="true">↗</span></a>
+        </nav>
         <RecentTokens />
         {/* what is hot first (names and numbers to act on), then the last half hour as it happens, then every launch */}
         <TrendingStrip initial={trending} serverNow={now} seenKeys={visibleFeed.filter((item) => item.kind === "swap").map(feedKey)} />
