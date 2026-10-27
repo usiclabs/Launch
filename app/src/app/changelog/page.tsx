@@ -18,15 +18,15 @@ const releases = [
     category: "Network focus",
     title: "One network, clearly in focus.",
     summary:
-      "LAUNCH is temporarily focused on Robinhood Chain while Base RPC reliability is being resolved.",
+      "LAUNCH is temporarily focused on Robinhood Chain while network reliability work continues.",
     updates: [
       [
         "Robinhood Chain as the active network",
-        "Base launch options, chain references and homepage labels are hidden for now, so the active experience stays clear and consistent.",
+        "Only the active network appears in launch options, chain references and homepage discovery.",
       ],
       [
         "Easy to restore",
-        "Base support remains in the product and can be re-enabled through the existing NEXT_PUBLIC_ENABLE_BASE feature flag when its RPC is ready.",
+        "Network availability is controlled by the existing NEXT_PUBLIC_ENABLE_BASE feature flag and can be restored when the network is ready.",
       ],
       [
         "A more welcoming first visit",
@@ -231,7 +231,7 @@ export default function ChangelogPage() {
             <p className={styles.category}>Core platform</p>
             <h2 id="foundation-title">The foundations remain simple.</h2>
             <p>
-              Launch on Robinhood Chain in one transaction: your token, a Uniswap v4 pool, and an original liquidity position locked permanently. All supply enters the pool at launch. No platform launch fee; network gas applies. Base is temporarily hidden while its RPC reliability is being resolved.
+              Launch on Robinhood Chain in one transaction: your token, a Uniswap v4 pool, and an original liquidity position locked permanently. All supply enters the pool at launch. No platform launch fee; network gas applies. The active network is temporarily limited to Robinhood Chain.
             </p>
             <p>
               Token and banner uploads, charts, swaps, token comparison, watchlists, creator fee collection and a polished mobile onboarding experience support the journey from first visit to managing a launch. Other networks remain hidden until they are ready.
