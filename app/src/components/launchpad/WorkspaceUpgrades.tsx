@@ -400,10 +400,10 @@ export function ReleaseHighlights() {
           <span className="mr-2 font-semibold text-ink">A clearer way to LAUNCH.</span>
           Refined onboarding and Robinhood Chain discovery are live.
         </p>
-        <Link href="/changelog" onClick={dismiss} className="inline-flex min-h-9 items-center text-xs font-semibold text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-brand">
+        <Link href="/changelog" onClick={dismiss} className="inline-flex min-h-11 items-center text-xs font-semibold text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-brand">
           View changelog <span aria-hidden="true" className="ml-1">↗</span>
         </Link>
-        <button type="button" aria-label="Dismiss release highlights" onClick={dismiss} className="grid min-h-9 min-w-9 place-items-center rounded-lg text-lg leading-none text-muted transition-colors hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:outline-brand">
+        <button type="button" aria-label="Dismiss release highlights" onClick={dismiss} className="grid min-h-11 min-w-11 place-items-center rounded-lg text-lg leading-none text-muted transition-colors hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:outline-brand">
           <span aria-hidden="true">×</span>
         </button>
       </div>
