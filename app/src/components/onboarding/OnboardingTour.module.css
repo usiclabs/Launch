@@ -187,3 +187,29 @@
   .sceneSweep { display: none; }
   .sparkline path { stroke-dashoffset: 0; }
 }
+
+/* Give the launch diagram a sequence rather than three static tiles. */
+.mechanismNode { position: relative; }
+.nodeIcon { position: relative; overflow: hidden; box-shadow: inset 0 1px color-mix(in srgb, white 8%, transparent), 0 14px 28px -22px var(--color-brand); }
+.nodeIcon::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at 50% 110%, color-mix(in srgb, var(--color-brand) 22%, transparent), transparent 70%); opacity: 0; animation: nodeIgnite 650ms ease both; }
+.mechanismNode:nth-of-type(1) .nodeIcon::before { animation-delay: 250ms; }
+.mechanismNode:nth-of-type(2) .nodeIcon::before { animation-delay: 620ms; }
+.mechanismNode:nth-of-type(3) .nodeIcon::before { animation-delay: 990ms; }
+.nodeIcon svg { position: relative; z-index: 1; }
+.connector { position: relative; display: grid; place-items: center; width: 25px; height: 20px; }
+.connector::after { content: ""; position: absolute; width: 4px; height: 4px; left: 0; top: calc(50% - 2px); border-radius: 50%; background: var(--color-brand); box-shadow: 0 0 9px var(--color-brand); animation: signal 800ms 380ms ease-in-out both; }
+.connector:nth-of-type(2)::after { animation-delay: 750ms; }
+.previewSearch { position: relative; box-shadow: 0 7px 24px -18px var(--color-brand); }
+.previewSearch > svg:last-child { color: var(--color-brand); animation: starGlint 600ms 900ms ease both; }
+.marketRow:nth-child(2) .tokenTile { animation: tileLight 550ms 180ms ease both; }
+.marketRow:nth-child(3) .tokenTile { animation: tileLight 550ms 330ms ease both; }
+.marketRow:nth-child(4) .tokenTile { animation: tileLight 550ms 480ms ease both; }
+.workspaceRow svg { transition: transform 180ms ease; }
+.workspace:hover .workspaceRow svg { transform: translateX(2px); }
+.communityCard { transition: border-color 180ms ease, transform 180ms ease, background 180ms ease; }
+.communityCard:hover { border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-line-strong)); background: color-mix(in srgb, var(--color-brand) 5%, var(--color-paper)); transform: translateY(-2px); }
+@keyframes nodeIgnite { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes signal { from { opacity: 0; transform: translateX(0); } 35% { opacity: 1; } to { opacity: 0; transform: translateX(23px); } }
+@keyframes starGlint { from { opacity: .3; transform: scale(.7) rotate(-20deg); } to { opacity: 1; transform: none; } }
+@keyframes tileLight { from { opacity: .4; transform: scale(.9); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .connector::after { display: none; } .nodeIcon::before, .previewSearch > svg:last-child, .tokenTile { animation: none !important; } .communityCard:hover, .workspace:hover .workspaceRow svg { transform: none; } }

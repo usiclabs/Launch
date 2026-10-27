@@ -11,9 +11,9 @@ import styles from "./OnboardingTour.module.css";
 const STORAGE_KEY = "launch:welcome:v1";
 const REPLAY_EVENT = "launch:replay-welcome";
 const STEPS = [
-  { label: "Welcome", eyebrow: "Your idea starts here", title: "Your idea. Your next move.", description: "A place to discover tokens, follow the market and launch something of your own. Get oriented in five short steps.", href: "/rules#launchpad", link: "See how LAUNCH works" },
+  { label: "Welcome", eyebrow: "Your idea starts here", title: "Your idea. Your next move.", description: "Explore the market, shape a token and see how a launch works. Five quick scenes. No wallet needed to look around.", href: "/rules#launchpad", link: "See how LAUNCH works" },
   { label: "Discover", eyebrow: "Find your next move", title: "A market with a pulse.", description: "See what’s trending, follow live trades and filter launches by network. Save tokens to a watchlist that stays on this browser.", href: "/#launches", link: "Explore launches", icon: ChartNoAxesCombined },
-  { label: "Launch", eyebrow: "From an idea to onchain", title: "Make something yours.", description: "Choose your network and pair, add an identity, then review. One transaction creates your token and pool with liquidity locked forever. Zero platform fees; you pay network gas.", href: "/launch", link: "Open the launch form", icon: Rocket },
+  { label: "Launch", eyebrow: "From an idea to onchain", title: "Make something yours.", description: "Choose your network and pair, give your token an identity, then review. One transaction creates the token and pool and locks liquidity forever. No platform fee; you pay gas.", href: "/launch", link: "Open the launch form", icon: Rocket },
   { label: "Your space", eyebrow: "Keep everything in view", title: "One wallet. Your workspace.", description: "Your dashboard brings launches, holdings, trades and claimable fees together. Browse freely first. Connect your wallet when you’re ready to take action.", href: "/me", link: "Visit your dashboard", icon: Wallet },
   { label: "Connect", eyebrow: "More than a launch", title: "Keep the conversation open.", description: "Follow the conversation in Posts, understand the launch mechanics, or build with Agents. Choose where you want to begin.", href: "/feed", link: "Explore community posts", icon: MessagesSquare },
 ] as const;
