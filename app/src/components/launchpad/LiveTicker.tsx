@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useLive } from "./LiveProvider";
 import { ChainLogo } from "./ChainLogo";
-import { CHAIN_LABELS } from "@/lib/chainPublic";
+import { CHAIN_LABELS, PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 import { feedKey, riverUsd } from "@/lib/launchpad/river";
 import { ago } from "@/lib/launchpad/time";
 import styles from "./LiveTicker.module.css";
@@ -17,7 +17,8 @@ import styles from "./LiveTicker.module.css";
 export default function LiveTicker({ className = "" }: { className?: string }) {
   const { live } = useLive();
   // the newest event worth a line: a launch, or a trade of a dollar or more (an unpriced one counts); a quiet feed shows its newest
-  const item = live.feed.find((e) => e.kind === "launch" || e.usd === null || e.usd >= 1) ?? live.feed[0];
+  const visible = live.feed.filter(e => PUBLIC_CHAIN_KEYS.includes(e.chain));
+  const item = visible.find((e) => e.kind === "launch" || e.usd === null || e.usd >= 1) ?? visible[0];
   if (!item) return null;
   const chain = CHAIN_LABELS[item.chain];
   const kind = item.kind === "launch" ? "launch" : item.is_buy ? "buy" : "sell";

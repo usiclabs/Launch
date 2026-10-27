@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type PointerEvent } from "react";
 import { Pause, Play, ArrowUpRight, LockKeyhole } from "lucide-react";
 import { launchpad } from "@/lib/launchpad/config";
-import { CHAIN_KEYS, CHAIN_SHORT, explorerAddress } from "@/lib/chainPublic";
+import { PUBLIC_CHAIN_KEYS, CHAIN_SHORT, explorerAddress } from "@/lib/chainPublic";
 import { shouldAnimateLaunch } from "@/lib/launchpad/hero-animation";
 import styles from "./LaunchMachine.module.css";
 
@@ -74,7 +74,7 @@ export default function LaunchMachine({ coin = null, eyebrow }: { coin?: { key: 
     if (scene.current) scene.current.style.transform = `perspective(1000px) rotateX(${-y * 5}deg) rotateY(${x * 7}deg)`;
   }
 
-  const lockers = CHAIN_KEYS.flatMap((k) => { const locker = launchpad(k).locker; return locker ? [{ chain: k, locker }] : []; });
+  const lockers = PUBLIC_CHAIN_KEYS.flatMap((k) => { const locker = launchpad(k).locker; return locker ? [{ chain: k, locker }] : []; });
 
   return <div ref={root} className={styles.machine} data-stage={stage} data-loop={looping} data-playing={playing}>
     <div className={styles.heading}>

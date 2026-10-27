@@ -23,6 +23,7 @@ import WhyFree from "@/components/launchpad/WhyFree";
 import { MagicCard } from "@/components/vendor/magic-card";
 import { LAYOUT_COOKIE, parseLayout } from "@/lib/launchpad/list-layout";
 import { MARKET_COOKIE, parseMarketPreferences } from "@/lib/launchpad/market-preferences";
+import { BASE_PUBLIC_ENABLED } from "@/lib/chainPublic";
 
 export const dynamic = "force-dynamic";
 // Title and description come from the root layout; ?sort= / ?chain= / ?window= / ?view= are all this one page.
@@ -40,20 +41,22 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   const sp = hasSelection || !saved ? requested : { sort: saved.sort, window: saved.window, chain: saved.chain ?? undefined, filter: saved.filter ?? undefined, view: undefined };
   const sort = parseSort(sp.sort, "live");
   const window: VolumeWindow = VOLUME_WINDOWS.includes(sp.window as VolumeWindow) ? (sp.window as VolumeWindow) : "all";
-  const chain = visibleChainOr(sp.chain);
-  const filter = isFilter(sp.filter) ? sp.filter : null;
+  const chain = BASE_PUBLIC_ENABLED ? visibleChainOr(sp.chain) : "robinhood";
+  const filter = BASE_PUBLIC_ENABLED && isFilter(sp.filter) ? sp.filter : null;
   const usd = await ethUsd();
   const layout = parseLayout(jar.get(LAYOUT_COOKIE)?.value);
   const listOpts = { sort, window, chain, filter, limit: PAGE_SIZE, ethUsd: usd };
   const [page, feed, fresh, posts, fetchedTrending, boost] = await Promise.all([
     listLaunchesPage(listOpts),
     getLaunchFeed(RIVER_SEED, usd),
-    listLaunchesPage({ sort: "new", limit: JUST_LAUNCHED_SIZE, ethUsd: usd }),
+    listLaunchesPage({ sort: "new", chain, limit: JUST_LAUNCHED_SIZE, ethUsd: usd }),
     listFeed(30),
-    isTrendingSource(listOpts) ? null : getTrending(usd),
-    boostLaneOrNull(usd),
+    isTrendingSource(listOpts) ? null : getTrending(usd, chain),
+    BASE_PUBLIC_ENABLED ? boostLaneOrNull(usd) : null,
   ]);
   const trending = await withBoardTape(fetchedTrending ?? trendingFrom(page.items)); // the default view's first page doubles as the strip's candidates; the tapes are the cards' recent trades
+  const visibleFeed = BASE_PUBLIC_ENABLED ? feed : feed.filter(item => item.chain === "robinhood");
+  const visiblePosts = BASE_PUBLIC_ENABLED ? posts : posts.filter(post => post.chain === "robinhood");
   const now = nowMs();
 
   return (
@@ -62,16 +65,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         <LaunchHero configured={LAUNCHPAD_CONFIGURED} />
         <RecentTokens />
         {/* what is hot first (names and numbers to act on), then the last half hour as it happens, then every launch */}
-        <TrendingStrip initial={trending} serverNow={now} seenKeys={feed.filter((item) => item.kind === "swap").map(feedKey)} />
+        <TrendingStrip initial={trending} serverNow={now} seenKeys={visibleFeed.filter((item) => item.kind === "swap").map(feedKey)} />
         {/* paid and labelled, after the facts-only board and never inside it (boost.ts); nothing while BOOST is off */}
-        <BoostedLane initial={boost ?? { enabled: false }} serverNow={now} source="home" />
-        <LiveRiver initial={feed.filter((item) => inRiverWindow(item, now))} recent={feed} serverNow={now} coveredSince={riverCoverage(feed, RIVER_SEED, now)} lastActivityAt={feed[0] ? new Date(feed[0].at).getTime() : 0} />
+        {BASE_PUBLIC_ENABLED ? <BoostedLane initial={boost ?? { enabled: false }} serverNow={now} source="home" /> : null}
+        <LiveRiver initial={visibleFeed.filter((item) => inRiverWindow(item, now))} recent={visibleFeed} serverNow={now} coveredSince={riverCoverage(visibleFeed, RIVER_SEED, now)} lastActivityAt={visibleFeed[0] ? new Date(visibleFeed[0].at).getTime() : 0} />
         <div id="token-market" className="scroll-mt-24 grid items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_19rem]">
           <MagicCard className="min-w-0 rounded-2xl"><LaunchList frame="rounded-[inherit]" initial={page.items} initialHasMore={page.hasMore} initialSort={sort} initialWindow={window} initialChain={chain} initialFilter={filter} initialView={sp.view === "watchlist" ? "watchlist" : "market"} initialLayout={layout} hasDb={dbConfigured()} serverNow={now} /></MagicCard>
           <aside aria-label="New launches and community" className="grid min-w-0 gap-4 md:grid-cols-2 xl:sticky xl:top-24 xl:grid-cols-1">
             <JustLaunched initial={fresh.items} serverNow={now} />
             <div className="min-w-0 space-y-4">
-              <PostsFeed initial={posts} compact />
+              <PostsFeed initial={visiblePosts} compact />
               <WhyFree />
             </div>
           </aside>

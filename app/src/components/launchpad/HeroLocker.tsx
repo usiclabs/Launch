@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import LaunchMachine from "./LaunchMachine";
 import { useLive } from "./LiveProvider";
-import { CHAIN_LABELS } from "@/lib/chainPublic";
+import { CHAIN_LABELS, PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 import { feedKey } from "@/lib/launchpad/river";
 import { coinActive, pickLaunch, type CoinReaction, COIN_LIFE_MS } from "@/lib/launchpad/hero-coin";
 
@@ -19,7 +19,7 @@ export default function HeroLocker({ imageBase }: { imageBase: string | null }) 
   if (seen.current === null) seen.current = new Set(live.feed.filter((item) => item.kind === "launch").map(feedKey));
   const [reaction, setReaction] = useState<CoinReaction | null>(null);
   useEffect(() => subscribe((data) => {
-    const picked = pickLaunch(data.feed, seen.current ?? new Set(), data.at, imageBase);
+    const picked = pickLaunch(data.feed.filter(item => PUBLIC_CHAIN_KEYS.includes(item.chain)), seen.current ?? new Set(), data.at, imageBase);
     seen.current = picked.seen;
     setReaction((cur) => picked.reaction ?? (cur && data.at - cur.since >= COIN_LIFE_MS ? null : cur));
   }), [subscribe, imageBase]);

@@ -1,4 +1,5 @@
 "use client";
+import { PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -50,13 +51,13 @@ export default function JustLaunched({ initial, serverNow }: { initial: L[]; ser
       controller?.abort();
       const c = new AbortController();
       controller = c;
-      fetch(`/api/launch/list?sort=new&limit=${JUST_LAUNCHED_SIZE}`, { cache: "no-store", signal: c.signal })
+      fetch(`/api/launch/list?sort=new&limit=${JUST_LAUNCHED_SIZE}${PUBLIC_CHAIN_KEYS.length === 1 ? `&chain=${PUBLIC_CHAIN_KEYS[0]}` : ""}`, { cache: "no-store", signal: c.signal })
         .then(async (res) => {
           if (!res.ok) return;
           const data = await res.json() as { launches?: L[] };
           if (c.signal.aborted || !Array.isArray(data.launches)) return;
-          shown.current = data.launches;
-          setRows(data.launches);
+          shown.current = data.launches.filter(row => PUBLIC_CHAIN_KEYS.includes(row.chain));
+          setRows(shown.current);
         })
         .catch(() => { /* keep the last rows; the next event retries */ });
     }

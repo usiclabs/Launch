@@ -6,7 +6,7 @@ import { useLive } from "./LiveProvider";
 import LiveNumber, { COMPACT_USD } from "../LiveNumber";
 import { fmtUsd } from "@/lib/launchpad/math";
 import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
-import { CHAIN_KEYS, CHAIN_LABELS, chainList } from "@/lib/chainPublic";
+import { PUBLIC_CHAIN_KEYS, CHAIN_LABELS } from "@/lib/chainPublic";
 import styles from "./LaunchMechanism.module.css";
 
 /** Characters in a grouped count such as "114,839". Counted by hand so the server and the browser always agree. */
@@ -40,16 +40,16 @@ export default function LaunchMechanism() {
   return <section aria-label="Network totals" className={styles.panel}>
     <dl className={styles.readings}>
       <Reading lead label="Trades" note="buys and sells, all on-chain" chars={countChars(t.trades)}>{count(t.trades)}</Reading>
-      <Reading label="Tokens launched" note={`on ${chainList("&", CHAIN_LABELS)}`} chars={countChars(t.launches)}>{count(t.launches)}</Reading>
+      <Reading label="Tokens launched" note="all-time platform activity" chars={countChars(t.launches)}>{count(t.launches)}</Reading>
       <Reading label="All-time volume" note="through Uniswap v4 pools" title={usdTitle(t.volume_usd, "quote volume")} chars={usdChars}>{usd(t.volume_usd, true)}</Reading>
       <Reading label="Fees to recipients" note="to the wallets creators chose" title={usdTitle(t.fees_to_creators_usd, "quote-asset fees")} tone="up" chars={usdChars}>{usd(t.fees_to_creators_usd, true)}</Reading>
       {/* plain text, not a roller: this reading never changes, and the strut in the stylesheet already puts it on its neighbours' baseline */}
       <Reading label="Platform fee" note="to us, on every chain" tone="brand" chars={2}>$0</Reading>
     </dl>
     <details className={`group ${styles.breakdown}`}>
-      <summary className="-mx-2 flex min-h-11 w-fit cursor-pointer list-none items-center gap-1.5 px-2 text-xs text-muted hover:text-ink lg:min-h-9 [&::-webkit-details-marker]:hidden">The numbers across {chainList("&", CHAIN_LABELS)}<ChevronDown size={13} aria-hidden="true" className="group-open:rotate-180" /></summary>
+      <summary className="-mx-2 flex min-h-11 w-fit cursor-pointer list-none items-center gap-1.5 px-2 text-xs text-muted hover:text-ink lg:min-h-9 [&::-webkit-details-marker]:hidden">All-time platform totals<ChevronDown size={13} aria-hidden="true" className="group-open:rotate-180" /></summary>
       <dl className="grid grid-cols-2 gap-x-5 gap-y-3 border-t border-dashed border-line-strong py-4 text-xs sm:grid-cols-4 lg:grid-cols-[repeat(7,auto)] lg:justify-between">
-        {CHAIN_KEYS.map((k) => <div key={k}><dt className="text-muted">{CHAIN_LABELS[k]} launches</dt><dd className="mt-1 font-mono text-ink tnum">{count(t.by_chain[k]?.launches ?? 0)}</dd></div>)}
+        {PUBLIC_CHAIN_KEYS.map((k) => <div key={k}><dt className="text-muted">{CHAIN_LABELS[k]} launches</dt><dd className="mt-1 font-mono text-ink tnum">{count(t.by_chain[k]?.launches ?? 0)}</dd></div>)}
         <div><dt className="text-muted">All-time trades</dt><dd className="mt-1 font-mono text-ink tnum">{count(t.trades)}</dd></div>
         <div><dt className="text-muted">All-time volume</dt><dd className="mt-1 font-mono text-ink tnum" title={usdNote}>{usd(t.volume_usd)}</dd></div>
         <div><dt className="text-muted">Fees to recipients</dt><dd className="mt-1 font-mono text-up tnum" title={usdNote}>{usd(t.fees_to_creators_usd)}</dd></div>

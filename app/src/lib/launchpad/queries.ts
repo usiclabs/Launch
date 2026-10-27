@@ -812,8 +812,8 @@ export async function withBoardTape(snap: TrendingSnap): Promise<TrendingSnap> {
 }
 
 /** "Hot right now": the top of the live sort, ranked for the strip by lib/launchpad/ranking.ts. */
-export async function getTrending(ethUsd: number | null = null): Promise<TrendingSnap> {
-  const page = await listLaunchesPage({ sort: "live", limit: TRENDING_CANDIDATES, ethUsd });
+export async function getTrending(ethUsd: number | null = null, chain: ChainKey | null = null): Promise<TrendingSnap> {
+  const page = await listLaunchesPage({ sort: "live", chain, limit: TRENDING_CANDIDATES, ethUsd });
   return trendingFrom(page.items);
 }
 

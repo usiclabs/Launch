@@ -1,4 +1,5 @@
 "use client";
+import { PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -286,11 +287,11 @@ export function PostsFeed({ initial, compact = false }: { initial: PostRow[]; co
     () =>
       subscribe((snap) => {
         if (snap.posts) {
-          setPosts(snap.posts);
+          setPosts(compact ? snap.posts.filter(post => PUBLIC_CHAIN_KEYS.includes(post.chain)) : snap.posts);
           setNow(nowMs());
         }
       }),
-    [subscribe],
+    [subscribe, compact],
   );
   // compact (home): last 5 only, collapsible; the choice is remembered per browser
   const [collapsed, setCollapsed] = useState(false);

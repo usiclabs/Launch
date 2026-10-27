@@ -38,7 +38,7 @@ const SORTS: { key: LaunchSort; label: string }[] = [
 ];
 const WINDOWS: VolumeWindow[] = ["1h", "24h", "all"];
 const CHAIN_FILTERS: { key: ChainKey | null; label: string }[] = [
-  { key: null, label: "All chains" },
+  ...(VISIBLE_CHAINS.length > 1 ? [{ key: null, label: "All chains" }] : []),
   ...VISIBLE_CHAINS.map((key) => ({ key, label: CHAIN_SHORT[key] })),
 ];
 const HL_NEW_MS = 60_000;
@@ -263,7 +263,7 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
   const searchResult = remote?.query === nq && remote.chain === chain ? remote : null;
   const searching = Boolean(nq && !searchResult);
   const candidates = nq ? mergeLaunches(rows, searchResult?.rows ?? []) : rows;
-  const shown = candidates.filter((row) => (!chain || row.chain === chain) && matchesFilter(row, filter, now) && (!nq || matchesQuery(row, nq)));
+  const shown = candidates.filter((row) => VISIBLE_CHAINS.includes(row.chain) && (!chain || row.chain === chain) && matchesFilter(row, filter, now) && (!nq || matchesQuery(row, nq)));
   if (nq) shown.sort((a, b) => rankHit(a, nq) - rankHit(b, nq));
   const showWindow = sort === "volume";
   const reset = () => { setQ(""); pick("live", "all", null, null); };
@@ -317,7 +317,7 @@ export default function LaunchList({ initial, initialHasMore = false, initialSor
         <div className={`flex items-start gap-2 ${view === "watchlist" ? "hidden" : ""}`}>
           <SlidersHorizontal aria-hidden="true" size={13} className="mt-3.5 shrink-0 text-muted" />
           <ToggleGroup aria-label="Quick filter" value={filter ? [filter] : []} onValueChange={(values) => pick(sort, window_, chain, (values[0] as LaunchFilter | undefined) ?? null)} variant="chips" className="min-w-0 overflow-x-auto bb-scroll">
-            {FILTERS.filter((f) => filterOnChain(f, chain)).map((f) => <ToggleGroupItem key={f.key} value={f.key} title={f.title} className="min-h-10 px-2.5 text-[11px]">{f.label}</ToggleGroupItem>)}
+            {FILTERS.filter((f) => (!f.chains || f.chains.some(k => VISIBLE_CHAINS.includes(k))) && filterOnChain(f, chain)).map((f) => <ToggleGroupItem key={f.key} value={f.key} title={f.title} className="min-h-10 px-2.5 text-[11px]">{f.label}</ToggleGroupItem>)}
           </ToggleGroup>
         </div>
       </div>

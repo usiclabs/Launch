@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { ArrowUpRight, History } from "lucide-react";
-import { CHAIN_SHORT } from "@/lib/chainPublic";
+import { CHAIN_SHORT, PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 import type { RecentToken } from "@/lib/launchpad/browser-history";
 import { clearRecentTokens, rememberToken, useRecentTokens } from "./useBrowserHistory";
 import TokenAvatar from "./TokenAvatar";
@@ -15,7 +15,8 @@ export function RecordTokenVisit({ chain, token, name, symbol, image }: Omit<Rec
 
 export default function RecentTokens() {
   const history = useRecentTokens();
-  if (!history.ready || !history.items.length) return null;
+  const visible = history.items.filter(item => PUBLIC_CHAIN_KEYS.includes(item.chain));
+  if (!history.ready || !visible.length) return null;
   return (
     <section
       aria-labelledby="recent-tokens-heading"
@@ -31,7 +32,7 @@ export default function RecentTokens() {
         </button>
       </div>
       <ul className="flex gap-2 overflow-x-auto pb-1 bb-scroll" aria-label="Recently viewed tokens">
-        {history.items.map((item) => (
+        {visible.map((item) => (
           <li key={`${item.chain}:${item.token}`} className="w-48 shrink-0">
             <Link
               href={`/t/${item.chain}/${item.token}`}

@@ -1,4 +1,5 @@
 "use client";
+import { PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 
 import Link from "next/link";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -62,7 +63,7 @@ export default function LiveRiver({ initial, recent: seed = initial, serverNow, 
   const tilt = useMotionValue(0);
 
   useEffect(() => subscribe((snap) => {
-    const feed = snap.feed ?? [];
+    const feed = (snap.feed ?? []).filter(item => PUBLIC_CHAIN_KEYS.includes(item.chain));
     const t = Date.now();
     setEntries((cur) => mergeRiver(cur, feed, t));
     setRecent((cur) => mergeRiver(cur, feed, t, BUBBLE_HISTORY_MS));

@@ -14,7 +14,7 @@ import type { LaunchRow } from "@/lib/launchpad/queries";
 import { fmtQuote } from "@/lib/launchpad/math";
 import { marketUsd } from "@/lib/launchpad/market-format";
 import { capDisplay } from "@/lib/launchpad/market-cap";
-import { CHAIN_LABELS, CHAIN_SHORT } from "@/lib/chainPublic";
+import { CHAIN_LABELS, CHAIN_SHORT, PUBLIC_CHAIN_KEYS } from "@/lib/chainPublic";
 import { ago } from "@/lib/launchpad/time";
 import { SNIPER_BLOCKS } from "@/lib/launchpad/holders";
 import { FRESH_HOURS, MIN_STRIP, MIN_TRADERS_1H, MIN_TRADES_1H, stickyKing } from "@/lib/launchpad/ranking";
@@ -141,11 +141,11 @@ export default function TrendingStrip({ initial, serverNow, seenKeys = [] }: { i
   useEffect(() => subscribe((live) => {
     setNow(live.at); // the shared poll is the clock for every "ago" label and every reaction: no timer decides what is shown
     lastAt.current = live.at;
-    const next = live.trending;
+    const next = live.trending ? { ...live.trending, items: live.trending.items.filter(row => PUBLIC_CHAIN_KEYS.includes(row.chain)) } : null;
     if (!next) return;
     // what this poll's trades do to the cards: the tapes and the reactions (trending-live.ts decides, this only draws)
     const onBoard = next.items.slice(0, BOARD_RUNNERS + 2).map(launchKey);
-    const plan = planHits({ feed: live.feed, seen: seen.current ?? new Set(), board: onBoard, at: live.at });
+    const plan = planHits({ feed: live.feed.filter(item => PUBLIC_CHAIN_KEYS.includes(item.chain)), seen: seen.current ?? new Set(), board: onBoard, at: live.at });
     seen.current = plan.seen;
     setCards((cur) => applyPlan(cur, plan, live.at, onBoard));
     // an empty board has no cards, so the mouse can never leave it: drop a hold left over from the board that emptied
