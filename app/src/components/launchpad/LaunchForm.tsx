@@ -35,7 +35,7 @@ import { encodeV4ExactInSingle, type PoolKey } from "@/lib/launchpad/swap";
 import { PLATFORM_TOKEN, TOKEN_PREVIEW } from "@/lib/launchpad/platformToken";
 import { gitlawbLinkedUsd } from "@/lib/launchpad/twig";
 import { parseXHandle } from "@/lib/launchpad/xHandle";
-import { CHAINS, CHAIN_LABELS, CHAIN_KEYS, DEFAULT_CHAIN, chainKeyOf, BUILDER_DATA_SUFFIX, explorerTx, shortAddr, type ChainKey } from "@/lib/chainPublic";
+import { CHAINS, CHAIN_LABELS, PUBLIC_CHAIN_KEYS, DEFAULT_CHAIN, chainKeyOf, BUILDER_DATA_SUFFIX, explorerTx, shortAddr, type ChainKey } from "@/lib/chainPublic";
 import { friendlyError } from "@/lib/errors";
 import { Spinner } from "@/components/Skeleton";
 import { useLaunchDraft } from "./useLaunchDraft";
@@ -297,8 +297,9 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   const draftDetails = useMemo(() => ({ name, symbol, description, image, banner, website, x, chain }), [name, symbol, description, image, banner, website, x, chain]);
   const draft = useLaunchDraft(draftDetails, !inFlight);
   function applyDraft(value: DraftDetails) {
+    const restoredChain = PUBLIC_CHAIN_KEYS.includes(value.chain) ? value.chain : DEFAULT_CHAIN;
     setName(value.name); setSymbol(value.symbol); setDescription(value.description); setImage(value.image); setBanner(value.banner); setWebsite(value.website); setX(value.x);
-    setChain(value.chain); setQuoteKey(launchpad(value.chain).quotes[0].key); setStock(null); setMcapPick(null); setCustomMcap("");
+    setChain(restoredChain); setQuoteKey(launchpad(restoredChain).quotes[0].key); setStock(null); setMcapPick(null); setCustomMcap("");
     setTypedBuyFor(null); setDeclinedNow(true);
     setFeePips(0); setBeneficiary("burn"); setRows([emptyRow()]);
   }
@@ -399,6 +400,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
   const hasRow = (payout: string) => rows.some((r) => r.payout.trim().toLowerCase() === payout.toLowerCase());
 
   async function launch() {
+    if (!PUBLIC_CHAIN_KEYS.includes(chain)) return;
     if (!journal.ready || readTransactions().some(tx => tx.wallet.toLowerCase() === address?.toLowerCase() && tx.chain === chain && tx.kind === "launch" && tx.state === "pending") || submitting.current || inFlight || draft.pending || !draft.ready || TOKEN_PREVIEW || !valid || !address || !cfg.factory || startTick === null) return;
     submitting.current = true;
     setGasEstimate(null);
@@ -630,7 +632,7 @@ export default function LaunchForm({ ethUsd, platformPrices = { base: null, robi
                 <span className="text-xs text-muted">same launch, same rules, on every chain</span>
               </div>
               <div className="grid sm:grid-cols-3 gap-2">
-                {CHAIN_KEYS.map((k) => {
+                {PUBLIC_CHAIN_KEYS.map((k) => {
                   const active = chain === k;
                   const ok = launchpad(k).configured;
                   return (

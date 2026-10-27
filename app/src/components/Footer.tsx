@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUp, ArrowUpRight, FileCode2 } from "lucide-react";
 import { BRAND, BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE, BRAND_X } from "@/lib/brand";
-import { CHAIN_KEYS, CHAIN_LABELS, CHAINS, explorerAddress } from "@/lib/chainPublic";
+import { BASE_PUBLIC_ENABLED, PUBLIC_CHAIN_KEYS, CHAIN_LABELS, CHAINS, explorerAddress } from "@/lib/chainPublic";
 import { hasChainPage, launchpad } from "@/lib/launchpad/config";
 import { chainLandingPath } from "@/lib/chainLanding";
 import Mark from "./launchpad/Mark";
@@ -40,7 +40,7 @@ export default function Footer() {
               Open to your next idea
             </div>
             <h2 className={styles.heading}>Make it yours.<br /><span>Keep it open.</span></h2>
-            <p className={styles.description}>Live on Base and Robinhood Chain. Arc coming soon.<br />No platform cut. You only pay gas.</p>
+            <p className={styles.description}>{BASE_PUBLIC_ENABLED ? "Live on Base and Robinhood Chain. Arc coming soon." : "Live on Robinhood Chain. Arc coming soon."}<br />No platform cut. You only pay gas.</p>
             <Link href="/launch" className={styles.launch}>
               Launch a token <ArrowRight size={17} aria-hidden="true" />
             </Link>
@@ -60,7 +60,7 @@ export default function Footer() {
               <Link href="/rules#contracts" className={styles.verification}>Verify the contracts <ArrowUpRight size={13} aria-hidden="true" /></Link>
             </div>
           </div>
-          {CHAIN_KEYS.map((chain) => {
+          {PUBLIC_CHAIN_KEYS.map((chain) => {
             const { factory, locker } = launchpad(chain);
             return (
               <div className={styles.chain} key={chain}>

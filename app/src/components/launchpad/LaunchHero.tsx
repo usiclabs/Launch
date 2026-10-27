@@ -6,6 +6,7 @@ import HeroCtaLink from "./HeroCtaLink";
 import LiveTicker from "./LiveTicker";
 import { ChainLogoStack } from "./ChainLogo";
 import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
+import { BASE_PUBLIC_ENABLED } from "@/lib/chainPublic";
 import { VISIBLE_CHAINS } from "@/lib/launchpad/config";
 import { coinPicturesEnabled, imagePublicBase } from "@/lib/launchpad/imageStore";
 import { HERO } from "./hero-layout";
@@ -60,7 +61,7 @@ export default function LaunchHero({ configured }: { configured: boolean }) {
               <span className="truncate">Explore tokens</span>
             </Link>
           </div>
-          <p className="mt-4 text-xs leading-relaxed text-muted">Live on Base and Robinhood Chain · Arc coming soon</p>
+          <p className="mt-4 text-xs leading-relaxed text-muted">{BASE_PUBLIC_ENABLED ? "Live on Base and Robinhood Chain · Arc coming soon" : "Live on Robinhood Chain · Arc coming soon"}</p>
           {/* the proofs: three small chips, each one a place to check the claim */}
           <ul className={HERO.proofs}>
             {PUBLIC_SOURCE_VISIBLE && (<li><a href={`${BRAND_GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer" className={proof}><Scale size={14} aria-hidden="true" className="text-muted" />MIT licensed</a></li>)}

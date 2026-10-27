@@ -7,7 +7,7 @@ import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
 import styles from "@/components/sections/RulesGuide.module.css";
 import { launchpad } from "@/lib/launchpad/config";
-import { CHAINS, CHAIN_KEYS, CHAIN_LABELS, explorerAddress } from "@/lib/chainPublic";
+import { BASE_PUBLIC_ENABLED, CHAINS, CHAIN_KEYS, PUBLIC_CHAIN_KEYS, CHAIN_LABELS, explorerAddress } from "@/lib/chainPublic";
 import { BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE } from "@/lib/brand";
 import LaunchMachine from "@/components/launchpad/LaunchMachine";
 import { ChainLogo } from "@/components/launchpad/ChainLogo";
@@ -19,7 +19,7 @@ export const metadata: Metadata = pageMetadata({ path: "/rules", title: "How it 
 
 const STEPS = [
   { title: "Your token is deployed", description: "A plain ERC-20 with EIP-2612 permit. Fixed supply, 1 billion by default. No mint, no pause, no blacklist, no transfer tax, no owner.", value: "1B", label: "default supply" },
-  { title: "A market opens", description: `A Uniswap v4 pool pairs your token with ETH, ${PLATFORM_TOKEN.symbol} on Base and Robinhood Chain, USDG on Robinhood Chain, a tokenized stock (Coinbase stocks on Base, Robinhood Stock Tokens on Robinhood Chain), or USDC on Arc. No hook. The pool starts at the market cap you pick.`, value: "v4", label: "Uniswap pool" },
+  { title: "A market opens", description: `A Uniswap v4 pool pairs your token with ETH, ${PLATFORM_TOKEN.symbol} on Robinhood Chain, USDG on Robinhood Chain, a tokenized stock (Coinbase stocks on Base, Robinhood Stock Tokens on Robinhood Chain), or USDC on Arc. No hook. The pool starts at the market cap you pick.`, value: "v4", label: "Uniswap pool" },
   { title: "The liquidity position is locked", description: "100% of the supply goes into one single-sided position at launch. Its NFT is minted to an ownerless locker that has no function to withdraw, transfer or shrink it. Ever.", value: "100%", label: "deposited at launch" },
   { title: "Fee routing is written in", description: "The trading fee you choose (0%, 1% or 3%) goes 100% to the beneficiaries you name, or is burned if you name none. Fixed at launch, unchangeable.", value: "0 / 1 / 3%", label: "your trading fee" },
 ] as const;
@@ -58,7 +58,7 @@ const VERIFIERS: Record<(typeof CHAIN_KEYS)[number], { name: string; url: (addr:
 export default function RulesPage() {
   return (
     <main className={`${shell.page} ${styles.guide}`}>
-      <SectionIntro eyebrow="The protocol, explained" icon={<BookOpen />} title="How it works" description="One transaction on Base, Robinhood Chain or Arc. Your token, a market, and a permanently locked liquidity position. You only pay gas.">
+      <SectionIntro eyebrow="The protocol, explained" icon={<BookOpen />} title="How it works" description={`${BASE_PUBLIC_ENABLED ? "One transaction on Base, Robinhood Chain or Arc." : "One transaction on Robinhood Chain."} Your token, a market, and a permanently locked liquidity position. You only pay gas.`}>
         <Link href="/launch" className={shell.action}>Launch a token <ArrowRight size={15} aria-hidden="true" /></Link>
         <a href="#contracts" className={shell.textLink}>Verify the contracts <ArrowDown size={14} aria-hidden="true" /></a>
       </SectionIntro>
@@ -137,7 +137,7 @@ export default function RulesPage() {
               <details open><summary>Why is my token under &ldquo;quiet launches&rdquo;?<ChevronDown size={17} aria-hidden="true" /></summary><div><p>The home page ranks by facts, not by launch order. A token is <strong>live</strong> once a wallet other than its launcher has traded it in the last 24 hours; trades in the launch block and the next three blocks (snipe bots) don&apos;t count, and neither do the launcher&apos;s own. Live tokens rank by outside wallets in the last hour, then today, then by their last outside trade. A wallet&apos;s newest launch gets its first hour on the board regardless; after that it sits under quiet launches, one row per wallet, until someone trades it.</p><p>Nothing is hidden: every launch stays in the New tab, in search and in the API. The only way up is a trade from an outside wallet.</p></div></details>
               {boostEnabled() ? <BoostRulesEntry /> : null}
               <details open><summary>What can change after launch?<ChevronDown size={17} aria-hidden="true" /></summary><div><p>Nothing on-chain can be edited after launch: not the name, not the fee, not the beneficiaries. Metadata (image, description, links) is stored by this site and can change; the token itself cannot.</p></div></details>
-              <details open><summary>What is a {PLATFORM_TOKEN.symbol}-quoted pool?<ChevronDown size={17} aria-hidden="true" /></summary><div><p>{PLATFORM_TOKEN.symbol} is the configured pairing token on Base and Robinhood Chain. Buyers pay in {PLATFORM_TOKEN.symbol}, and trading fees are collected in the pool&apos;s quote asset. Fees go to the recipients chosen at launch or are burned when no recipients are named.</p><p>Check the selected chain and quote contract before confirming a transaction. USD estimates are for display only and depend on available market pricing.</p></div></details>
+              <details open><summary>What is a {PLATFORM_TOKEN.symbol}-quoted pool?<ChevronDown size={17} aria-hidden="true" /></summary><div><p>{PLATFORM_TOKEN.symbol} is the configured pairing token on Robinhood Chain. Buyers pay in {PLATFORM_TOKEN.symbol}, and trading fees are collected in the pool&apos;s quote asset. Fees go to the recipients chosen at launch or are burned when no recipients are named.</p><p>Check the selected chain and quote contract before confirming a transaction. USD estimates are for display only and depend on available market pricing.</p></div></details>
               <details open><summary>What should I know about stock-quoted pools?<ChevronDown size={17} aria-hidden="true" /></summary><div><p>Stock-quoted pools use tokenized stocks as the quote asset: Coinbase tokenized stocks (B20) on Base, recognised here only from Coinbase&apos;s official list and priced in dollars where Chainlink publishes an on-chain feed (the others show no dollar price); Robinhood Stock Tokens on Robinhood Chain, recognised only from Robinhood&apos;s own registry.</p><p>Both are securities issued by third parties under Regulation S and are not offered to US persons. Coinbase&apos;s also exclude the UK, Canada, Australia, Singapore and Switzerland. Their issuers can pause transfers or freeze wallets in restricted jurisdictions. Holding or trading them is subject to the issuer&apos;s terms, not ours.</p></div></details>
             </div>
           </section>
@@ -146,7 +146,7 @@ export default function RulesPage() {
             <div className={styles.sectionHeading}><div><p className={styles.eyebrow}><FileCode2 size={14} aria-hidden="true" />The source of truth</p><h2 id="contracts-heading">Don&apos;t take our word for it.</h2></div></div>
             <p className={styles.contractIntro}>Contracts, addresses and source verification. The same contract design on every chain, with chain-specific Uniswap deployments.</p>
             <div className={styles.registry}>
-              {CHAIN_KEYS.map((chain) => {
+              {PUBLIC_CHAIN_KEYS.map((chain) => {
                 const config = launchpad(chain);
                 return <section key={chain} className={styles.network} aria-labelledby={`${chain}-contracts`}>
                   <header><h3 id={`${chain}-contracts`}><ChainLogo chain={chain} size={18} />{CHAIN_LABELS[chain]}</h3><span>Chain ID <strong>{CHAINS[chain].id}</strong></span></header>

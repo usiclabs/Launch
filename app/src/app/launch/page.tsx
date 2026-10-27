@@ -7,13 +7,13 @@ import LaunchForm from "@/components/launchpad/LaunchForm";
 import SectionIntro from "@/components/sections/SectionIntro";
 import { Rocket } from "lucide-react";
 import { ethUsd } from "@/lib/launchpad/ethPrice";
-import { DEFAULT_CHAIN, chainKeyOr, type ChainKey } from "@/lib/chainPublic";
+import { BASE_PUBLIC_ENABLED, DEFAULT_CHAIN, PUBLIC_CHAIN_KEYS, chainKeyOr, type ChainKey } from "@/lib/chainPublic";
 import { CONFIGURED_CHAINS, launchpad } from "@/lib/launchpad/config";
 
 export const metadata: Metadata = pageMetadata({
   path: "/launch",
   title: "Launch a token for free",
-  description: "Deploy a token on Base, Robinhood Chain or Arc with 100% of supply locked as Uniswap v4 liquidity. No platform fee. Gas only.",
+  description: `Deploy a token on ${BASE_PUBLIC_ENABLED ? "Base, Robinhood Chain or Arc" : "Robinhood Chain"} with 100% of supply locked as Uniswap v4 liquidity. No platform fee. Gas only.`,
 });
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 /** The requested chain, unless it has no contracts here: then the first configured one (the default in development, where none may be). */
 function initialChainFor(param: string | undefined): ChainKey {
   const wanted = chainKeyOr(param, DEFAULT_CHAIN);
-  return launchpad(wanted).configured ? wanted : (CONFIGURED_CHAINS[0] ?? wanted);
+  return PUBLIC_CHAIN_KEYS.includes(wanted) && launchpad(wanted).configured ? wanted : (CONFIGURED_CHAINS.find(k => PUBLIC_CHAIN_KEYS.includes(k)) ?? DEFAULT_CHAIN);
 }
 
 export default async function LaunchPage({ searchParams }: { searchParams: Promise<{ chain?: string }> }) {

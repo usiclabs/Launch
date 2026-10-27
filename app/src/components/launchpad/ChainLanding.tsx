@@ -9,7 +9,7 @@ import { boostLaneOrNull } from "@/lib/launchpad/boostServer";
 import { BOOST_CHAIN } from "@/lib/launchpad/boost";
 import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
-import { CHAIN_KEYS, CHAIN_LABELS, CHAINS, EXPLORERS, explorerAddress, type ChainKey } from "@/lib/chainPublic";
+import { PUBLIC_CHAIN_KEYS, CHAIN_LABELS, CHAINS, EXPLORERS, explorerAddress, type ChainKey } from "@/lib/chainPublic";
 import { BRAND } from "@/lib/brand";
 import { CHAIN_LANDING, chainLandingPath } from "@/lib/chainLanding";
 import { hasChainPage, launchpad } from "@/lib/launchpad/config";
@@ -44,7 +44,7 @@ export default async function ChainLanding({ chain }: { chain: ChainKey }) {
   const launches = totals.by_chain[chain].launches;
   const now = nowMs();
   const layout = parseLayout((await cookies()).get(LAYOUT_COOKIE)?.value);
-  const others = CHAIN_KEYS.filter((k) => k !== chain && hasChainPage(k));
+  const others = PUBLIC_CHAIN_KEYS.filter((k) => k !== chain && hasChainPage(k));
 
   return (
     <main className={shell.page}>

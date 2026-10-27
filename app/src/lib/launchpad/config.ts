@@ -1,6 +1,6 @@
 import { isAddress, type Address } from "viem";
 import { PLATFORM_TOKEN } from "./platformToken";
-import { CHAIN_KEYS, SITE_URL, isChainKey, type ChainKey } from "@/lib/chainPublic";
+import { CHAIN_KEYS, PUBLIC_CHAIN_KEYS, SITE_URL, isChainKey, type ChainKey } from "@/lib/chainPublic";
 import { unlistedQuote } from "./unlisted-quote";
 import { GITLAWB_ADDRESS, GITLAWB_ADDRESS_ROBINHOOD, GITLAWB_DECIMALS, GITLAWB_NAME, GITLAWB_SYMBOL } from "./gitlawb";
 import { TWIG_ADDRESS, TWIG_DECIMALS, TWIG_NAME, TWIG_SYMBOL } from "./twig";
@@ -194,14 +194,14 @@ export function launchpad(key: ChainKey): ChainLaunchpad {
 export const CONFIGURED_CHAINS: ChainKey[] = CHAIN_KEYS.filter((k) => CFG[k].configured);
 export const LAUNCHPAD_CONFIGURED = CONFIGURED_CHAINS.length > 0;
 /** Chains offered in wallet switchers and list filters: the configured ones; every chain where none is (local development). */
-export const VISIBLE_CHAINS: ChainKey[] = CONFIGURED_CHAINS.length > 0 ? CONFIGURED_CHAINS : CHAIN_KEYS;
+export const VISIBLE_CHAINS: ChainKey[] = (CONFIGURED_CHAINS.length > 0 ? CONFIGURED_CHAINS : CHAIN_KEYS).filter(k => PUBLIC_CHAIN_KEYS.includes(k));
 /**
  * Chains with a landing page (/base, /robinhood, /arc): configured ones only, never the development fallback
  * above. A page for a chain without contracts has nothing to launch, so every link to one, the sitemap entry
  * and the /t/<chain> redirect go through this.
  */
 export function hasChainPage(key: ChainKey): boolean {
-  return CONFIGURED_CHAINS.includes(key);
+  return CONFIGURED_CHAINS.includes(key) && PUBLIC_CHAIN_KEYS.includes(key);
 }
 /** A `?chain=` param the list may filter by: a visible chain, else null (all chains), so a link to a chain that is not live yet never shows an empty list. */
 export function visibleChainOr(v: unknown): ChainKey | null {

@@ -6,7 +6,10 @@
 const KEYS = ["base", "robinhood", "arc"] as const;
 export type ChainKey = (typeof KEYS)[number];
 export const CHAIN_KEYS: ChainKey[] = [...KEYS];
-export const DEFAULT_CHAIN: ChainKey = "base";
+/** Temporary public rollout switch. Set NEXT_PUBLIC_ENABLE_BASE=true and redeploy to restore Base. */
+export const BASE_PUBLIC_ENABLED = process.env.NEXT_PUBLIC_ENABLE_BASE === "true";
+export const PUBLIC_CHAIN_KEYS: ChainKey[] = CHAIN_KEYS.filter(k => k !== "base" || BASE_PUBLIC_ENABLED);
+export const DEFAULT_CHAIN: ChainKey = BASE_PUBLIC_ENABLED ? "base" : "robinhood";
 
 /** EVM chain ids. chainPublic.test.ts keeps these equal to the viem chain objects. */
 export const CHAIN_IDS: Record<ChainKey, number> = { base: 8453, robinhood: 4663, arc: 5042 };

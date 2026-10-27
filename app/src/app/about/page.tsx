@@ -5,7 +5,7 @@ import { ArrowRight, ArrowUpRight, Info } from "lucide-react";
 import SectionIntro from "@/components/sections/SectionIntro";
 import shell from "@/components/sections/SectionShell.module.css";
 import { BRAND, BRAND_GITHUB, PUBLIC_SOURCE_VISIBLE, BRAND_X } from "@/lib/brand";
-import { CHAIN_KEYS, CHAIN_LABELS, CHAINS } from "@/lib/chainPublic";
+import { BASE_PUBLIC_ENABLED, PUBLIC_CHAIN_KEYS, CHAIN_LABELS, CHAINS } from "@/lib/chainPublic";
 import { chainLandingPath } from "@/lib/chainLanding";
 import { hasChainPage } from "@/lib/launchpad/config";
 
@@ -17,7 +17,7 @@ import { hasChainPage } from "@/lib/launchpad/config";
 export const metadata: Metadata = pageMetadata({
   path: "/about",
   title: `About ${BRAND}`,
-  description: `${BRAND} is a free token launchpad on Base and Robinhood Chain, with Arc coming soon. What it does, who builds it, and which channels are official.`,
+  description: `${BRAND} is a free token launchpad on ${BASE_PUBLIC_ENABLED ? "Base and Robinhood Chain" : "Robinhood Chain"}, with Arc coming soon. What it does, who builds it, and which channels are official.`,
 });
 
 const DIFFERENCES = [
@@ -36,7 +36,7 @@ export default function AboutPage() {
         eyebrow="About"
         icon={<Info />}
         title={`What ${BRAND} is`}
-        description={<>{BRAND} is a free token launchpad. One transaction deploys a fixed-supply ERC-20, opens a Uniswap v4 pool at the market cap you pick and locks 100% of the supply as liquidity, forever. Live on Base and Robinhood Chain. Arc is coming soon.</>}
+        description={<>{BRAND} is a free token launchpad. One transaction deploys a fixed-supply ERC-20, opens a Uniswap v4 pool at the market cap you pick and locks 100% of the supply as liquidity, forever. Live on {BASE_PUBLIC_ENABLED ? "Base and Robinhood Chain" : "Robinhood Chain"}. Arc is coming soon.</>}
       >
         <Link href="/launch" className={shell.action}>Launch a token <ArrowRight size={15} aria-hidden="true" /></Link>
         <Link href="/rules" className={shell.textLink}>How it works <ArrowRight size={14} aria-hidden="true" /></Link>
@@ -56,9 +56,9 @@ export default function AboutPage() {
 
       <section className={`${shell.anchorSection} mt-14`} id="chains" aria-labelledby="chains-heading">
         <h2 id="chains-heading" className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">Where it runs</h2>
-        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">The same launch mechanics run on Base and Robinhood Chain using each network&apos;s Uniswap v4 contracts. Arc support is coming soon. Addresses and verification records are listed on the <Link href="/rules#contracts" className="text-brand underline decoration-line-strong underline-offset-4 hover:text-ink">contracts section</Link> of the how-it-works page.</p>
+        <p className="mt-4 max-w-[40rem] text-base leading-relaxed text-body text-pretty">The same launch mechanics run on {BASE_PUBLIC_ENABLED ? "Base and Robinhood Chain" : "Robinhood Chain"} using each network&apos;s Uniswap v4 contracts. Arc support is coming soon. Addresses and verification records are listed on the <Link href="/rules#contracts" className="text-brand underline decoration-line-strong underline-offset-4 hover:text-ink">contracts section</Link> of the how-it-works page.</p>
         <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-          {CHAIN_KEYS.map((chain) => (
+          {PUBLIC_CHAIN_KEYS.map((chain) => (
             <div key={chain} className="bb-detail-tile rounded-2xl border border-line bg-card p-5">
               <dt className="text-sm font-semibold text-ink">{hasChainPage(chain) ? <Link href={chainLandingPath(chain)} className="hover:text-brand underline decoration-line-strong underline-offset-4">{CHAIN_LABELS[chain]}</Link> : CHAIN_LABELS[chain]}</dt>
               <dd className="mt-1 font-mono text-xs text-muted tnum">Chain ID {CHAINS[chain].id}{!hasChainPage(chain) ? " · Coming soon" : ""}</dd>
