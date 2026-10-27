@@ -1,5 +1,5 @@
 import { PLATFORM_TOKEN } from "@/lib/launchpad/platformToken";
-import { SITE_URL } from "@/lib/chainPublic";
+import { SITE_URL, BASE_PUBLIC_ENABLED } from "@/lib/chainPublic";
 import { launchpad } from "@/lib/launchpad/config";
 import { BRAND } from "@/lib/brand";
 import { boostEnabled } from "@/lib/launchpad/boostServer";
@@ -43,6 +43,41 @@ function verificationLine(label: string, c: { factory: string | null; locker: st
 }
 
 export function GET() {
+  if (!BASE_PUBLIC_ENABLED) {
+    const r = launchpad("robinhood");
+    const body = `# ${BRAND}
+
+> LAUNCH is a zero-fee token launchpad on Robinhood Chain (4663). One transaction deploys a token and locks 100% of its supply in Uniswap v4 liquidity. You pay network gas only.
+
+## Contract verification
+${verificationLine("Robinhood Chain (4663)", r, [
+  ["Blockscout", (address) => `https://robinhoodchain.blockscout.com/address/${address}?tab=contract`],
+  ["Sourcify", (address) => `https://repo.sourcify.dev/4663/${address}`],
+])}
+
+## What a launch does
+1. Deploys a fixed-supply ERC-20 (1,000,000,000; no mint, pause, blacklist, tax or owner).
+2. Opens a Uniswap v4 pool with ETH, ${PLATFORM_TOKEN.symbol} or USDG as quote assets. The pool starts at the selected market cap.
+3. Places 100% of the supply in a single-sided liquidity position held by an ownerless locker.
+4. Sets the trading fee to 0%, 1% or 3%; fees go to the creator's chosen recipients or are burned.
+
+## Launch
+factory.launch((name, symbol, metadataURI, quote, supply=0, startTick, lpFee, salt, recipients))
+The default supply is 1B. startTick 184200 is approximately 10 ETH FDV. USDG uses approximately 391400 for a $10k FDV.
+For ERC-20 quotes, call factory.findSalt(...) before launching.
+Optional metadata: POST ${SITE_URL}/api/launch/meta {chain, launcher, salt, name, symbol, description?, image_url?, website?, x_handle?}.
+
+## API
+- GET  ${SITE_URL}/api/launch/list?chain=robinhood&sort=live|new|mcap|volume|gainers|holders&window=1h|24h|all&limit=50
+- GET  ${SITE_URL}/api/launch/feed
+- GET  ${SITE_URL}/api/launch/meta/<token>
+- POST ${SITE_URL}/api/launch/sync?chain=robinhood&tx=0x…
+- GET  ${SITE_URL}/api/health
+
+Pages: /, /launch, /t/robinhood/<token>, /rules, /agents.
+`;
+    return new Response(body, { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=300" } });
+  }
   const b = launchpad("base");
   const r = launchpad("robinhood");
   const a = launchpad("arc");
