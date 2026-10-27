@@ -373,8 +373,8 @@ export function DraftProjects({
 export function ReleaseHighlights() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
-  const key = "launch:release-seen:v1",
-    release = "workspace-2026-10-26";
+  const key = "launch:release-seen:v1";
+  const release = "experience-2026-10-27";
   useEffect(() => {
     const t = setTimeout(() => {
       try {
@@ -393,40 +393,19 @@ export function ReleaseHighlights() {
   }
   if (!visible || pathname !== "/") return null;
   return (
-    <aside
-      aria-label="What’s new on LAUNCH"
-      className="bb-market bb-mid bb-page pt-5"
-    >
-      <div
-        className={`${styles.surface} flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line p-5`}
-      >
-        <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted">
-            New on LAUNCH
-          </p>
-          <h2 className="mt-1 text-sm font-semibold text-ink">
-            More room for your next idea.
-          </h2>
-          <p className="mt-2 text-xs text-body">
-            Named drafts, workspace backups and release updates.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href="/changelog"
-            onClick={dismiss}
-            className={`${button} inline-flex items-center`}
-          >
-            See what’s new
-          </Link>
-          <button
-            className={button}
-            aria-label="Dismiss release highlights"
-            onClick={dismiss}
-          >
-            Dismiss
-          </button>
-        </div>
+    <aside aria-label="What’s new on LAUNCH" className="bb-market bb-mid bb-page pt-3 sm:pt-4">
+      <div className={`${styles.surface} flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-line bg-card/70 px-3 py-2.5 sm:px-4`}>
+        <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-brand shadow-[0_0_12px_var(--color-glow)]" />
+        <p className="min-w-0 flex-1 text-xs leading-relaxed text-body">
+          <span className="mr-2 font-semibold text-ink">A clearer way to LAUNCH.</span>
+          Refined onboarding and Robinhood Chain discovery are live.
+        </p>
+        <Link href="/changelog" onClick={dismiss} className="inline-flex min-h-9 items-center text-xs font-semibold text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-brand">
+          View changelog <span aria-hidden="true" className="ml-1">↗</span>
+        </Link>
+        <button type="button" aria-label="Dismiss release highlights" onClick={dismiss} className="grid min-h-9 min-w-9 place-items-center rounded-lg text-lg leading-none text-muted transition-colors hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:outline-brand">
+          <span aria-hidden="true">×</span>
+        </button>
       </div>
     </aside>
   );
