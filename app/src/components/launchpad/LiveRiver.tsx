@@ -115,7 +115,7 @@ export default function LiveRiver({ initial, recent: seed = initial, serverNow, 
   const sameToken = hovered ? entries.filter((e) => e.item.kind === "swap" && e.item.token === hovered.item.token && e.item.chain === hovered.item.chain).length : 0;
 
   return (
-    <section ref={section} aria-labelledby="river-heading" className="relative rounded-3xl border border-line bg-card/70 p-4 shadow-card backdrop-blur-xl sm:p-6">
+    <section id="activity" ref={section} aria-labelledby="river-heading" className="relative scroll-mt-24 rounded-3xl border border-line bg-card/70 p-4 shadow-card backdrop-blur-xl sm:p-6">
       <ShineBorder duration={18} />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
