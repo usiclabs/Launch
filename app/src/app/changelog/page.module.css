@@ -298,3 +298,49 @@
     transition: none;
   }
 }
+
+/* Small interaction cues keep the release log feeling responsive without
+   competing with the update content. */
+.card {
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card:hover {
+    border-color: var(--color-line-strong);
+    transform: translateY(-2px);
+  }
+}
+.sidebar nav > a:focus-visible,
+.page a:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 4px;
+}
+@media (max-width: 767px) {
+  .sidebar nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--page-gutter, 0px));
+    padding: 4px 2px 12px;
+    scrollbar-width: none;
+  }
+  .sidebar nav::-webkit-scrollbar {
+    display: none;
+  }
+  .sidebar .navLabel {
+    display: none;
+  }
+  .sidebar nav > a {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
