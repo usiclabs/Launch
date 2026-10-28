@@ -44,7 +44,7 @@ export default function LaunchMechanism() {
       <Reading label="All-time volume" note="through Uniswap v4 pools" title={usdTitle(t.volume_usd, "quote volume")} chars={usdChars}>{usd(t.volume_usd, true)}</Reading>
       <Reading label="Fees to recipients" note="to the wallets creators chose" title={usdTitle(t.fees_to_creators_usd, "quote-asset fees")} tone="up" chars={usdChars}>{usd(t.fees_to_creators_usd, true)}</Reading>
       {/* plain text, not a roller: this reading never changes, and the strut in the stylesheet already puts it on its neighbours' baseline */}
-      <Reading label="Platform fee" note="to us, on every chain" tone="brand" chars={2}>$0</Reading>
+      <Reading label="Platform fee" note="always $0 to LAUNCH" tone="brand" chars={2}>$0</Reading>
     </dl>
     <details className={`group ${styles.breakdown}`}>
       <summary className="-mx-2 flex min-h-11 w-fit cursor-pointer list-none items-center gap-1.5 px-2 text-xs text-muted hover:text-ink lg:min-h-9 [&::-webkit-details-marker]:hidden">All-time platform totals<ChevronDown size={13} aria-hidden="true" className="group-open:rotate-180" /></summary>

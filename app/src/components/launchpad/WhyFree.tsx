@@ -24,7 +24,7 @@ export default function WhyFree() {
           <span className="text-4xl font-bold tracking-tight text-up tnum">$0</span>
           <span className="text-sm font-medium text-ink">platform fee</span>
         </p>
-        <p className="mt-1 text-pretty text-xs leading-relaxed text-muted">On every launch and every trade, on every chain.</p>
+        <p className="mt-1 text-pretty text-xs leading-relaxed text-muted">LAUNCH takes no cut from launches or trades.</p>
 
         {/* where a trading fee goes, as the two shares it can have */}
         <div className="mt-4 rounded-xl border border-line bg-paper/60 p-3">

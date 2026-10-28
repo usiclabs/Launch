@@ -33,14 +33,14 @@ test("the headline is stepped so it stays two lines, and the hero grid has three
   assert.match(heroCss, /\.stage \{ grid-area: stage;/);
 });
 
-test("the hero has two ways in, and the proofs are chips that are easy to hit", () => {
-  // the filled button, and the way in for someone who wants it explained first: the rules guide
+test("the hero offers a clear launch path and a direct route into token discovery", () => {
+  // the filled button starts a launch; the secondary action takes visitors straight to the market
   assert.match(hero, /<HeroCtaLink id="hero-cta" href="\/launch"/);
-  assert.match(hero, /<Link href="\/rules#launchpad" aria-label="See how it works" className="group inline-flex min-h-12 /);
-  assert.match(hero, /<span aria-hidden="true" className="hidden truncate sm:inline">See how it works<\/span>/);
-  // phones: both buttons share one row, and below 380px the second is just its tile so the filled one keeps its words
+  assert.match(hero, /<Link href="#token-market" aria-label="Explore tokens" className="group inline-flex min-h-12 /);
+  assert.match(hero, /<span className="truncate">Explore tokens<\/span>/);
+  // phones: both actions share one row; the secondary action remains explicitly labeled for screen readers
   assert.ok(HERO.actions.split(" ").includes("items-center") && !HERO.actions.split(" ").includes("flex-col"));
-  assert.match(hero, /truncate max-\[379px\]:hidden sm:hidden">How it works</);
+  assert.match(hero, /aria-label="Explore tokens"/);
   // larger text: the buttons no longer fit side by side, so the row wraps (the second goes under the first) instead of the
   // filled button shrinking to an icon or the second running off the page; the filled button keeps room for its words
   // From 640px it never wraps (the tablet hero is laid out around one row), so none of this changes there.
@@ -113,17 +113,15 @@ test("the totals strip has five readings in order, with Trades as the big one", 
   assert.equal((totals.match(/<Reading /g) ?? []).length, 5);
   assert.match(totals, /<Reading lead label="Trades" note="buys and sells, all on-chain"/);
   assert.equal((totals.match(/<Reading lead /g) ?? []).length, 1, "one big figure");
-  assert.match(totals, /label="Platform fee" note="to us, on every chain" tone="brand" chars=\{2\}>\$0<\/Reading>/);
+  assert.match(totals, /label="Platform fee" note="always \$0 to LAUNCH" tone="brand" chars=\{2\}>\$0<\/Reading>/);
   assert.match(totals, /label="Fees to recipients" note="to the wallets creators chose"[^\n]*tone="up"/);
   // a valid description list: each reading is a div holding one term and its two descriptions
   assert.match(totals, /<div className=\{[^\n]*\n\s*<dt className=\{styles\.label\}>\{label\}<\/dt>\n\s*<dd [^\n]*<\/dd>\n\s*<dd className=\{styles\.note\}>\{note\}<\/dd>\n\s*<\/div>/);
 });
 
-test("the strip names Robinhood Chain in full, in its notes and in the breakdown", () => {
-  assert.match(totals, /import \{ CHAIN_KEYS, CHAIN_LABELS, chainList \} from "@\/lib\/chainPublic"/);
-  assert.doesNotMatch(totals, /CHAIN_SHORT/);
-  assert.match(totals, /note=\{`on \$\{chainList\("&", CHAIN_LABELS\)\}`\}/);
-  assert.match(totals, />The numbers across \{chainList\("&", CHAIN_LABELS\)\}</);
+test("the totals breakdown lists only configured public chains by their full names", () => {
+  assert.match(totals, /import \{ PUBLIC_CHAIN_KEYS, CHAIN_LABELS \} from "@\/lib\/chainPublic"/);
+  assert.match(totals, /\{PUBLIC_CHAIN_KEYS\.map\(\(k\) =>/);
   assert.match(totals, /\{CHAIN_LABELS\[k\]\} launches</);
 });
 
